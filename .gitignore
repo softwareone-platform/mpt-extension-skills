@@ -1,0 +1,14 @@
+# IDE - IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Shell script temporaries
+*.swp
+*.swo
+*~
