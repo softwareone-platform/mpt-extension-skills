@@ -1,6 +1,6 @@
 ---
-name: gh-commit-pr
-description: Use this skill when the agent needs to create commits or open/update GitHub pull requests with the gh CLI. Trigger for requests like "commit these changes", "open a PR", "update the PR", or "reply to review comments". Enforce repository-local AGENTS.md rules for commit format, PR title/body format, PR update strategy, review replies, and required comment footer.
+name: swo-gh-commit-pr
+description: Create commits and open or update pull requests when users ask to commit changes, open a PR, update an existing PR, or reply to PR review feedback. Follow repository AGENTS.md policy for commit format, PR title/body format, PR update strategy, and required review-comment footer.
 ---
 
 # GH Commit PR
