@@ -1,0 +1,35 @@
+# Pull Request Guidelines
+
+## Owner
+Sirius Team
+
+## Scope
+
+Applies to:
+ - pull requests in repositories for extensions, tools, and libraries
+
+## Purpose
+Define shared expectations for pull request structure, history, titles, and testing.
+
+## Definitions
+
+- A `release branch` is a branch named `release/*`, where `*` is the release number, for example `release/5`.
+- A repository may contain multiple `release/*` branches.
+- Only one branch is considered the active release branch: the `release/*` branch with the highest release number.
+
+## General Rules
+
+1. Prefer a single commit per pull request by squashing the branch history before merge.
+2. It is acceptable to keep more than one commit in a pull request when the history is intentionally separated, for example:
+ - one commit for refactoring existing code
+ - one commit for the feature or bug fix
+3. Try to keep pull requests small and reviewable. Prefer to keep the total change size under 500 changed lines.
+4. The pull request title must contain the issue number, f.e. MPT-1234.
+5. Prefer using `[HF]` or `[BACKPORT]` markers in pull request titles for pull requests opened against release branches.
+7. For hotfixes and backports, open the pull request for the `main` branch first and then create the corresponding pull request for the release branch.
+8. Keep branch history linear. When updating a branch with the latest changes from `main`, use rebase instead of a merge commit.
+
+GOOD
+```bash
+git pull --rebase origin main
+```
