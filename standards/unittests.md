@@ -60,6 +60,7 @@ GOOD
 )
 def test_validation_payload(a, is_valid_expected):
     result = validate_payload(a)
+
     assert result.is_valid == is_valid_expected
 ```
 6. Use `@pytest.mark.parametrize` when testing multiple permutations of the same behavior.
@@ -113,7 +114,9 @@ GOOD
 ```python
 def test_example():
     param = 1
+
     result = function_under_test(param)
+
     assert result == ["expected_value_1", "expected_value_2"]
     # or whole object
     assert result == expected_result
@@ -153,11 +156,15 @@ def test_outer_function(input_value, is_valid):
 )
 def test_inner_function(input_value, is_valid):
     # Verify the branch where it actually exists.
-    assert inner_function_to_test(input_value) is is_valid
+    result = inner_function_to_test(input_value)
+
+    assert result is is_valid
     
 # Also add a focused test for the outer function behavior.
 def test_outer_function():
-    assert outer_function_to_test(1) is True
+    result = outer_function_to_test(1)
+
+    assert result is True
 ```
 
 10. Do not test private or protected functions or methods directly. Cover them through public behavior instead.
@@ -179,7 +186,9 @@ assert get_timestamp() > 0
 
 GOOD
 ```python
-assert get_timestamp(fixed_time) == expected_value
+result = get_timestamp(fixed_time)
+
+assert result == expected_value
 ```
 
 12. Target unit test coverage above 95% unless a repository documents an explicit exception.

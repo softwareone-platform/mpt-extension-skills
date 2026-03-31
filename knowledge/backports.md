@@ -69,5 +69,5 @@ Before opening the backport pull request, verify that:
 
 ## Related Documents
 
-- `standards/pull-requests.md`
-- `knowledge/build-and-checks.md`
+- [standards/pull-requests.md](../standards/pull-requests.md)
+- [knowledge/build-and-checks.md](./build-and-checks.md)

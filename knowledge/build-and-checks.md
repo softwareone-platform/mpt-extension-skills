@@ -51,6 +51,6 @@ Before considering a change ready, verify that:
 
 ## Related Documents
 
-- `standards/documentation.md`
-- `standards/makefiles.md`
-- `knowledge/make-targets.md`
+- [standards/documentation.md](../standards/documentation.md)
+- [standards/makefiles.md](../standards/makefiles.md)
+- [knowledge/make-targets.md](./make-targets.md)

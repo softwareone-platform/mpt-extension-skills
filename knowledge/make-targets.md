@@ -1,4 +1,4 @@
-# Common Make Targets
+# Shared Marketplace/Extensions Make Targets
 
 ## Purpose
 
@@ -43,6 +43,6 @@ Repositories that support migrations may also expose targets such as:
 
 ## Related Documents
 
-- `standards/makefiles.md`
-- `knowledge/build-and-checks.md`
-- `knowledge/migrations.md`
+- [standards/makefiles.md](../standards/makefiles.md)
+- [knowledge/build-and-checks.md](./build-and-checks.md)
+- [knowledge/migrations.md](./migrations.md)
