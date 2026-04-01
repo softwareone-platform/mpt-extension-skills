@@ -13,7 +13,7 @@ An agent should determine whether the task is primarily about a skill, a shared 
 
 ## Repository Layout
 
-- `README.md`: top-level description of the repository, its purpose, and the current shared standards
+- `README.md`: top-level index for the repository, including links to standards, knowledge, and skills
 - `standards/`: shared engineering standards, practices, and reusable cross-repository knowledge
 - `knowledge/`: shared operational guidance and reusable how-to documentation
 - `skills/*/SKILL.md`: skill definitions for reusable agent workflows
@@ -79,6 +79,7 @@ Treat `knowledge/` as reusable guidance. Repository-specific commands and except
 - `knowledge/build-and-checks.md`: shared build and validation workflow guidance
 - `knowledge/migrations.md`: shared migration workflow guidance
 - `knowledge/backports.md`: shared backport workflow guidance
+- `knowledge/skills_setup.md`: shared skill setup and install workflows
 
 ## Current Skills
 
