@@ -85,6 +85,7 @@ Treat `knowledge/` as reusable guidance. Repository-specific commands and except
 
 - `skills/swo-gh-commit-pr/SKILL.md`: Git commit and GitHub pull request workflow skill
 - `skills/swo-jira-workitem-ops/SKILL.md`: Jira work item operations skill
+- `skills/swo-daily-standup/SKILL.md`: Daily standup summary skill (Done, Doing, Todo, Blockers from JIRA + GitHub)
 
 ## Agent Expectations
 

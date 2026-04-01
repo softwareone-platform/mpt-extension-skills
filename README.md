@@ -10,6 +10,7 @@ Current skills:
 
 - [swo-gh-commit-pr](./skills/swo-gh-commit-pr/SKILL.md): Git commit + GitHub PR workflow skill
 - [swo-jira-workitem-ops](./skills/swo-jira-workitem-ops/SKILL.md): Jira work item operations skill
+- [swo-daily-standup](./skills/swo-daily-standup/SKILL.md): Daily standup summary skill (Done, Doing, Todo, Blockers from JIRA + GitHub)
 
 For prerequisites and setup/install examples, see [knowledge/skills_setup.md](./knowledge/skills_setup.md).
 
