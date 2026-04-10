@@ -41,6 +41,7 @@ Avoid using this directory for:
 
 Current documents in `standards/`:
 
+- [commit-messages.md](./standards/commit-messages.md): shared commit message format with tag, Jira ID, short summary, and required AI-generated description line
 - [documentation.md](./standards/documentation.md): shared repository documentation structure and authoring rules for human readers and AI agents
 - [extensions-best-practices.md](./standards/extensions-best-practices.md): extension architecture and design guidance for isolation, deployability, local development, and reusability
 - [makefiles.md](./standards/makefiles.md): shared `Makefile` structure and expectations for organizing common development commands
