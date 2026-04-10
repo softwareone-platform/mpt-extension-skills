@@ -13,14 +13,14 @@ An agent should determine whether the task is primarily about a skill, a shared 
 
 ## Repository Layout
 
-- `README.md`: top-level index for the repository, including links to standards, knowledge, and skills
+- [README.md](./README.md): top-level index for the repository, including links to standards, knowledge, and skills
 - `standards/`: shared engineering standards, practices, and reusable cross-repository knowledge
 - `knowledge/`: shared operational guidance and reusable how-to documentation
 - `skills/*/SKILL.md`: skill definitions for reusable agent workflows
 
 ## How To Read This Repository
 
-1. Start with `README.md` to understand the repository purpose and the role of `standards/`.
+1. Start with [README.md](./README.md) to understand the repository purpose and the role of `standards/`.
 2. Decide whether the user request is primarily about:
    - using or editing a skill
    - applying or updating a shared standard
@@ -56,6 +56,7 @@ Use `knowledge/` when the task involves:
 
 - building and validating a repository
 - understanding common `make` targets
+- managing dependencies through shared `uv` workflows
 - running checks and tests
 - working with migrations
 - performing a backport
@@ -65,26 +66,27 @@ Treat `knowledge/` as reusable guidance. Repository-specific commands and except
 
 ## Current Standards
 
-- `standards/documentation.md`: repository documentation structure and authoring guidance
-- `standards/extensions-best-practices.md`: extension architecture and local development guidance
-- `standards/makefiles.md`: shared `Makefile` conventions
-- `standards/packages-and-dependencies.md`: Python dependency management rules
-- `standards/pull-requests.md`: pull request workflow and history rules
-- `standards/python-coding.md`: Python coding conventions
-- `standards/unittests.md`: Python unit testing guidelines
+- [documentation.md](./standards/documentation.md): repository documentation structure and authoring guidance
+- [extensions-best-practices.md](./standards/extensions-best-practices.md): extension architecture and local development guidance
+- [makefiles.md](./standards/makefiles.md): shared `Makefile` conventions
+- [packages-and-dependencies.md](./standards/packages-and-dependencies.md): Python dependency management rules
+- [pull-requests.md](./standards/pull-requests.md): pull request workflow and history rules
+- [python-coding.md](./standards/python-coding.md): Python coding conventions
+- [unittests.md](./standards/unittests.md): Python unit testing guidelines
 
 ## Current Knowledge
 
-- `knowledge/make-targets.md`: shared reference for common `make` target meanings
-- `knowledge/build-and-checks.md`: shared build and validation workflow guidance
-- `knowledge/migrations.md`: shared migration workflow guidance
-- `knowledge/backports.md`: shared backport workflow guidance
-- `knowledge/skills_setup.md`: shared skill setup and install workflows
+- [make-targets.md](./knowledge/make-targets.md): shared reference for common `make` target meanings
+- [manage-dependencies.md](./knowledge/manage-dependencies.md): shared dependency-management workflow for repositories that use `uv`
+- [build-and-checks.md](./knowledge/build-and-checks.md): shared build and validation workflow guidance
+- [migrations.md](./knowledge/migrations.md): shared migration workflow guidance
+- [backports.md](./knowledge/backports.md): shared backport workflow guidance
+- [skills_setup.md](./knowledge/skills_setup.md): shared skill setup and install workflows
 
 ## Current Skills
 
-- `skills/swo-gh-commit-pr/SKILL.md`: Git commit and GitHub pull request workflow skill
-- `skills/swo-jira-workitem-ops/SKILL.md`: Jira work item operations skill
+- [swo-gh-commit-pr](./skills/swo-gh-commit-pr/SKILL.md): Git commit and GitHub pull request workflow skill
+- [swo-jira-workitem-ops](./skills/swo-jira-workitem-ops/SKILL.md): Jira work item operations skill
 
 ## Agent Expectations
 

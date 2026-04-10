@@ -61,6 +61,7 @@ Examples:
 
 - how to build and validate a repository
 - how to use common `make` targets
+- how to manage dependencies through the shared `uv` workflow
 - how to run or create migrations
 - how to perform a backport
 - how to execute common development workflows across repositories
@@ -68,6 +69,7 @@ Examples:
 Current documents in `knowledge/`:
 
 - [make-targets.md](./knowledge/make-targets.md): shared reference for common `make` targets and their typical meaning
+- [manage-dependencies.md](./knowledge/manage-dependencies.md): shared dependency-management workflow for repositories that use `uv`
 - [build-and-checks.md](./knowledge/build-and-checks.md): shared guidance for building repositories and validating that checks and tests pass
 - [migrations.md](./knowledge/migrations.md): shared workflow for running, checking, and creating migrations
 - [backports.md](./knowledge/backports.md): shared workflow for backporting changes to the active release branch
