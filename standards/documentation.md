@@ -77,6 +77,7 @@ Recommended document responsibilities:
 - `docs/external-integrations.md`: external systems, integration points, and setup expectations
 - `docs/e2e.md`: end-to-end test setup, execution, and environment requirements
 - `docs/migrations.md`: migration workflow, tooling, and operational guidance
+- `docs/documentation.md`: repository documentation guideline, rules
 
 ## Authoring Guidance
 
