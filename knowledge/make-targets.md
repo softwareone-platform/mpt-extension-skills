@@ -30,6 +30,17 @@ Always prefer the target definitions documented by the target repository.
 - `make shell`: open an application-specific shell, for example a Django shell
 - `make review`: run repository-supported review tooling, if available
 
+## Dependency-Related Targets
+
+Repositories that use `uv` for dependency management may also expose targets such as:
+
+- `make uv-add pkg=<package>`: add a runtime dependency through the repository-supported `uv` workflow
+- `make uv-add-dev pkg=<package>`: add a development dependency through the repository-supported `uv` workflow
+- `make uv-upgrade`: upgrade dependencies and refresh the lock file through the repository-supported `uv` workflow
+- `make uv-upgrade pkg=<package>`: upgrade one dependency and refresh the lock file through the repository-supported `uv` workflow
+
+For the shared dependency workflow and when to prefer these targets over direct `uv` commands, see [knowledge/manage-dependencies.md](./manage-dependencies.md).
+
 ## Migration-Related Targets
 
 Repositories that support migrations may also expose targets such as:
@@ -44,5 +55,6 @@ Repositories that support migrations may also expose targets such as:
 ## Related Documents
 
 - [standards/makefiles.md](../standards/makefiles.md)
+- [knowledge/manage-dependencies.md](./manage-dependencies.md)
 - [knowledge/build-and-checks.md](./build-and-checks.md)
 - [knowledge/migrations.md](./migrations.md)

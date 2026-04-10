@@ -17,6 +17,7 @@ Use this document when you need to:
 This document describes the mandatory local validation workflow that should exist across repositories.
 
 Before creating a commit, make sure `pre-commit` is installed or updated in the local environment.
+If the change includes dependency updates, follow the workflow in [manage-dependencies.md](./manage-dependencies.md) first. Repositories in this family commonly use `uv` through the repository-provided targets described in [make-targets.md](./make-targets.md) instead of ad hoc dependency commands.
 
 ## Typical Validation Flow
 
@@ -53,4 +54,5 @@ Before considering a change ready, verify that:
 
 - [standards/documentation.md](../standards/documentation.md)
 - [standards/makefiles.md](../standards/makefiles.md)
+- [knowledge/manage-dependencies.md](./manage-dependencies.md)
 - [knowledge/make-targets.md](./make-targets.md)

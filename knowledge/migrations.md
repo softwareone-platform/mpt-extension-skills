@@ -90,4 +90,4 @@ make migrate-new-data name=backfill_customer_external_id
 
 ## Related Documents
 
-- make targets description `knowledge/make-targets.md`
+- [make-targets.md](./make-targets.md): shared make targets reference for migration-related commands
