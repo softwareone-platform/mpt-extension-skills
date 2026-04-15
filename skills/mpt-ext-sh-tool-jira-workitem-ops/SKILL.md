@@ -1,5 +1,5 @@
 ---
-name: swo-jira-workitem-ops
+name: mpt-ext-sh-tool-jira-workitem-ops
 description: Read, create, edit, comment, assign, search, and link Jira work items when users request Jira issue operations. Verify auth and project context, enforce assignee safety by default, include AI attribution in generated descriptions/comments, and surface permission or validation blockers clearly.
 ---
 

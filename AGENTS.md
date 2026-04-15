@@ -16,6 +16,7 @@ An agent should determine whether the task is primarily about a skill, a shared 
 - [README.md](./README.md): top-level index for the repository, including links to standards, knowledge, and skills
 - `standards/`: shared engineering standards, practices, and reusable cross-repository knowledge
 - `knowledge/`: shared operational guidance and reusable how-to documentation
+- `docs/`: repository-specific documentation such as installation, distribution, contributing, testing, and documentation guidance
 - `skills/*/SKILL.md`: skill definitions for reusable agent workflows
 
 ## How To Read This Repository
@@ -28,8 +29,11 @@ An agent should determine whether the task is primarily about a skill, a shared 
    - both
 3. If the task is about a specific skill, read only the relevant `SKILL.md` file first.
 4. If the task depends on engineering conventions, read the relevant file from `standards/`.
-5. If the task is about a reusable workflow or how-to process, read the relevant file from `knowledge/`.
-6. Do not load the entire repository by default. Read only the files needed for the current task.
+5. If the task is about a reusable workflow or how-to process, read the relevant file from `knowledge/` or `docs/`, depending on where that workflow is documented.
+6. If the task is about validating this repository or understanding its test commands, read `docs/testing.md`.
+7. If the task is about how to contribute changes in this repository, read `docs/contributing.md`.
+8. If the task is about repository documentation validation or documentation structure in this repository, read `docs/documentation.md`.
+9. Do not load the entire repository by default. Read only the files needed for the current task.
 
 ## How To Use `standards/`
 
@@ -74,6 +78,7 @@ Treat `knowledge/` as reusable guidance. Repository-specific commands and except
 - [packages-and-dependencies.md](./standards/packages-and-dependencies.md): Python dependency management rules
 - [pull-requests.md](./standards/pull-requests.md): pull request workflow and history rules
 - [python-coding.md](./standards/python-coding.md): Python coding conventions
+- [skills.md](./standards/skills.md): shared rules and best practices for writing reusable skills
 - [unittests.md](./standards/unittests.md): Python unit testing guidelines
 
 ## Current Knowledge
@@ -83,12 +88,18 @@ Treat `knowledge/` as reusable guidance. Repository-specific commands and except
 - [build-and-checks.md](./knowledge/build-and-checks.md): shared build and validation workflow guidance
 - [migrations.md](./knowledge/migrations.md): shared migration workflow guidance
 - [backports.md](./knowledge/backports.md): shared backport workflow guidance
-- [skills_setup.md](./knowledge/skills_setup.md): shared skill setup and install workflows
+
+## Repository Docs
+
+- [contributing.md](./docs/contributing.md): repository-specific contribution workflow and links to shared standards
+- [documentation.md](./docs/documentation.md): repository-specific documentation validation rules and local linking requirements
+- [installation.md](./docs/installation.md): how to install and use the shared skills package from this repository
+- [testing.md](./docs/testing.md): repository-specific test and validation commands
 
 ## Current Skills
 
-- [swo-gh-commit-pr](./skills/swo-gh-commit-pr/SKILL.md): Git commit and GitHub pull request workflow skill
-- [swo-jira-workitem-ops](./skills/swo-jira-workitem-ops/SKILL.md): Jira work item operations skill
+- [mpt-ext-sh-workflow-gh-commit-pr](./skills/mpt-ext-sh-workflow-gh-commit-pr/SKILL.md): Git commit and GitHub pull request workflow skill
+- [mpt-ext-sh-tool-jira-workitem-ops](./skills/mpt-ext-sh-tool-jira-workitem-ops/SKILL.md): Jira work item operations skill
 
 ## Agent Expectations
 
