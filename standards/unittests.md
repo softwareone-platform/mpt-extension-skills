@@ -20,32 +20,62 @@ Define general rules for unit test code in Python repositories.
 ## General Rules
 1. Use `pytest` for unit tests.
 2. Write tests as functions, not classes.
-3. Name test files and test functions with the `test_` prefix.
-4. Follow AAA (Arrange, Act, Assert). See the [flake8-aaa documentation](https://flake8-aaa.readthedocs.io/en/stable/index.html).
+3. Do *NOT* use type annotations (PEP 484)
+4. Name test files and test functions with the `test_` prefix.
+5. Do *NOT* write docstrings
+6. Follow AAA (Arrange, Act, Assert). See the [flake8-aaa documentation](https://flake8-aaa.readthedocs.io/en/stable/index.html).
+BAD
+```python
+def test_returns_error_for_invalid_payload():
+    payload = {"name": ""}
+    
+    validate = validate_payload(payload)
+    
+    assert validate.is_valid is False
+```
 
 GOOD
 ```python
 def test_returns_error_for_invalid_payload():
-    # Arrange
     payload = {"name": ""}
     
-    # Act
     result = validate_payload(payload)
     
-    # Assert
     assert result.is_valid is False
 ```
-5. Do not use `if` statements or branching logic inside tests.
 
 BAD
 ```python
-@pytest.mark.parametrize("a", [1, 2])
-def test_validation_payload(a):
-    result = validate_payload(a)
+def test_reverse_shopping() -> None:
+    shopping = ["apples", "bananas", "cabbages"]
+
+    shopping.reverse()
+
+    assert shopping == ["cabbages", "bananas", "apples"]
+
+```
+
+GOOD
+```python
+def test_reverse_shopping() -> None:
+    shopping = ["apples", "bananas", "cabbages"]
+
+    shopping.reverse()  # act
+
+    assert shopping == ["cabbages", "bananas", "apples"]
+```
+
+7. Do not use `if` statements or branching logic inside tests.
+
+BAD
+```python
+@pytest.mark.parametrize("payload", [1, 2])
+def test_validation_payload(payload):
+    result = validate_payload(payload)
     
-    if a == 1:
+    if payload == 1:
         assert result.is_valid
-    elif a == 2:
+    elif payload == 2:
         assert not result.is_valid
 ```
 
@@ -58,16 +88,16 @@ GOOD
         (2, False),
     ],
 )
-def test_validation_payload(a, is_valid_expected):
-    result = validate_payload(a)
+def test_validation_payload(payload, is_valid_expected):
+    result = validate_payload(payload)
 
     assert result.is_valid == is_valid_expected
 ```
-6. Use `@pytest.mark.parametrize` when testing multiple permutations of the same behavior.
-7. Keep the test directory structure aligned with the source code structure.
+7. Use `@pytest.mark.parametrize` when testing multiple permutations of the same behavior.
+8. Keep the test directory structure aligned with the source code structure.
 
 BAD
-```
+```text
 mpt-extension-<name>/
 |-- <name>/ # main code of the extension
     |-- flows/  # definition of flows
@@ -81,7 +111,7 @@ tests/
 ```
 
 GOOD
-```
+```text
 mpt-extension-<name>/
 |-- <name>/ # main code of the extension
      |-- flows/  # definition of flows
@@ -93,7 +123,7 @@ tests/
       |-- test_fulfillment.py  # same module name with test_ prefix
       |-- test_validation.py
 ```
-8. Prefer a single logical assertion per test. If multiple assertions validate one result object, keep them tightly related and easy to read.
+9.Prefer a single logical assertion per test. If multiple assertions validate one result object, keep them tightly related and easy to read.
 
 BAD
 ```python
@@ -123,7 +153,7 @@ def test_example():
     # or
     assert result == {"property_1": "property_1", "property_2": "property_2"}
 ```
-9. Test branches as close as possible to the function where the branch exists.
+10. Test branches as close as possible to the function where the branch exists.
 ```python
 
 def inner_function_to_test(a):
@@ -167,7 +197,7 @@ def test_outer_function():
     assert result is True
 ```
 
-10. Do not test private or protected functions or methods directly. Cover them through public behavior instead.
+11. Do not test private or protected functions or methods directly. Cover them through public behavior instead.
 
 BAD
 ```python
@@ -177,7 +207,7 @@ def test_private_function():
     assert _private_function() is True
 ```
 
-11. Unit tests must be deterministic. They must not depend on current time, randomness, or external state.
+12. Unit tests must be deterministic. They must not depend on current time, randomness, or external state.
 
 BAD
 ```python
@@ -191,8 +221,8 @@ result = get_timestamp(fixed_time)
 assert result == expected_value
 ```
 
-12. Target unit test coverage above 95% unless a repository documents an explicit exception.
-13. Every bugfix MUST have test to reproduce it or changes in existing tests
+13. Target unit test coverage above 95% unless a repository documents an explicit exception.
+14. Every bugfix MUST have test to reproduce it or changes in existing tests
 
 ## Mocking Rules
 1. Do not use `unittest.mock` directly.
