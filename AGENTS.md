@@ -58,6 +58,7 @@ Use `knowledge/` when the task involves:
 - understanding common `make` targets
 - managing dependencies through shared `uv` workflows
 - running checks and tests
+- preparing a repository for commit-time validation such as `pre-commit`
 - working with migrations
 - performing a backport
 - understanding repeatable engineering workflows that are not strict standards

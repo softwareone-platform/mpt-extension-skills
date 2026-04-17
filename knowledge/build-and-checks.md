@@ -17,6 +17,7 @@ Use this document when you need to:
 This document describes the mandatory local validation workflow that should exist across repositories.
 
 Before creating a commit, make sure `pre-commit` is installed or updated in the local environment.
+Treat this as a required preparation step, not an optional cleanup task.
 If the change includes dependency updates, follow the workflow in [manage-dependencies.md](./manage-dependencies.md) first. Repositories in this family commonly use `uv` through the repository-provided targets described in [make-targets.md](./make-targets.md) instead of ad hoc dependency commands.
 
 ## Typical Validation Flow
@@ -42,6 +43,19 @@ Typical expectations:
 
 Before committing changes, make sure `pre-commit` is installed or updated locally.
 
+`pre-commit` hooks run automatically during `git commit`.
+Do not assume the commit step succeeded just because the commit command was started.
+You must review the hook output and confirm that all hooks passed.
+
+If hooks fail or rewrite files:
+
+1. inspect the reported failures or file changes
+2. apply or keep the hook-generated fixes
+3. rerun the relevant checks if needed
+4. retry the commit and confirm the hooks pass cleanly
+
+The commit workflow is not complete until the automatic `pre-commit` run succeeds.
+
 ## What To Verify
 
 Before considering a change ready, verify that:
@@ -49,6 +63,8 @@ Before considering a change ready, verify that:
 - `make build` was executed if `uv.lock` changed
 - `make check-all` passes successfully
 - `pre-commit` is installed or updated before commit
+- the automatic `pre-commit` run triggered by `git commit` was reviewed
+- the automatic `pre-commit` run completed without remaining failures
 
 ## Related Documents
 
