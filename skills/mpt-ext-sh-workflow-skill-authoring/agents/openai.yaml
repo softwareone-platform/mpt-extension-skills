@@ -1,0 +1,4 @@
+interface:
+  display_name: "Skill Authoring"
+  short_description: "Create or update reusable shared skills"
+  default_prompt: "Create or update a reusable shared skill. Classify it as tool, task, or workflow; apply the shared naming and structure rules; keep the skill concise and reusable; add the required agents/openai.yaml adapter; and separate skill-specific behavior from shared standards or knowledge."

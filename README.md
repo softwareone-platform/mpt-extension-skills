@@ -9,6 +9,7 @@ The [skills/](./skills/) directory contains reusable agent skills.
 Current skills:
 
 - [mpt-ext-sh-workflow-gh-commit-pr](./skills/mpt-ext-sh-workflow-gh-commit-pr/SKILL.md): Git commit + GitHub PR workflow skill
+- [mpt-ext-sh-workflow-skill-authoring](./skills/mpt-ext-sh-workflow-skill-authoring/SKILL.md): Shared workflow skill for creating and updating reusable skills
 - [mpt-ext-sh-tool-jira-workitem-ops](./skills/mpt-ext-sh-tool-jira-workitem-ops/SKILL.md): Jira work item operations skill
 
 For installation and package usage, see [docs/installation.md](./docs/installation.md).
