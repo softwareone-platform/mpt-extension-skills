@@ -1,5 +1,5 @@
 ---
-name: swo-gh-commit-pr
+name: mpt-ext-sh-workflow-gh-commit-pr
 description: Create commits and open or update pull requests when users ask to commit changes, open a PR, update an existing PR, or reply to PR review feedback. Follow repository AGENTS.md policy for commit format, PR title/body format, PR update strategy, and required review-comment footer.
 ---
 

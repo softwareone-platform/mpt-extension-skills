@@ -1,0 +1,26 @@
+name: PR and merge check
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  shell-tools:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install shellcheck 0.11.0
+        uses: ludeeus/action-shellcheck@2.0.0
+        with:
+          version: v0.11.0
+          scandir: ./scripts
+
+      - name: Run make checks and tests
+        run: make check-all

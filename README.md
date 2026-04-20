@@ -8,10 +8,10 @@ The [skills/](./skills/) directory contains reusable agent skills.
 
 Current skills:
 
-- [swo-gh-commit-pr](./skills/swo-gh-commit-pr/SKILL.md): Git commit + GitHub PR workflow skill
-- [swo-jira-workitem-ops](./skills/swo-jira-workitem-ops/SKILL.md): Jira work item operations skill
+- [mpt-ext-sh-workflow-gh-commit-pr](./skills/mpt-ext-sh-workflow-gh-commit-pr/SKILL.md): Git commit + GitHub PR workflow skill
+- [mpt-ext-sh-tool-jira-workitem-ops](./skills/mpt-ext-sh-tool-jira-workitem-ops/SKILL.md): Jira work item operations skill
 
-For prerequisites and setup/install examples, see [knowledge/skills_setup.md](./knowledge/skills_setup.md).
+For installation and package usage, see [docs/installation.md](./docs/installation.md).
 
 ## Shared Standards
 
@@ -48,6 +48,7 @@ Current documents in `standards/`:
 - [packages-and-dependencies.md](./standards/packages-and-dependencies.md): shared dependency management rules for Python repositories, including `uv`, lock files, and version pinning strategy
 - [pull-requests.md](./standards/pull-requests.md): shared pull request rules for titles, commit structure, reviewability, testing, and release branch workflows
 - [python-coding.md](./standards/python-coding.md): shared Python coding conventions, including typing, docstrings, linting, and naming expectations
+- [skills.md](./standards/skills.md): shared rules and best practices for writing reusable skills
 - [unittests.md](./standards/unittests.md): Python unit testing guidelines, including test structure, parametrization, determinism, and mocking rules
 
 These standards are intended to be linked from repository-level documentation rather than copied into each repository.
@@ -74,4 +75,10 @@ Current documents in `knowledge/`:
 - [build-and-checks.md](./knowledge/build-and-checks.md): shared guidance for building repositories and validating that checks and tests pass
 - [migrations.md](./knowledge/migrations.md): shared workflow for running, checking, and creating migrations
 - [backports.md](./knowledge/backports.md): shared workflow for backporting changes to the active release branch
-- [skills_setup.md](./knowledge/skills_setup.md): shared skill setup and install workflows
+
+Repository docs in `docs/`:
+
+- [contributing.md](./docs/contributing.md): repository-specific contribution workflow and links to shared standards
+- [documentation.md](./docs/documentation.md): repository-specific documentation validation rules and local linking requirements
+- [installation.md](./docs/installation.md): how to install and use the shared skills package from this repository
+- [testing.md](./docs/testing.md): how to run shell validation and integration tests for this repository
