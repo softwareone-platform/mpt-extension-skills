@@ -54,6 +54,7 @@ This repository exposes the main validation commands through `make`:
 make check
 make test
 make check-all
+make review
 ```
 
 Current commands:
@@ -61,8 +62,34 @@ Current commands:
 - `make check`: runs `shellcheck`
 - `make test`: runs the shell integration tests
 - `make check-all`: runs both validation and tests
+- `make review`: runs the local CodeRabbit review command
 
 Use `make help` to see the available commands.
+
+## Local CodeRabbit Review
+
+To run CodeRabbit locally, install and authenticate the CodeRabbit CLI first.
+
+The official CLI command uses `cr` as the short alias for `coderabbit`.
+
+From the repository root, run:
+
+```bash
+make review
+```
+
+This target runs:
+
+```bash
+coderabbit review
+```
+
+You can pass additional CLI options through `args`:
+
+```bash
+make review args="--plain"
+make review args="--base release/5"
+```
 
 ## CI Validation
 
@@ -81,6 +108,7 @@ The workflow runs:
 - [contributing.md](./contributing.md)
 - [installation.md](./installation.md)
 - [../Makefile](../Makefile)
+- [../make/external_tools.mk](../make/external_tools.mk)
 - [../make/repo.mk](../make/repo.mk)
 - [../scripts/mpt-skills.sh](../scripts/mpt-skills.sh)
 - [../tests/test_mpt_skills.sh](../tests/test_mpt_skills.sh)
