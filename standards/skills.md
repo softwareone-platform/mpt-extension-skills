@@ -54,11 +54,18 @@ Examples:
 17. Avoid deep or ambiguous composition between skills. Keep the execution model easy to understand from reading the skill.
 18. Do not duplicate shared standards or shared operational guidance inside a skill. Link to the relevant document in `standards/` or `knowledge/` instead.
 19. When a skill links to shared `standards/`, `knowledge/`, or package documentation, it must use local installed paths only. Do not rely on GitHub URLs or other remote links for required execution context.
-20. Do not treat repository-specific behavior as reusable truth unless the skill is explicitly intended for that repository or repository family.
-21. Write skills in direct, operational language. Prefer explicit instructions and guardrails over narrative explanation.
-22. State destructive or high-risk actions explicitly. Do not hide them inside vague steps.
-23. Keep examples short, concrete, and directly relevant to the skill.
-24. Add supporting files only when they materially improve reuse, correctness, or maintainability.
+20. When resolving shared package documents at runtime, look in the installed package root:
+
+```text
+${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
+```
+
+Use paths under that root such as `standards/skills.md`, `standards/documentation.md`, `knowledge/...`, or `docs/...` when the skill needs shared guidance from this package.
+21. Do not treat repository-specific behavior as reusable truth unless the skill is explicitly intended for that repository or repository family.
+22. Write skills in direct, operational language. Prefer explicit instructions and guardrails over narrative explanation.
+23. State destructive or high-risk actions explicitly. Do not hide them inside vague steps.
+24. Keep examples short, concrete, and directly relevant to the skill.
+25. Add supporting files only when they materially improve reuse, correctness, or maintainability.
 
 ## Required Structure
 
@@ -167,6 +174,7 @@ The exact headings may vary, but the content should remain explicit and easy to 
 - Use the skill only for the reusable operational behavior that should be applied by an agent.
 - Link to shared documents instead of copying long policy sections into the skill body.
 - Use local package paths when linking shared `standards/`, `knowledge/`, or package documentation from a skill.
+- Resolve shared package links from `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current` unless the task is explicitly working in the source repository.
 - Keep the top-level flow readable without forcing the reader to open many extra files.
 - Use `references/` only for detail that genuinely supports execution.
 - Use `scripts/` when the scripted path is safer or more repeatable than prose instructions alone.
