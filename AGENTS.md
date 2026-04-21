@@ -98,8 +98,8 @@ Treat `knowledge/` as reusable guidance. Repository-specific commands and except
 
 ## Current Skills
 
-- [mpt-ext-sh-workflow-gh-commit-pr](./skills/mpt-ext-sh-workflow-gh-commit-pr/SKILL.md): Git commit and GitHub pull request workflow skill
-- [mpt-ext-sh-tool-jira-workitem-ops](./skills/mpt-ext-sh-tool-jira-workitem-ops/SKILL.md): Jira work item operations skill
+- [mpt-ext-workflow-gh-commit-pr](./skills/mpt-ext-workflow-gh-commit-pr/SKILL.md): Git commit and GitHub pull request workflow skill
+- [mpt-ext-tool-jira-workitem-ops](./skills/mpt-ext-tool-jira-workitem-ops/SKILL.md): Jira work item operations skill
 
 ## Agent Expectations
 

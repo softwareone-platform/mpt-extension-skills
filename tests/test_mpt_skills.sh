@@ -116,8 +116,8 @@ test_install_codex_only() {
   assert_exists "${tmp_root}/store/versions/1.0.0/docs"
   assert_exists "${tmp_root}/store/versions/1.0.0/bin/mpt-skills"
   assert_symlink_target "${tmp_root}/bin/mpt-skills" "${tmp_root}/store/current/bin/mpt-skills"
-  assert_symlink_target "${tmp_root}/codex/skills/mpt-ext-sh-workflow-gh-commit-pr" "${tmp_root}/store/current/skills/mpt-ext-sh-workflow-gh-commit-pr"
-  assert_not_exists "${tmp_root}/claude/skills/mpt-ext-sh-workflow-gh-commit-pr"
+  assert_symlink_target "${tmp_root}/codex/skills/mpt-ext-workflow-gh-commit-pr" "${tmp_root}/store/current/skills/mpt-ext-workflow-gh-commit-pr"
+  assert_not_exists "${tmp_root}/claude/skills/mpt-ext-workflow-gh-commit-pr"
   pass "${FUNCNAME[0]}"
 }
 
@@ -131,8 +131,8 @@ test_install_claude_only() {
 
   assert_contains "${output}" 'Target runtime: Claude'
   assert_contains "${output}" 'Claude wiring complete'
-  assert_symlink_target "${tmp_root}/claude/skills/mpt-ext-sh-tool-jira-workitem-ops" "${tmp_root}/store/current/skills/mpt-ext-sh-tool-jira-workitem-ops"
-  assert_not_exists "${tmp_root}/codex/skills/mpt-ext-sh-tool-jira-workitem-ops"
+  assert_symlink_target "${tmp_root}/claude/skills/mpt-ext-tool-jira-workitem-ops" "${tmp_root}/store/current/skills/mpt-ext-tool-jira-workitem-ops"
+  assert_not_exists "${tmp_root}/codex/skills/mpt-ext-tool-jira-workitem-ops"
   pass "${FUNCNAME[0]}"
 }
 
@@ -152,8 +152,8 @@ test_install_all_and_preserve_non_managed_entries() {
   assert_contains "${output}" 'Claude wiring complete'
   assert_exists "${tmp_root}/codex/skills/custom-skill"
   assert_exists "${tmp_root}/claude/skills/local-note"
-  assert_symlink_target "${tmp_root}/codex/skills/mpt-ext-sh-workflow-gh-commit-pr" "${tmp_root}/store/current/skills/mpt-ext-sh-workflow-gh-commit-pr"
-  assert_symlink_target "${tmp_root}/claude/skills/mpt-ext-sh-tool-jira-workitem-ops" "${tmp_root}/store/current/skills/mpt-ext-sh-tool-jira-workitem-ops"
+  assert_symlink_target "${tmp_root}/codex/skills/mpt-ext-workflow-gh-commit-pr" "${tmp_root}/store/current/skills/mpt-ext-workflow-gh-commit-pr"
+  assert_symlink_target "${tmp_root}/claude/skills/mpt-ext-tool-jira-workitem-ops" "${tmp_root}/store/current/skills/mpt-ext-tool-jira-workitem-ops"
   pass "${FUNCNAME[0]}"
 }
 
@@ -167,8 +167,8 @@ test_install_auto_detects_available_runtimes() {
   output="$(run_with_env "${tmp_root}" install 2.1.0)"
 
   assert_contains "${output}" 'Target runtimes: Codex and Claude'
-  assert_symlink_target "${tmp_root}/codex/skills/mpt-ext-sh-workflow-gh-commit-pr" "${tmp_root}/store/current/skills/mpt-ext-sh-workflow-gh-commit-pr"
-  assert_symlink_target "${tmp_root}/claude/skills/mpt-ext-sh-tool-jira-workitem-ops" "${tmp_root}/store/current/skills/mpt-ext-sh-tool-jira-workitem-ops"
+  assert_symlink_target "${tmp_root}/codex/skills/mpt-ext-workflow-gh-commit-pr" "${tmp_root}/store/current/skills/mpt-ext-workflow-gh-commit-pr"
+  assert_symlink_target "${tmp_root}/claude/skills/mpt-ext-tool-jira-workitem-ops" "${tmp_root}/store/current/skills/mpt-ext-tool-jira-workitem-ops"
   pass "${FUNCNAME[0]}"
 }
 
@@ -205,8 +205,8 @@ test_deactivate_removes_runtime_links_only() {
   assert_contains "${output}" 'Target runtimes: Codex and Claude'
   assert_contains "${output}" 'Codex links removed'
   assert_contains "${output}" 'Claude links removed'
-  assert_not_exists "${tmp_root}/codex/skills/mpt-ext-sh-workflow-gh-commit-pr"
-  assert_not_exists "${tmp_root}/claude/skills/mpt-ext-sh-tool-jira-workitem-ops"
+  assert_not_exists "${tmp_root}/codex/skills/mpt-ext-workflow-gh-commit-pr"
+  assert_not_exists "${tmp_root}/claude/skills/mpt-ext-tool-jira-workitem-ops"
   assert_exists "${tmp_root}/store/current"
   assert_exists "${tmp_root}/store/versions/1.0.0/manifest.json"
   pass "${FUNCNAME[0]}"
@@ -225,8 +225,8 @@ test_deactivate_auto_detects_available_runtimes() {
   assert_contains "${output}" 'Target runtimes: Codex and Claude'
   assert_contains "${output}" 'Codex links removed'
   assert_contains "${output}" 'Claude links removed'
-  assert_not_exists "${tmp_root}/codex/skills/mpt-ext-sh-workflow-gh-commit-pr"
-  assert_not_exists "${tmp_root}/claude/skills/mpt-ext-sh-tool-jira-workitem-ops"
+  assert_not_exists "${tmp_root}/codex/skills/mpt-ext-workflow-gh-commit-pr"
+  assert_not_exists "${tmp_root}/claude/skills/mpt-ext-tool-jira-workitem-ops"
   assert_exists "${tmp_root}/store/current"
   pass "${FUNCNAME[0]}"
 }
@@ -246,8 +246,8 @@ test_remove_all_cleans_install_root_and_runtime_links() {
   assert_contains "${output}" 'Claude links removed'
   assert_contains "${output}" 'Removed user command'
   assert_contains "${output}" 'Removed install root'
-  assert_not_exists "${tmp_root}/codex/skills/mpt-ext-sh-workflow-gh-commit-pr"
-  assert_not_exists "${tmp_root}/claude/skills/mpt-ext-sh-tool-jira-workitem-ops"
+  assert_not_exists "${tmp_root}/codex/skills/mpt-ext-workflow-gh-commit-pr"
+  assert_not_exists "${tmp_root}/claude/skills/mpt-ext-tool-jira-workitem-ops"
   assert_not_exists "${tmp_root}/store"
   assert_not_exists "${tmp_root}/bin/mpt-skills"
   pass "${FUNCNAME[0]}"

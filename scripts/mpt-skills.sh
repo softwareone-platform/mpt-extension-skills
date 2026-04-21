@@ -97,7 +97,7 @@ skill_count() {
   local count
   count="$(
     find "${INSTALL_ROOT}/current/skills" -maxdepth 1 -mindepth 1 -type d \
-      -name 'mpt-ext-sh-*' | wc -l | tr -d ' '
+      -name 'mpt-ext-*' | wc -l | tr -d ' '
   )"
   printf '%s' "${count}"
 }
@@ -191,7 +191,7 @@ refresh_runtime_links() {
 
   log_info "Removing existing managed skill links from ${runtime_name}"
   find "${runtime_dir}" -maxdepth 1 -mindepth 1 \
-    -name 'mpt-ext-sh-*' -exec rm -rf {} +
+    -name 'mpt-ext-*' -exec rm -rf {} +
 
   local linked=0
   local skill_dir
@@ -201,7 +201,7 @@ refresh_runtime_links() {
     log_info "Linked $(basename "${skill_dir}") into ${runtime_name}"
   done < <(
     find "${INSTALL_ROOT}/current/skills" -maxdepth 1 -mindepth 1 -type d \
-      -name 'mpt-ext-sh-*' -print0
+      -name 'mpt-ext-*' -print0
   )
 
   log_done "${runtime_name} wiring complete (${linked} skills linked)"
@@ -218,7 +218,7 @@ remove_runtime_links() {
 
   log_info "Removing existing managed skill links from ${runtime_name}"
   find "${runtime_dir}" -maxdepth 1 -mindepth 1 \
-    -name 'mpt-ext-sh-*' -exec rm -rf {} +
+    -name 'mpt-ext-*' -exec rm -rf {} +
   log_done "${runtime_name} links removed"
 }
 
