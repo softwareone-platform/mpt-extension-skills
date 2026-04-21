@@ -1,0 +1,4 @@
+interface:
+  display_name: "Run Repository Checks"
+  short_description: "Run the required local validation flow for current changes"
+  default_prompt: "Run the repository-required local checks for the current changes: read the repository validation docs first, determine the correct commands and ordering for this change scope, execute the checks, and report pass/fail results with precise blockers."

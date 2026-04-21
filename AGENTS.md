@@ -98,8 +98,21 @@ Treat `knowledge/` as reusable guidance. Repository-specific commands and except
 
 ## Current Skills
 
-- [mpt-ext-workflow-gh-commit-pr](./skills/mpt-ext-workflow-gh-commit-pr/SKILL.md): Git commit and GitHub pull request workflow skill
-- [mpt-ext-tool-jira-workitem-ops](./skills/mpt-ext-tool-jira-workitem-ops/SKILL.md): Jira work item operations skill
+- [mpt-ext-tool-gh-pr-ops](./skills/mpt-ext-tool-gh-pr-ops/SKILL.md): GitHub pull request operations for reading, creating, updating, and replying to PR comments
+- [mpt-ext-tool-git-branch-ops](./skills/mpt-ext-tool-git-branch-ops/SKILL.md): Git branch operations for selecting a base branch and creating a safe work branch
+- [mpt-ext-tool-jira-workitem-ops](./skills/mpt-ext-tool-jira-workitem-ops/SKILL.md): Jira work item operations for reading, editing, commenting, assignment, and links
+- [mpt-ext-task-start-jira-work](./skills/mpt-ext-task-start-jira-work/SKILL.md): Task for moving a Jira issue and its parent chain into In Progress and resolving sprint or assignee mismatches
+- [mpt-ext-task-commit-changes](./skills/mpt-ext-task-commit-changes/SKILL.md): Task for staging intended files and creating a repository-compliant commit
+- [mpt-ext-task-create-work-branch](./skills/mpt-ext-task-create-work-branch/SKILL.md): Task for reading Jira context and creating a correctly named work branch
+- [mpt-ext-task-run-repository-checks](./skills/mpt-ext-task-run-repository-checks/SKILL.md): Task for running the repository-defined local validation flow for current changes
+- [mpt-ext-task-fix-repository-check-failures](./skills/mpt-ext-task-fix-repository-check-failures/SKILL.md): Task for fixing failing repository checks and tests one blocker at a time
+- [mpt-ext-task-fix-pre-commit-failures](./skills/mpt-ext-task-fix-pre-commit-failures/SKILL.md): Task for resolving failed pre-commit hooks triggered during git commit
+- [mpt-ext-task-open-pull-request](./skills/mpt-ext-task-open-pull-request/SKILL.md): Task for opening or updating a repository-compliant pull request
+- [mpt-ext-task-move-jira-to-code-review](./skills/mpt-ext-task-move-jira-to-code-review/SKILL.md): Task for transitioning a ready Jira issue into Code Review
+- [mpt-ext-task-handle-pr-comments](./skills/mpt-ext-task-handle-pr-comments/SKILL.md): Task for reading PR review feedback, applying scoped fixes, and replying in review threads
+- [mpt-ext-task-move-jira-to-qa](./skills/mpt-ext-task-move-jira-to-qa/SKILL.md): Task for transitioning a merged Jira issue into QA
+- [mpt-ext-workflow-start-work](./skills/mpt-ext-workflow-start-work/SKILL.md): Workflow for coordinating branch creation and Jira start-state setup
+- [mpt-ext-workflow-finish-work](./skills/mpt-ext-workflow-finish-work/SKILL.md): Workflow for finishing development work through commit, PR, review, and post-merge Jira handoff
 - [mpt-ext-workflow-skill-authoring](./skills/mpt-ext-workflow-skill-authoring/SKILL.md): Skill authoring workflow for creating or updating reusable shared skills
 
 ## Agent Expectations

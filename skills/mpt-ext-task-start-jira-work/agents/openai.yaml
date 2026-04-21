@@ -1,0 +1,4 @@
+interface:
+  display_name: "Start Jira Work"
+  short_description: "Move a Jira issue into active development"
+  default_prompt: "Start Jira work on an issue: read the issue and Jira auth context, move the issue and its full parent chain to In Progress, verify active sprint placement, add the active sprint when missing, and ask before reassigning the issue to the current Jira-authenticated user."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Handle PR Comments"
+  short_description: "Process review comments on an existing pull request"
+  default_prompt: "Handle review comments on the current pull request: read the unresolved comments first, decide which selected comments need a fix or only a reply, apply the minimal required changes, and post an explicit follow-up reply in each addressed review thread."

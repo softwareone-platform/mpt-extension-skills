@@ -1,0 +1,4 @@
+interface:
+  display_name: "Git Branch Ops"
+  short_description: "Safely create and switch work branches"
+  default_prompt: "Handle Git branch operations for starting work: determine the correct base branch from the branch type, inspect the worktree, stop for dirty state or branch conflicts, update the base branch locally, and create the target branch safely."

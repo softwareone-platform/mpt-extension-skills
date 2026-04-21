@@ -1,4 +1,0 @@
-interface:
-  display_name: "GH Commit + PR"
-  short_description: "AGENTS-first commits and PR create/update via gh CLI"
-  default_prompt: "Read repository AGENTS.md first, prepare a clean commit, and create or update a GitHub PR with required formatting."

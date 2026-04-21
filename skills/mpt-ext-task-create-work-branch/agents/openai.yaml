@@ -1,0 +1,4 @@
+interface:
+  display_name: "Create Work Branch"
+  short_description: "Create a Jira-based work branch"
+  default_prompt: "Create a work branch from Jira issue context: read the issue, derive a short branch description, choose the correct branch naming pattern from the branch type, and create the branch through the shared Git branch tool skill."

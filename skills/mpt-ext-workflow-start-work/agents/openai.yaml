@@ -1,0 +1,4 @@
+interface:
+  display_name: "Start Work"
+  short_description: "Start development from Jira context"
+  default_prompt: "Start work on a Jira issue by creating the correctly named work branch from Jira context and then moving the Jira issue into active development state through the shared branch-creation and Jira-start tasks."

@@ -1,0 +1,102 @@
+---
+name: mpt-ext-tool-gh-pr-ops
+description: Read, create, update, inspect, and comment on GitHub pull requests when users need PR-level operations. Use this tool skill to work with pull request metadata, PR status, merge state, review comments, and comment replies through gh CLI or repository-supported GitHub tooling.
+---
+
+# GH PR Ops
+
+## Purpose
+
+Operate GitHub pull requests safely and consistently through repository-supported tooling.
+
+## Use When
+
+- The user wants to create or update a pull request.
+- The user wants to inspect PR metadata, status, or merge state.
+- The user wants to read PR comments or review feedback.
+- The user wants to reply to PR comments.
+- The task requires low-level GitHub PR operations without broader workflow orchestration.
+
+## Do Not Use When
+
+- The task is to create or switch Git branches.
+- The task is to update Jira issue state.
+- The task is to decide which repository checks to run before commit.
+- The task is a broader publish or review workflow that should orchestrate PR operations rather than redefine them.
+
+## Inputs
+
+- Branch name or pull request number.
+- Repository context from the current Git checkout.
+- Optional base branch and head branch for PR creation.
+- Optional PR title or description when creating or editing a PR.
+- Optional PR comment or reply body.
+- Installed shared package root:
+
+```text
+${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
+```
+
+## Workflow
+
+1. Build repository context first.
+- If not already done for the current task, read the target repository `AGENTS.md`.
+- Read repository-specific docs only when the repository defines PR workflow, review, or GitHub tooling exceptions.
+- Read shared package docs only when the repository explicitly points to them.
+
+2. Resolve the target PR context.
+- Identify the current repository and branch.
+- If the task refers to an existing PR, resolve the PR by number or branch.
+- If the task is to create a PR, resolve the head and base branches first.
+
+3. Read before write.
+- Fetch the current PR metadata before editing, replying, or checking merge state.
+- Read existing comments or review threads before posting a reply.
+- Prefer parseable command output when available.
+
+4. Create or update PR state.
+- Create a PR only when one does not already exist for the branch.
+- Update the existing PR instead of creating a duplicate when a matching PR already exists.
+- Use repository PR rules from repo docs first.
+- When the repository relies on this shared package standard for PR formatting, use `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/standards/pull-requests.md` as the source of truth.
+
+5. Handle comments safely.
+- Read the relevant PR comments first.
+- Reply to the specific PR comment or review thread requested by the task.
+- Preserve the meaning of the user’s requested response or status update.
+
+6. Report the result clearly.
+- Show which PR was read, created, updated, or replied to.
+- Show the PR URL when applicable.
+- Show blockers clearly when auth, permissions, missing PR context, or GitHub API failures prevent completion.
+
+## Command Patterns
+
+```bash
+# List PRs for a branch
+gh pr list --head "$(git rev-parse --abbrev-ref HEAD)" --json number,url,title
+
+# View one PR
+gh pr view 123 --json number,title,url,state,mergeStateStatus
+
+# View PR comments
+gh pr view 123 --comments
+
+# Create PR
+gh pr create --base main --head feature/MPT-1234/example --title "MPT-1234 example" --body-file /tmp/pr_body.md
+
+# Update PR
+gh pr edit 123 --title "MPT-1234 example" --body-file /tmp/pr_body.md
+```
+
+## Guardrails
+
+- Never create a duplicate PR when one already exists for the same branch.
+- Never assume repository PR formatting rules without first checking repo context when the task depends on them.
+- Never reply to a PR comment without reading the relevant comment thread first.
+- Never hide GitHub auth, permission, or API blockers.
+- Never mix commit creation, branch creation, or Jira transitions into this tool skill.
+
+## Expected Outcome
+
+The requested PR operation is completed safely with clear repository context, current PR state is read before mutation when needed, and the user receives the resulting PR details or a precise blocker explanation.

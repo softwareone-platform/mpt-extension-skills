@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fix Pre-commit Failures"
+  short_description: "Resolve commit-time pre-commit hook failures safely"
+  default_prompt: "Fix the current pre-commit hook failures step by step: read the failed git commit hook output, inspect any hook-generated file changes, address one remaining hook blocker at a time, rerun the relevant validation if needed, and retry the commit only when the hooks should pass cleanly."
