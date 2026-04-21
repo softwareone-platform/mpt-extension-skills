@@ -1,5 +1,5 @@
 ---
-name: mpt-ext-sh-workflow-skill-authoring
+name: mpt-ext-workflow-skill-authoring
 description: Create or update reusable shared skills when users ask to design, add, refactor, or improve an agent skill. Use this workflow to classify the skill as tool, task, or workflow, apply the shared naming and structure rules, keep the skill concise and reusable, add required agents/openai.yaml metadata, and separate skill-specific behavior from shared standards or knowledge.
 ---
 
