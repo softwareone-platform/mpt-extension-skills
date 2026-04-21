@@ -26,19 +26,19 @@ Define shared expectations for writing reusable skills that are clear, scoped, m
  - `tool`
  - `task`
  - `workflow`
-3. Every shared skill folder name must start with the `mpt-ext-sh-` prefix.
+3. Every shared skill folder name must start with the `mpt-ext-` prefix.
 4. The skill type must be part of the skill name.
 5. Shared skills must use this naming pattern:
 
 ```text
-mpt-ext-sh-<type>-<short-purpose>
+mpt-ext-<type>-<short-purpose>
 ```
 
 Examples:
 
-- `mpt-ext-sh-tool-jira-workitem-ops`
-- `mpt-ext-sh-task-send-pr`
-- `mpt-ext-sh-workflow-start-work`
+- `mpt-ext-tool-jira-workitem-ops`
+- `mpt-ext-task-send-pr`
+- `mpt-ext-workflow-start-work`
 
 6. Keep the `<short-purpose>` segment concise, explicit, and action-oriented.
 7. Do not mix multiple responsibility levels in one skill. A skill must not act as a tool reference, an atomic task, and a full workflow at the same time.
