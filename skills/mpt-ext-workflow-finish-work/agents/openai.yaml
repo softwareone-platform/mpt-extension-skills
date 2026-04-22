@@ -1,0 +1,4 @@
+interface:
+  display_name: "Finish Work"
+  short_description: "Coordinate commit, PR, review handoff, and Jira completion"
+  default_prompt: "Finish development work end to end: run repository validation first, fix repository and pre-commit failures when present, commit the changes, open or update the pull request, move Jira to Code Review, handle review comments when needed, and move Jira to QA after merge."

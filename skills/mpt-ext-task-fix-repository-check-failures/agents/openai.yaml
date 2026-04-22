@@ -1,0 +1,4 @@
+interface:
+  display_name: "Fix Repository Check Failures"
+  short_description: "Work through failing checks and tests one blocker at a time"
+  default_prompt: "Fix the current repository validation failures step by step: read the failing output first, isolate one actionable blocker at a time, apply the smallest required fix, rerun the relevant checks, and continue until the validation flow passes or a clear blocker remains."

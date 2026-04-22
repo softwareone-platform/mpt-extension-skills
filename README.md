@@ -8,9 +8,22 @@ The [skills/](./skills/) directory contains reusable agent skills.
 
 Current skills:
 
-- [mpt-ext-workflow-gh-commit-pr](./skills/mpt-ext-workflow-gh-commit-pr/SKILL.md): Git commit + GitHub PR workflow skill
+- [mpt-ext-tool-gh-pr-ops](./skills/mpt-ext-tool-gh-pr-ops/SKILL.md): GitHub pull request operations for create, update, inspection, and comments
+- [mpt-ext-tool-git-branch-ops](./skills/mpt-ext-tool-git-branch-ops/SKILL.md): Git branch creation and branch-base selection workflow for starting work safely
+- [mpt-ext-tool-jira-workitem-ops](./skills/mpt-ext-tool-jira-workitem-ops/SKILL.md): Jira work item operations for reading, editing, commenting, assignment, and links
+- [mpt-ext-task-start-jira-work](./skills/mpt-ext-task-start-jira-work/SKILL.md): Move Jira issues and parent chain into active development state
+- [mpt-ext-task-commit-changes](./skills/mpt-ext-task-commit-changes/SKILL.md): Stage intended files and create a repository-compliant commit
+- [mpt-ext-task-create-work-branch](./skills/mpt-ext-task-create-work-branch/SKILL.md): Create a work branch from Jira issue context and branch type
+- [mpt-ext-task-run-repository-checks](./skills/mpt-ext-task-run-repository-checks/SKILL.md): Run the repository-required local validation flow for the current change scope
+- [mpt-ext-task-fix-repository-check-failures](./skills/mpt-ext-task-fix-repository-check-failures/SKILL.md): Work through failing local checks and tests one blocker at a time
+- [mpt-ext-task-fix-pre-commit-failures](./skills/mpt-ext-task-fix-pre-commit-failures/SKILL.md): Resolve commit-time pre-commit hook failures one blocker at a time
+- [mpt-ext-task-open-pull-request](./skills/mpt-ext-task-open-pull-request/SKILL.md): Create or update a repository-compliant pull request
+- [mpt-ext-task-move-jira-to-code-review](./skills/mpt-ext-task-move-jira-to-code-review/SKILL.md): Move a Jira issue into Code Review when branch work is ready for review
+- [mpt-ext-task-handle-pr-comments](./skills/mpt-ext-task-handle-pr-comments/SKILL.md): Address existing PR review comments with scoped fixes or thread replies
+- [mpt-ext-task-move-jira-to-qa](./skills/mpt-ext-task-move-jira-to-qa/SKILL.md): Move a Jira issue into QA after reviewed work is merged
+- [mpt-ext-workflow-start-work](./skills/mpt-ext-workflow-start-work/SKILL.md): Coordinate branch creation and Jira start-of-work setup
+- [mpt-ext-workflow-finish-work](./skills/mpt-ext-workflow-finish-work/SKILL.md): Coordinate commit, PR, review feedback handling, and Jira completion states
 - [mpt-ext-workflow-skill-authoring](./skills/mpt-ext-workflow-skill-authoring/SKILL.md): Shared workflow skill for creating and updating reusable skills
-- [mpt-ext-tool-jira-workitem-ops](./skills/mpt-ext-tool-jira-workitem-ops/SKILL.md): Jira work item operations skill
 
 For installation and package usage, see [docs/installation.md](./docs/installation.md).
 

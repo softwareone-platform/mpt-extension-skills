@@ -1,0 +1,4 @@
+interface:
+  display_name: "Commit Changes"
+  short_description: "Create a clean compliant Git commit"
+  default_prompt: "Commit completed repository changes: inspect the current diff, stage only the intended files, build the commit message from repository rules, and create a clean repository-compliant commit after required validation is complete."

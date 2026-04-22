@@ -1,0 +1,4 @@
+interface:
+  display_name: "GH PR Ops"
+  short_description: "Operate GitHub pull requests safely"
+  default_prompt: "Handle GitHub pull request operations through repository-supported tooling: resolve the target PR, read PR state before mutations, create or update PRs without duplication, inspect merge state, and read or reply to PR comments safely."

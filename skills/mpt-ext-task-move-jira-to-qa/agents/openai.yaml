@@ -1,0 +1,4 @@
+interface:
+  display_name: "Move Jira To QA"
+  short_description: "Transition a Jira issue into QA after merge"
+  default_prompt: "Move a Jira issue into QA: read the current issue state, verify the relevant pull request is already merged, transition the issue to QA through the shared Jira operations skill, and report blockers clearly when the work is not yet in post-merge state."

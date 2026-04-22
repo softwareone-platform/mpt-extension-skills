@@ -1,0 +1,4 @@
+interface:
+  display_name: "Open Pull Request"
+  short_description: "Create or update a compliant PR"
+  default_prompt: "Open or update a repository-compliant pull request: inspect branch PR state, read repository PR rules, build the PR title and description from those rules, and create or update the PR without duplication."
