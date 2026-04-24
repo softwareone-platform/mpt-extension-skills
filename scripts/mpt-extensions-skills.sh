@@ -613,7 +613,7 @@ list_installed() {
   fi
 
   if [[ -d "${INSTALL_ROOT}/versions" ]]; then
-    installed_versions="$(find "${INSTALL_ROOT}/versions" -maxdepth 1 -mindepth 1 -type d -exec basename {} \; | sort)"
+    installed_versions="$(find "${INSTALL_ROOT}/versions" -maxdepth 1 -mindepth 1 -type d -exec basename {} \; | sort_versions_desc)"
   fi
 
   if [[ -z "${installed_versions}" ]]; then

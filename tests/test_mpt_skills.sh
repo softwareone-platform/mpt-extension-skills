@@ -203,7 +203,8 @@ test_list_marks_active_version() {
   mkdir -p "${tmp_root}/codex"
   install_release_for_test "${tmp_root}" 1.0.0 --codex >/dev/null
   install_release_for_test "${tmp_root}" 1.1.0 --codex >/dev/null
-  run_with_env "${tmp_root}" activate 1.0.0 --codex >/dev/null
+  install_release_for_test "${tmp_root}" 1.10.0 --codex >/dev/null
+  run_with_env "${tmp_root}" activate 1.1.0 --codex >/dev/null
 
   local output
   local asset_dir="${tmp_root}/assets"
@@ -214,8 +215,11 @@ test_list_marks_active_version() {
   output="$(run_with_release_env "${tmp_root}" "${asset_dir}" "1.2.0" list)"
 
   assert_contains "${output}" 'Installed versions:'
-  assert_contains "${output}" '1.0.0 (active)'
-  assert_contains "${output}" '1.1.0'
+  assert_contains "${output}" '1.0.0'
+  assert_contains "${output}" '1.1.0 (active)'
+  assert_contains "${output}" '1.10.0'
+  assert_before "${output}" '1.10.0' '1.1.0 (active)'
+  assert_before "${output}" '1.1.0 (active)' '1.0.0'
   assert_contains "${output}" 'Available GitHub releases:'
   assert_contains "${output}" '1.2.0'
   assert_contains "${output}" '1.3.0'
