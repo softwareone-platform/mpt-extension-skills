@@ -72,7 +72,7 @@ Use `remove --all` when you want to remove the installed package completely.
 The installer and activation command support these environment variable overrides:
 
 - `MPT_EXTENSION_SKILLS_HOME`: root directory for installed package versions and the `current` symlink. Default: `~/.mpt-extension-skills`
-- `CODEX_SKILLS_DIR`: Codex skills directory that receives managed shared skill links during activation. Default: `~/.agents/skills`
+- `CODEX_SKILLS_DIR`: Codex skills directory that receives managed shared skill links during activation. Default: `~/.codex/skills`
 - `CLAUDE_SKILLS_DIR`: Claude skills directory that receives managed shared skill links during activation. Default: `~/.claude/skills`
 - `MPT_SKILLS_BIN_DIR`: directory where the user-facing `mpt-skills` command is linked. Default: `~/.local/bin`
 
@@ -80,7 +80,7 @@ Example:
 
 ```bash
 export MPT_EXTENSION_SKILLS_HOME="$HOME/.local/share/mpt-extension-skills"
-export CODEX_SKILLS_DIR="$HOME/.agents/skills"
+export CODEX_SKILLS_DIR="$HOME/.codex/skills"
 export CLAUDE_SKILLS_DIR="$HOME/.claude/skills"
 export MPT_SKILLS_BIN_DIR="$HOME/.local/bin"
 

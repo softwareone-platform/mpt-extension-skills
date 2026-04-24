@@ -7,7 +7,7 @@ REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 COMMAND_NAME="$(basename "$0")"
 
 INSTALL_ROOT="${MPT_EXTENSION_SKILLS_HOME:-${HOME}/.mpt-extension-skills}"
-CODEX_SKILLS_DIR="${CODEX_SKILLS_DIR:-${HOME}/.agents/skills}"
+CODEX_SKILLS_DIR="${CODEX_SKILLS_DIR:-${HOME}/.codex/skills}"
 CLAUDE_SKILLS_DIR="${CLAUDE_SKILLS_DIR:-${HOME}/.claude/skills}"
 COMMAND_BIN_DIR="${MPT_SKILLS_BIN_DIR:-${HOME}/.local/bin}"
 
@@ -56,7 +56,7 @@ Environment overrides:
   MPT_EXTENSION_SKILLS_HOME  Install root for versioned package contents
                              Default: \$HOME/.mpt-extension-skills
   CODEX_SKILLS_DIR           Codex skills directory to wire during activation
-                             Default: \$HOME/.agents/skills
+                             Default: \$HOME/.codex/skills
   CLAUDE_SKILLS_DIR          Claude skills directory to wire during activation
                              Default: \$HOME/.claude/skills
   MPT_SKILLS_BIN_DIR         Directory where the user-facing mpt-skills command is linked

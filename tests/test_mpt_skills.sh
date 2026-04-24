@@ -55,6 +55,15 @@ run_with_env() {
     "${SCRIPT_PATH}" "$@"
 }
 
+run_with_home_defaults() {
+  local tmp_root="$1"
+  shift
+  env -i \
+    HOME="${tmp_root}" \
+    PATH="/usr/bin:/bin" \
+    "${SCRIPT_PATH}" "$@"
+}
+
 test_help_without_install() {
   local tmp_root
   tmp_root="$(mktemp -d)"
@@ -68,6 +77,7 @@ test_help_without_install() {
   assert_contains "${output}" 'CODEX_SKILLS_DIR           Codex skills directory to wire during activation'
   assert_contains "${output}" 'CLAUDE_SKILLS_DIR          Claude skills directory to wire during activation'
   assert_contains "${output}" 'MPT_SKILLS_BIN_DIR         Directory where the user-facing mpt-skills command is linked'
+  assert_contains "${output}" 'Default: $HOME/.codex/skills'
   assert_contains "${output}" 'Current installed version:'
   assert_contains "${output}" 'not installed'
   pass "${FUNCNAME[0]}"
@@ -169,6 +179,22 @@ test_install_auto_detects_available_runtimes() {
   assert_contains "${output}" 'Target runtimes: Codex and Claude'
   assert_symlink_target "${tmp_root}/codex/skills/mpt-ext-workflow-start-work" "${tmp_root}/store/current/skills/mpt-ext-workflow-start-work"
   assert_symlink_target "${tmp_root}/claude/skills/mpt-ext-tool-jira-workitem-ops" "${tmp_root}/store/current/skills/mpt-ext-tool-jira-workitem-ops"
+  pass "${FUNCNAME[0]}"
+}
+
+test_install_uses_default_home_runtime_dirs() {
+  local tmp_root
+  tmp_root="$(mktemp -d)"
+
+  mkdir -p "${tmp_root}/.codex" "${tmp_root}/.claude"
+
+  local output
+  output="$(run_with_home_defaults "${tmp_root}" install 2.2.0)"
+
+  assert_contains "${output}" 'Target runtimes: Codex and Claude'
+  assert_symlink_target "${tmp_root}/.codex/skills/mpt-ext-workflow-start-work" "${tmp_root}/.mpt-extension-skills/current/skills/mpt-ext-workflow-start-work"
+  assert_symlink_target "${tmp_root}/.claude/skills/mpt-ext-tool-jira-workitem-ops" "${tmp_root}/.mpt-extension-skills/current/skills/mpt-ext-tool-jira-workitem-ops"
+  assert_symlink_target "${tmp_root}/.local/bin/mpt-skills" "${tmp_root}/.mpt-extension-skills/current/bin/mpt-skills"
   pass "${FUNCNAME[0]}"
 }
 
@@ -293,6 +319,8 @@ main() {
   test_install_all_and_preserve_non_managed_entries
   TESTS_RUN=$((TESTS_RUN + 1))
   test_install_auto_detects_available_runtimes
+  TESTS_RUN=$((TESTS_RUN + 1))
+  test_install_uses_default_home_runtime_dirs
   TESTS_RUN=$((TESTS_RUN + 1))
   test_activate_switches_current_version
   TESTS_RUN=$((TESTS_RUN + 1))
