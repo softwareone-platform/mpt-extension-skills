@@ -27,7 +27,8 @@ Current skills:
 - [mpt-ext-workflow-complete-after-merge](./skills/mpt-ext-workflow-complete-after-merge/SKILL.md): Coordinate merge confirmation and the final Jira post-merge handoff
 - [mpt-ext-workflow-skill-authoring](./skills/mpt-ext-workflow-skill-authoring/SKILL.md): Shared workflow skill for creating and updating reusable skills
 
-For installation and package usage, see [docs/installation.md](./docs/installation.md).
+For first-time installation from GitHub Releases, see [docs/installation.md](./docs/installation.md).
+For installed CLI commands, updates, local debug installs, and release lifecycle usage, see [docs/usage.md](./docs/usage.md).
 
 ## Shared Standards
 
@@ -96,5 +97,6 @@ Repository docs in `docs/`:
 
 - [contributing.md](./docs/contributing.md): repository-specific contribution workflow and links to shared standards
 - [documentation.md](./docs/documentation.md): repository-specific documentation validation rules and local linking requirements
-- [installation.md](./docs/installation.md): how to install and use the shared skills package from this repository
+- [installation.md](./docs/installation.md): first-time installation from GitHub Releases
+- [usage.md](./docs/usage.md): installed CLI commands, updates, local debug installs, and release lifecycle usage
 - [testing.md](./docs/testing.md): how to run shell validation and integration tests for this repository

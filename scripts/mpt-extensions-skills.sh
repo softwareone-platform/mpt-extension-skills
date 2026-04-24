@@ -5,6 +5,9 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 COMMAND_NAME="$(basename "$0")"
+GITHUB_REPOSITORY_NAME="softwareone-platform/mpt-extension-skills"
+RELEASES_BASE_URL="${MPT_SKILLS_RELEASES_BASE_URL:-https://github.com/${GITHUB_REPOSITORY_NAME}/releases}"
+GITHUB_API_BASE_URL="${MPT_SKILLS_GITHUB_API_BASE_URL:-https://api.github.com/repos/${GITHUB_REPOSITORY_NAME}}"
 
 INSTALL_ROOT="${MPT_EXTENSION_SKILLS_HOME:-${HOME}/.mpt-extension-skills}"
 CODEX_SKILLS_DIR="${CODEX_SKILLS_DIR:-${HOME}/.codex/skills}"
@@ -17,6 +20,10 @@ log_info() {
 
 log_warn() {
   printf '[WARN] %s\n' "$*" >&2
+}
+
+cleanup_release_tmp_files() {
+  rm -rf "${MPT_SKILLS_TMP_ARCHIVE:-}" "${MPT_SKILLS_TMP_EXTRACT_DIR:-}"
 }
 
 log_done() {
@@ -39,9 +46,11 @@ current_version_block() {
 usage() {
   cat <<EOF
 Usage:
-  ${COMMAND_NAME} install <version> [--codex | --claude | --all]
+  ${COMMAND_NAME} install --version <version> [--codex | --claude | --all]
+  ${COMMAND_NAME} install --path <local-repo> [--codex | --claude | --all]
   ${COMMAND_NAME} activate <version> [--codex | --claude | --all]
   ${COMMAND_NAME} deactivate [--codex | --claude | --all]
+  ${COMMAND_NAME} update [--codex | --claude | --all]
   ${COMMAND_NAME} remove --all
   ${COMMAND_NAME} list
   ${COMMAND_NAME} --help
@@ -59,7 +68,7 @@ Environment overrides:
                              Default: \$HOME/.codex/skills
   CLAUDE_SKILLS_DIR          Claude skills directory to wire during activation
                              Default: \$HOME/.claude/skills
-  MPT_SKILLS_BIN_DIR         Directory where the user-facing mpt-skills command is linked
+  MPT_SKILLS_BIN_DIR         Directory where the user-facing mpt-extensions-skills command is linked
                              Default: \$HOME/.local/bin
 
 $(current_version_block)
@@ -67,10 +76,27 @@ EOF
 }
 
 repo_commit() {
-  if git -C "${REPO_ROOT}" rev-parse --verify HEAD >/dev/null 2>&1; then
-    git -C "${REPO_ROOT}" rev-parse --short HEAD
+  local source_dir="${1:-${REPO_ROOT}}"
+  if git -C "${source_dir}" rev-parse --verify HEAD >/dev/null 2>&1; then
+    git -C "${source_dir}" rev-parse --short HEAD
   else
     printf 'unknown'
+  fi
+}
+
+source_commit_for_manifest() {
+  local source_dir="$1"
+  local source_type="$2"
+  local manifest_commit=""
+
+  if [[ "${source_type}" == "release" && -f "${source_dir}/manifest.json" ]]; then
+    manifest_commit="$(sed -n 's/.*"source_commit"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "${source_dir}/manifest.json" | head -n 1)"
+  fi
+
+  if [[ -n "${manifest_commit}" ]]; then
+    printf '%s' "${manifest_commit}"
+  else
+    repo_commit "${source_dir}"
   fi
 }
 
@@ -97,7 +123,7 @@ skill_count() {
   local count
   count="$(
     find "${INSTALL_ROOT}/current/skills" -maxdepth 1 -mindepth 1 -type d \
-      -name 'mpt-ext-*' | wc -l | tr -d ' '
+      -name 'mpt-ext-*' -exec test -f '{}/SKILL.md' ';' -print | wc -l | tr -d ' '
   )"
   printf '%s' "${count}"
 }
@@ -105,6 +131,8 @@ skill_count() {
 write_manifest() {
   local version="$1"
   local version_dir="$2"
+  local source_dir="$3"
+  local source_type="$4"
   local installed_at
   installed_at="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 
@@ -114,20 +142,22 @@ write_manifest() {
   "name": "mpt-extension-skills",
   "version": "${version}",
   "installed_at": "${installed_at}",
-  "source_repo": "softwareone-platform/mpt-extension-skills",
-  "source_commit": "$(repo_commit)"
+  "source_repo": "${GITHUB_REPOSITORY_NAME}",
+  "source_commit": "$(source_commit_for_manifest "${source_dir}" "${source_type}")",
+  "source_type": "${source_type}"
 }
 EOF
 }
 
 install_cli_command() {
   local version_dir="$1"
+  local source_dir="$2"
   local bin_dir="${version_dir}/bin"
 
   log_info "Installing package CLI into ${bin_dir}"
   mkdir -p "${bin_dir}"
-  cp "${REPO_ROOT}/scripts/mpt-skills.sh" "${bin_dir}/mpt-skills"
-  chmod +x "${bin_dir}/mpt-skills"
+  cp "${source_dir}/scripts/mpt-extensions-skills.sh" "${bin_dir}/mpt-extensions-skills"
+  chmod +x "${bin_dir}/mpt-extensions-skills"
   log_done "Installed package CLI files"
 }
 
@@ -196,6 +226,9 @@ refresh_runtime_links() {
   local linked=0
   local skill_dir
   while IFS= read -r -d '' skill_dir; do
+    if [[ ! -f "${skill_dir}/SKILL.md" ]]; then
+      continue
+    fi
     ln -sfn "${skill_dir}" "${runtime_dir}/$(basename "${skill_dir}")"
     linked=$((linked + 1))
     log_info "Linked $(basename "${skill_dir}") into ${runtime_name}"
@@ -266,9 +299,9 @@ remove_all() {
   log_runtime_selection
   deactivate_selected_runtimes
 
-  if [[ -L "${COMMAND_BIN_DIR}/mpt-skills" || -f "${COMMAND_BIN_DIR}/mpt-skills" ]]; then
-    log_info "Removing user command ${COMMAND_BIN_DIR}/mpt-skills"
-    rm -f "${COMMAND_BIN_DIR}/mpt-skills"
+  if [[ -L "${COMMAND_BIN_DIR}/mpt-extensions-skills" || -f "${COMMAND_BIN_DIR}/mpt-extensions-skills" ]]; then
+    log_info "Removing user command ${COMMAND_BIN_DIR}/mpt-extensions-skills"
+    rm -f "${COMMAND_BIN_DIR}/mpt-extensions-skills"
     log_done "Removed user command"
   fi
 
@@ -277,6 +310,39 @@ remove_all() {
     rm -rf "${INSTALL_ROOT}"
     log_done "Removed install root"
   fi
+}
+
+require_source_package() {
+  local source_dir="$1"
+  local missing=0
+
+  for path in scripts/mpt-extensions-skills.sh skills standards knowledge docs; do
+    if [[ ! -e "${source_dir}/${path}" ]]; then
+      echo "Package source is missing required path: ${source_dir}/${path}" >&2
+      missing=1
+    fi
+  done
+
+  if [[ "${missing}" -ne 0 ]]; then
+    exit 1
+  fi
+}
+
+copy_package_files() {
+  local source_dir="$1"
+  local version_dir="$2"
+
+  log_info "Copying skills/"
+  cp -R "${source_dir}/skills" "${version_dir}/skills"
+
+  log_info "Copying standards/"
+  cp -R "${source_dir}/standards" "${version_dir}/standards"
+
+  log_info "Copying knowledge/"
+  cp -R "${source_dir}/knowledge" "${version_dir}/knowledge"
+
+  log_info "Copying docs/"
+  cp -R "${source_dir}/docs" "${version_dir}/docs"
 }
 
 activate_version() {
@@ -293,46 +359,157 @@ activate_version() {
   log_done "Updated current symlink to ${version_dir}"
 
   ensure_command_bin_dir
-  log_info "Linking user command mpt-skills into ${COMMAND_BIN_DIR}"
-  ln -sfn "${INSTALL_ROOT}/current/bin/mpt-skills" "${COMMAND_BIN_DIR}/mpt-skills"
-  log_done "Command available as ${COMMAND_BIN_DIR}/mpt-skills"
+  log_info "Linking user command mpt-extensions-skills into ${COMMAND_BIN_DIR}"
+  ln -sfn "${INSTALL_ROOT}/current/bin/mpt-extensions-skills" "${COMMAND_BIN_DIR}/mpt-extensions-skills"
+  log_done "Command available as ${COMMAND_BIN_DIR}/mpt-extensions-skills"
 
   activate_selected_runtimes
   log_done "Version ${version} is now active"
 }
 
-install_version() {
+install_from_source() {
   local version="$1"
+  local source_dir="$2"
+  local source_type="$3"
   local version_dir="${INSTALL_ROOT}/versions/${version}"
 
   if [[ -e "${version_dir}" ]]; then
-    echo "Version already installed: ${version}" >&2
-    exit 1
+    if [[ "${version}" == "local" ]]; then
+      log_info "Replacing existing local installation"
+      rm -rf "${version_dir}"
+    else
+      log_info "Version ${version} is already installed"
+      activate_version "${version}"
+      return
+    fi
   fi
 
-  log_info "Installing version ${version} from local repository checkout"
+  require_source_package "${source_dir}"
+  log_info "Installing version ${version} from ${source_type}"
   ensure_install_root
 
   log_info "Creating version directory ${version_dir}"
   mkdir -p "${version_dir}"
 
-  log_info "Copying skills/"
-  cp -R "${REPO_ROOT}/skills" "${version_dir}/skills"
+  copy_package_files "${source_dir}" "${version_dir}"
 
-  log_info "Copying standards/"
-  cp -R "${REPO_ROOT}/standards" "${version_dir}/standards"
-
-  log_info "Copying knowledge/"
-  cp -R "${REPO_ROOT}/knowledge" "${version_dir}/knowledge"
-
-  log_info "Copying docs/"
-  cp -R "${REPO_ROOT}/docs" "${version_dir}/docs"
-
-  write_manifest "${version}" "${version_dir}"
-  install_cli_command "${version_dir}"
+  write_manifest "${version}" "${version_dir}" "${source_dir}" "${source_type}"
+  install_cli_command "${version_dir}" "${source_dir}"
   log_done "Installed package files for version ${version}"
 
   activate_version "${version}"
+}
+
+release_asset_name() {
+  local version="$1"
+  printf 'mpt-extension-skills-%s.tar.gz' "${version}"
+}
+
+download_release_package() {
+  local version="$1"
+  local destination="$2"
+  local asset_name
+  asset_name="$(release_asset_name "${version}")"
+
+  if [[ -n "${MPT_SKILLS_RELEASE_ASSET_DIR:-}" ]]; then
+    local local_asset="${MPT_SKILLS_RELEASE_ASSET_DIR}/${asset_name}"
+    if [[ ! -f "${local_asset}" ]]; then
+      echo "Release asset not found: ${local_asset}" >&2
+      exit 1
+    fi
+    log_info "Using local release asset ${local_asset}"
+    cp "${local_asset}" "${destination}"
+    return
+  fi
+
+  local url="${RELEASES_BASE_URL}/download/${version}/${asset_name}"
+  log_info "Downloading release asset ${url}"
+  curl -LsSf "${url}" -o "${destination}"
+}
+
+install_release_version() {
+  local version="$1"
+  local archive
+  local extract_dir
+  archive="$(mktemp)"
+  extract_dir="$(mktemp -d)"
+  MPT_SKILLS_TMP_ARCHIVE="${archive}"
+  MPT_SKILLS_TMP_EXTRACT_DIR="${extract_dir}"
+  trap cleanup_release_tmp_files EXIT INT TERM
+
+  download_release_package "${version}" "${archive}"
+  tar -xzf "${archive}" -C "${extract_dir}"
+  install_from_source "${version}" "${extract_dir}" "release"
+  cleanup_release_tmp_files
+  trap - EXIT INT TERM
+}
+
+install_local_path() {
+  local source_dir="$1"
+
+  if [[ ! -d "${source_dir}" ]]; then
+    echo "Local repository path does not exist: ${source_dir}" >&2
+    exit 1
+  fi
+
+  install_from_source "local" "${source_dir}" "local"
+}
+
+latest_release_version() {
+  if [[ -n "${MPT_SKILLS_LATEST_VERSION:-}" ]]; then
+    printf '%s\n' "${MPT_SKILLS_LATEST_VERSION}"
+    return
+  fi
+
+  local latest_url="${GITHUB_API_BASE_URL}/releases/latest"
+  local response
+  if ! response="$(curl -LsSf "${latest_url}")"; then
+    log_warn "latest_release_version could not fetch release metadata from ${latest_url}"
+    return
+  fi
+
+  # The CLI avoids requiring jq, so this intentionally uses a small sed parser
+  # for GitHub's tag_name field and reports a warning if the response shape changes.
+  local tag
+  tag="$(printf '%s' "${response}" | sed -n 's/.*"tag_name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -n 1)"
+
+  if [[ -z "${tag}" ]]; then
+    log_warn "latest_release_version could not parse tag_name from GitHub response"
+  fi
+
+  printf '%s\n' "${tag}"
+}
+
+current_installed_version() {
+  if [[ -f "${INSTALL_ROOT}/current/manifest.json" ]]; then
+    sed -n 's/.*"version": "\(.*\)".*/\1/p' "${INSTALL_ROOT}/current/manifest.json" | head -n 1
+  fi
+}
+
+update_to_latest() {
+  local latest_version
+  latest_version="$(latest_release_version)"
+
+  if [[ -z "${latest_version}" ]]; then
+    echo "Unable to resolve latest release version" >&2
+    exit 1
+  fi
+
+  local current_version
+  current_version="$(current_installed_version)"
+
+  if [[ "${current_version}" == "${latest_version}" ]]; then
+    log_done "Already up to date (${current_version})"
+    return
+  fi
+
+  if [[ -n "${current_version}" ]]; then
+    log_info "Updating from ${current_version} to ${latest_version}"
+  else
+    log_info "Installing latest version ${latest_version}"
+  fi
+
+  install_release_version "${latest_version}"
 }
 
 list_installed() {
@@ -363,15 +540,50 @@ main() {
 
   case "$1" in
     install)
-      if [[ $# -lt 2 || $# -gt 5 ]]; then
+      if [[ $# -lt 2 || $# -gt 6 ]]; then
+        usage
+        exit 1
+      fi
+      case "$2" in
+        --version)
+          if [[ $# -lt 3 ]]; then
+            usage
+            exit 1
+          fi
+          local_version="$3"
+          shift 3
+          parse_runtime_selection "$@"
+          log_runtime_selection
+          install_release_version "${local_version}"
+          ;;
+        --path)
+          if [[ $# -lt 3 ]]; then
+            usage
+            exit 1
+          fi
+          local_path="$3"
+          shift 3
+          parse_runtime_selection "$@"
+          log_runtime_selection
+          install_local_path "${local_path}"
+          ;;
+        *)
+          usage
+          exit 1
+          ;;
+      esac
+      ;;
+    __install-from-source)
+      if [[ $# -lt 3 || $# -gt 6 ]]; then
         usage
         exit 1
       fi
       local_version="$2"
-      shift 2
+      local_path="$3"
+      shift 3
       parse_runtime_selection "$@"
       log_runtime_selection
-      install_version "${local_version}"
+      install_from_source "${local_version}" "${local_path}" "${MPT_SKILLS_INSTALL_SOURCE_TYPE:-local-checkout}"
       ;;
     activate)
       if [[ $# -lt 2 || $# -gt 5 ]]; then
@@ -394,6 +606,16 @@ main() {
       parse_runtime_selection "$@"
       log_runtime_selection
       deactivate_selected_runtimes
+      ;;
+    update)
+      if [[ $# -gt 4 ]]; then
+        usage
+        exit 1
+      fi
+      shift
+      parse_runtime_selection "$@"
+      log_runtime_selection
+      update_to_latest
       ;;
     remove)
       if [[ $# -ne 2 || "$2" != "--all" ]]; then

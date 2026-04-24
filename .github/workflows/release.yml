@@ -1,0 +1,61 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Release version without v prefix, for example 1.2.3
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate version
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          case "${VERSION}" in
+            v*)
+              echo "Version input must not start with v" >&2
+              exit 1
+              ;;
+            *[!0-9.]*|'')
+              echo "Version must contain only digits and dots" >&2
+              exit 1
+              ;;
+          esac
+
+      - name: Build release assets
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          mkdir -p dist/package
+          cp -R scripts skills standards knowledge docs README.md LICENSE dist/package/
+          printf '{"name":"mpt-extension-skills","version":"%s","source_repo":"softwareone-platform/mpt-extension-skills","source_commit":"%s","source_type":"release"}\n' \
+            "${VERSION}" \
+            "${GITHUB_SHA}" \
+            > dist/package/manifest.json
+          tar -C dist/package -czf "dist/mpt-extension-skills-${VERSION}.tar.gz" .
+          sed "s/__MPT_SKILLS_RELEASE_VERSION__/${VERSION}/g" scripts/mpt-extensions-skills-install.sh > dist/mpt-extensions-skills-install.sh
+          chmod +x dist/mpt-extensions-skills-install.sh
+          shasum -a 256 "dist/mpt-extension-skills-${VERSION}.tar.gz" dist/mpt-extensions-skills-install.sh > dist/SHA256SUMS
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.version }}
+          name: v${{ inputs.version }}
+          target_commitish: ${{ github.sha }}
+          fail_on_unmatched_files: true
+          files: |
+            dist/mpt-extensions-skills-install.sh
+            dist/mpt-extension-skills-${{ inputs.version }}.tar.gz
+            dist/SHA256SUMS
