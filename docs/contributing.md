@@ -29,10 +29,12 @@ Use these shared standards as the source of truth:
 
 - This repository contains shared reusable materials rather than product runtime code.
 - Keep local links inside repository documentation and skill references relative to installed package paths or repository-local paths, depending on the document type.
-- When a change affects skill installation or runtime wiring, also review [installation.md](./installation.md).
+- When a change affects first-time installation, also review [installation.md](./installation.md).
+- When a change affects installed CLI commands or runtime wiring, also review [usage.md](./usage.md).
 
 ## Related Documents
 
 - [testing.md](./testing.md)
+- [usage.md](./usage.md)
 - [../README.md](../README.md)
 - [../AGENTS.md](../AGENTS.md)

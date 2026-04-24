@@ -3,7 +3,7 @@
 SHELLCHECK ?= shellcheck
 
 check:  ## Run shellcheck validation
-	$(SHELLCHECK) scripts/mpt-skills.sh
+	$(SHELLCHECK) scripts/mpt-extensions-skills.sh scripts/mpt-extensions-skills-install.sh
 
 test:  ## Run shell tests
 	bash tests/test_mpt_skills.sh

@@ -38,6 +38,7 @@ When changing documentation in this repository, validate the following:
 - Prefer linking to:
   - [contributing.md](./contributing.md)
   - [installation.md](./installation.md)
+  - [usage.md](./usage.md)
   - [testing.md](./testing.md)
 
 ## Validation Checklist
@@ -55,6 +56,8 @@ Before committing documentation changes, check:
 
 - [../standards/documentation.md](../standards/documentation.md)
 - [contributing.md](./contributing.md)
+- [installation.md](./installation.md)
+- [usage.md](./usage.md)
 - [testing.md](./testing.md)
 - [../README.md](../README.md)
 - [../AGENTS.md](../AGENTS.md)

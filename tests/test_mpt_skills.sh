@@ -4,7 +4,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
-SCRIPT_PATH="${REPO_ROOT}/scripts/mpt-skills.sh"
+SCRIPT_PATH="${REPO_ROOT}/scripts/mpt-extensions-skills.sh"
 
 TESTS_RUN=0
 
@@ -64,6 +64,57 @@ run_with_home_defaults() {
     "${SCRIPT_PATH}" "$@"
 }
 
+create_release_asset() {
+  local version="$1"
+  local asset_dir="$2"
+  local package_dir
+  package_dir="$(mktemp -d)"
+
+  mkdir -p "${asset_dir}" "${package_dir}/package"
+  cp -R \
+    "${REPO_ROOT}/scripts" \
+    "${REPO_ROOT}/skills" \
+    "${REPO_ROOT}/standards" \
+    "${REPO_ROOT}/knowledge" \
+    "${REPO_ROOT}/docs" \
+    "${package_dir}/package/"
+  cat > "${package_dir}/package/manifest.json" <<EOF
+{
+  "name": "mpt-extension-skills",
+  "version": "${version}",
+  "source_repo": "softwareone-platform/mpt-extension-skills",
+  "source_commit": "release-test-commit",
+  "source_type": "release"
+}
+EOF
+
+  tar -C "${package_dir}/package" -czf "${asset_dir}/mpt-extension-skills-${version}.tar.gz" .
+}
+
+run_with_release_env() {
+  local tmp_root="$1"
+  local asset_dir="$2"
+  local latest_version="$3"
+  shift 3
+  env \
+    MPT_EXTENSION_SKILLS_HOME="${tmp_root}/store" \
+    CODEX_SKILLS_DIR="${tmp_root}/codex/skills" \
+    CLAUDE_SKILLS_DIR="${tmp_root}/claude/skills" \
+    MPT_SKILLS_BIN_DIR="${tmp_root}/bin" \
+    MPT_SKILLS_RELEASE_ASSET_DIR="${asset_dir}" \
+    MPT_SKILLS_LATEST_VERSION="${latest_version}" \
+    "${SCRIPT_PATH}" "$@"
+}
+
+install_release_for_test() {
+  local tmp_root="$1"
+  local version="$2"
+  shift 2
+  local asset_dir="${tmp_root}/assets"
+  create_release_asset "${version}" "${asset_dir}"
+  run_with_release_env "${tmp_root}" "${asset_dir}" "${version}" install --version "${version}" "$@"
+}
+
 test_help_without_install() {
   local tmp_root
   tmp_root="$(mktemp -d)"
@@ -72,11 +123,17 @@ test_help_without_install() {
   output="$(run_with_env "${tmp_root}" --help)"
 
   assert_contains "${output}" 'Usage:'
+  assert_contains "${output}" 'install --version <version>'
+  assert_contains "${output}" 'install --path <local-repo>'
+  if [[ "${output}" == *'install <version>'* ]]; then
+    fail 'Deprecated install <version> form must not be shown in help'
+  fi
+  assert_contains "${output}" 'update [--codex | --claude | --all]'
   assert_contains "${output}" 'Environment overrides:'
   assert_contains "${output}" 'MPT_EXTENSION_SKILLS_HOME  Install root for versioned package contents'
   assert_contains "${output}" 'CODEX_SKILLS_DIR           Codex skills directory to wire during activation'
   assert_contains "${output}" 'CLAUDE_SKILLS_DIR          Claude skills directory to wire during activation'
-  assert_contains "${output}" 'MPT_SKILLS_BIN_DIR         Directory where the user-facing mpt-skills command is linked'
+  assert_contains "${output}" 'MPT_SKILLS_BIN_DIR         Directory where the user-facing mpt-extensions-skills command is linked'
   assert_contains "${output}" 'Default: $HOME/.codex/skills'
   assert_contains "${output}" 'Current installed version:'
   assert_contains "${output}" 'not installed'
@@ -99,8 +156,8 @@ test_list_marks_active_version() {
   tmp_root="$(mktemp -d)"
 
   mkdir -p "${tmp_root}/codex"
-  run_with_env "${tmp_root}" install 1.0.0 --codex >/dev/null
-  run_with_env "${tmp_root}" install 1.1.0 --codex >/dev/null
+  install_release_for_test "${tmp_root}" 1.0.0 --codex >/dev/null
+  install_release_for_test "${tmp_root}" 1.1.0 --codex >/dev/null
   run_with_env "${tmp_root}" activate 1.0.0 --codex >/dev/null
 
   local output
@@ -117,17 +174,100 @@ test_install_codex_only() {
 
   mkdir -p "${tmp_root}/codex"
   local output
-  output="$(run_with_env "${tmp_root}" install 1.0.0 --codex)"
+  output="$(install_release_for_test "${tmp_root}" 1.0.0 --codex)"
 
   assert_contains "${output}" 'Target runtime: Codex'
   assert_contains "${output}" 'Installing version 1.0.0'
   assert_contains "${output}" 'Codex wiring complete'
   assert_exists "${tmp_root}/store/versions/1.0.0/manifest.json"
   assert_exists "${tmp_root}/store/versions/1.0.0/docs"
-  assert_exists "${tmp_root}/store/versions/1.0.0/bin/mpt-skills"
-  assert_symlink_target "${tmp_root}/bin/mpt-skills" "${tmp_root}/store/current/bin/mpt-skills"
+  assert_exists "${tmp_root}/store/versions/1.0.0/bin/mpt-extensions-skills"
+  assert_symlink_target "${tmp_root}/bin/mpt-extensions-skills" "${tmp_root}/store/current/bin/mpt-extensions-skills"
   assert_symlink_target "${tmp_root}/codex/skills/mpt-ext-workflow-start-work" "${tmp_root}/store/current/skills/mpt-ext-workflow-start-work"
   assert_not_exists "${tmp_root}/claude/skills/mpt-ext-workflow-start-work"
+  pass "${FUNCNAME[0]}"
+}
+
+test_install_from_release_asset() {
+  local tmp_root
+  tmp_root="$(mktemp -d)"
+  local asset_dir="${tmp_root}/assets"
+  create_release_asset "4.0.0" "${asset_dir}"
+
+  mkdir -p "${tmp_root}/codex"
+  local output
+  output="$(run_with_release_env "${tmp_root}" "${asset_dir}" "4.0.0" install --version 4.0.0 --codex)"
+
+  assert_contains "${output}" 'Using local release asset'
+  assert_contains "${output}" 'Installing version 4.0.0 from release'
+  assert_symlink_target "${tmp_root}/store/current" "${tmp_root}/store/versions/4.0.0"
+  assert_exists "${tmp_root}/store/versions/4.0.0/bin/mpt-extensions-skills"
+  assert_contains "$(sed -n 's/.*"source_commit": "\(.*\)".*/\1/p' "${tmp_root}/store/versions/4.0.0/manifest.json")" 'release-test-commit'
+  assert_contains "$(sed -n 's/.*"source_type": "\(.*\)".*/\1/p' "${tmp_root}/store/versions/4.0.0/manifest.json")" 'release'
+  assert_symlink_target "${tmp_root}/codex/skills/mpt-ext-workflow-start-work" "${tmp_root}/store/current/skills/mpt-ext-workflow-start-work"
+  pass "${FUNCNAME[0]}"
+}
+
+test_install_from_local_path_uses_local_version() {
+  local tmp_root
+  tmp_root="$(mktemp -d)"
+
+  mkdir -p "${tmp_root}/codex"
+  local output
+  output="$(run_with_env "${tmp_root}" install --path "${REPO_ROOT}" --codex)"
+
+  assert_contains "${output}" 'Installing version local from local'
+  assert_symlink_target "${tmp_root}/store/current" "${tmp_root}/store/versions/local"
+  assert_symlink_target "${tmp_root}/codex/skills/mpt-ext-workflow-start-work" "${tmp_root}/store/current/skills/mpt-ext-workflow-start-work"
+  pass "${FUNCNAME[0]}"
+}
+
+test_install_from_local_path_uses_local_git_commit() {
+  local tmp_root
+  tmp_root="$(mktemp -d)"
+  local source_dir="${tmp_root}/source"
+  mkdir -p "${source_dir}/scripts" "${source_dir}/skills/mpt-ext-demo" "${source_dir}/standards" "${source_dir}/knowledge" "${source_dir}/docs" "${tmp_root}/codex"
+
+  cp "${SCRIPT_PATH}" "${source_dir}/scripts/mpt-extensions-skills.sh"
+  printf '# Demo\n' > "${source_dir}/skills/mpt-ext-demo/SKILL.md"
+  printf '{"source_commit": "stale-release-commit"}\n' > "${source_dir}/manifest.json"
+
+  git -C "${source_dir}" init >/dev/null
+  git -C "${source_dir}" config user.email test@example.com
+  git -C "${source_dir}" config user.name Test
+  git -C "${source_dir}" add . >/dev/null
+  git -C "${source_dir}" commit -m init >/dev/null
+
+  local expected_commit
+  expected_commit="$(git -C "${source_dir}" rev-parse --short HEAD)"
+
+  run_with_env "${tmp_root}" install --path "${source_dir}" --codex >/dev/null
+
+  local actual_commit
+  actual_commit="$(sed -n 's/.*"source_commit": "\(.*\)".*/\1/p' "${tmp_root}/store/versions/local/manifest.json")"
+  local actual_type
+  actual_type="$(sed -n 's/.*"source_type": "\(.*\)".*/\1/p' "${tmp_root}/store/versions/local/manifest.json")"
+
+  [[ "${actual_commit}" == "${expected_commit}" ]] || fail "Expected local source_commit ${expected_commit}, got ${actual_commit}"
+  [[ "${actual_type}" == "local" ]] || fail "Expected local source_type, got ${actual_type}"
+  pass "${FUNCNAME[0]}"
+}
+
+test_update_installs_latest_release() {
+  local tmp_root
+  tmp_root="$(mktemp -d)"
+  local asset_dir="${tmp_root}/assets"
+  create_release_asset "4.1.0" "${asset_dir}"
+
+  mkdir -p "${tmp_root}/codex"
+  install_release_for_test "${tmp_root}" 4.0.0 --codex >/dev/null
+
+  local output
+  output="$(run_with_release_env "${tmp_root}" "${asset_dir}" "4.1.0" update --codex)"
+
+  assert_contains "${output}" 'Updating from 4.0.0 to 4.1.0'
+  assert_symlink_target "${tmp_root}/store/current" "${tmp_root}/store/versions/4.1.0"
+  assert_symlink_target "${tmp_root}/codex/skills/mpt-ext-workflow-start-work" "${tmp_root}/store/current/skills/mpt-ext-workflow-start-work"
   pass "${FUNCNAME[0]}"
 }
 
@@ -137,7 +277,7 @@ test_install_claude_only() {
 
   mkdir -p "${tmp_root}/claude"
   local output
-  output="$(run_with_env "${tmp_root}" install 1.1.0 --claude)"
+  output="$(install_release_for_test "${tmp_root}" 1.1.0 --claude)"
 
   assert_contains "${output}" 'Target runtime: Claude'
   assert_contains "${output}" 'Claude wiring complete'
@@ -155,7 +295,7 @@ test_install_all_and_preserve_non_managed_entries() {
   touch "${tmp_root}/claude/skills/local-note"
 
   local output
-  output="$(run_with_env "${tmp_root}" install 2.0.0 --all)"
+  output="$(install_release_for_test "${tmp_root}" 2.0.0 --all)"
 
   assert_contains "${output}" 'Target runtimes: Codex and Claude'
   assert_contains "${output}" 'Codex wiring complete'
@@ -174,7 +314,7 @@ test_install_auto_detects_available_runtimes() {
   mkdir -p "${tmp_root}/codex" "${tmp_root}/claude"
 
   local output
-  output="$(run_with_env "${tmp_root}" install 2.1.0)"
+  output="$(install_release_for_test "${tmp_root}" 2.1.0)"
 
   assert_contains "${output}" 'Target runtimes: Codex and Claude'
   assert_symlink_target "${tmp_root}/codex/skills/mpt-ext-workflow-start-work" "${tmp_root}/store/current/skills/mpt-ext-workflow-start-work"
@@ -189,12 +329,21 @@ test_install_uses_default_home_runtime_dirs() {
   mkdir -p "${tmp_root}/.codex" "${tmp_root}/.claude"
 
   local output
-  output="$(run_with_home_defaults "${tmp_root}" install 2.2.0)"
+  local asset_dir="${tmp_root}/assets"
+  create_release_asset "2.2.0" "${asset_dir}"
+  output="$(
+    env -i \
+      HOME="${tmp_root}" \
+      PATH="/usr/bin:/bin" \
+      MPT_SKILLS_RELEASE_ASSET_DIR="${asset_dir}" \
+      MPT_SKILLS_LATEST_VERSION="2.2.0" \
+      "${SCRIPT_PATH}" install --version 2.2.0
+  )"
 
   assert_contains "${output}" 'Target runtimes: Codex and Claude'
   assert_symlink_target "${tmp_root}/.codex/skills/mpt-ext-workflow-start-work" "${tmp_root}/.mpt-extension-skills/current/skills/mpt-ext-workflow-start-work"
   assert_symlink_target "${tmp_root}/.claude/skills/mpt-ext-tool-jira-workitem-ops" "${tmp_root}/.mpt-extension-skills/current/skills/mpt-ext-tool-jira-workitem-ops"
-  assert_symlink_target "${tmp_root}/.local/bin/mpt-skills" "${tmp_root}/.mpt-extension-skills/current/bin/mpt-skills"
+  assert_symlink_target "${tmp_root}/.local/bin/mpt-extensions-skills" "${tmp_root}/.mpt-extension-skills/current/bin/mpt-extensions-skills"
   pass "${FUNCNAME[0]}"
 }
 
@@ -203,8 +352,8 @@ test_activate_switches_current_version() {
   tmp_root="$(mktemp -d)"
 
   mkdir -p "${tmp_root}/codex"
-  run_with_env "${tmp_root}" install 1.0.0 --codex >/dev/null
-  run_with_env "${tmp_root}" install 1.1.0 --codex >/dev/null
+  install_release_for_test "${tmp_root}" 1.0.0 --codex >/dev/null
+  install_release_for_test "${tmp_root}" 1.1.0 --codex >/dev/null
 
   local output
   output="$(run_with_env "${tmp_root}" activate 1.0.0 --codex)"
@@ -223,7 +372,7 @@ test_deactivate_removes_runtime_links_only() {
   tmp_root="$(mktemp -d)"
 
   mkdir -p "${tmp_root}/codex" "${tmp_root}/claude"
-  run_with_env "${tmp_root}" install 1.0.0 --all >/dev/null
+  install_release_for_test "${tmp_root}" 1.0.0 --all >/dev/null
 
   local output
   output="$(run_with_env "${tmp_root}" deactivate --all)"
@@ -243,7 +392,7 @@ test_deactivate_auto_detects_available_runtimes() {
   tmp_root="$(mktemp -d)"
 
   mkdir -p "${tmp_root}/codex" "${tmp_root}/claude"
-  run_with_env "${tmp_root}" install 1.0.0 --all >/dev/null
+  install_release_for_test "${tmp_root}" 1.0.0 --all >/dev/null
 
   local output
   output="$(run_with_env "${tmp_root}" deactivate)"
@@ -262,7 +411,7 @@ test_remove_all_cleans_install_root_and_runtime_links() {
   tmp_root="$(mktemp -d)"
 
   mkdir -p "${tmp_root}/codex" "${tmp_root}/claude"
-  run_with_env "${tmp_root}" install 1.0.0 --all >/dev/null
+  install_release_for_test "${tmp_root}" 1.0.0 --all >/dev/null
 
   local output
   output="$(run_with_env "${tmp_root}" remove --all)"
@@ -275,16 +424,16 @@ test_remove_all_cleans_install_root_and_runtime_links() {
   assert_not_exists "${tmp_root}/codex/skills/mpt-ext-workflow-start-work"
   assert_not_exists "${tmp_root}/claude/skills/mpt-ext-tool-jira-workitem-ops"
   assert_not_exists "${tmp_root}/store"
-  assert_not_exists "${tmp_root}/bin/mpt-skills"
+  assert_not_exists "${tmp_root}/bin/mpt-extensions-skills"
   pass "${FUNCNAME[0]}"
 }
 
-test_installed_command_is_invokable_as_mpt_skills() {
+test_installed_command_is_invokable_as_mpt_extensions_skills() {
   local tmp_root
   tmp_root="$(mktemp -d)"
 
   mkdir -p "${tmp_root}/codex"
-  run_with_env "${tmp_root}" install 3.0.0 --codex >/dev/null
+  install_release_for_test "${tmp_root}" 3.0.0 --codex >/dev/null
 
   local output
   output="$(
@@ -294,11 +443,11 @@ test_installed_command_is_invokable_as_mpt_skills() {
       CODEX_SKILLS_DIR="${tmp_root}/codex/skills" \
       CLAUDE_SKILLS_DIR="${tmp_root}/claude/skills" \
       MPT_SKILLS_BIN_DIR="${tmp_root}/bin" \
-      mpt-skills --help
+      mpt-extensions-skills --help
   )"
 
   assert_contains "${output}" 'Usage:'
-  assert_contains "${output}" 'mpt-skills install <version>'
+  assert_contains "${output}" 'mpt-extensions-skills install --version <version>'
   assert_contains "${output}" '3.0.0'
   pass "${FUNCNAME[0]}"
 }
@@ -313,6 +462,14 @@ main() {
   test_list_marks_active_version
   TESTS_RUN=$((TESTS_RUN + 1))
   test_install_codex_only
+  TESTS_RUN=$((TESTS_RUN + 1))
+  test_install_from_release_asset
+  TESTS_RUN=$((TESTS_RUN + 1))
+  test_install_from_local_path_uses_local_version
+  TESTS_RUN=$((TESTS_RUN + 1))
+  test_install_from_local_path_uses_local_git_commit
+  TESTS_RUN=$((TESTS_RUN + 1))
+  test_update_installs_latest_release
   TESTS_RUN=$((TESTS_RUN + 1))
   test_install_claude_only
   TESTS_RUN=$((TESTS_RUN + 1))
@@ -330,7 +487,7 @@ main() {
   TESTS_RUN=$((TESTS_RUN + 1))
   test_remove_all_cleans_install_root_and_runtime_links
   TESTS_RUN=$((TESTS_RUN + 1))
-  test_installed_command_is_invokable_as_mpt_skills
+  test_installed_command_is_invokable_as_mpt_extensions_skills
   TESTS_RUN=$((TESTS_RUN + 1))
 
   printf '[DONE] %s tests passed\n' "${TESTS_RUN}"

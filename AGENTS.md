@@ -16,7 +16,7 @@ An agent should determine whether the task is primarily about a skill, a shared 
 - [README.md](./README.md): top-level index for the repository, including links to standards, knowledge, and skills
 - `standards/`: shared engineering standards, practices, and reusable cross-repository knowledge
 - `knowledge/`: shared operational guidance and reusable how-to documentation
-- `docs/`: repository-specific documentation such as installation, distribution, contributing, testing, and documentation guidance
+- `docs/`: repository-specific documentation such as installation, CLI usage, distribution, contributing, testing, and documentation guidance
 - `skills/*/SKILL.md`: skill definitions for reusable agent workflows
 
 ## How To Read This Repository
@@ -93,7 +93,8 @@ Treat `knowledge/` as reusable guidance. Repository-specific commands and except
 
 - [contributing.md](./docs/contributing.md): repository-specific contribution workflow and links to shared standards
 - [documentation.md](./docs/documentation.md): repository-specific documentation validation rules and local linking requirements
-- [installation.md](./docs/installation.md): how to install and use the shared skills package from this repository
+- [installation.md](./docs/installation.md): first-time installation from GitHub Releases
+- [usage.md](./docs/usage.md): installed CLI commands, updates, local debug installs, and release lifecycle usage
 - [testing.md](./docs/testing.md): repository-specific test and validation commands
 
 ## Current Skills

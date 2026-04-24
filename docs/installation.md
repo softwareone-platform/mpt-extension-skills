@@ -2,184 +2,61 @@
 
 ## Purpose
 
-Describe how to install and use the shared skills package from this repository.
+Describe the first-time installation path for the shared skills package from GitHub Releases.
 
 ## Prerequisites
 
-- A local agent/tool runtime that supports file-based skills
-- Access to your local home directories for Codex or Claude
+- Bash
+- `curl`
+- `tar`
 - Access to a local user bin directory such as `~/.local/bin`
+- A local agent/tool runtime that supports file-based skills, such as Codex or Claude
 
-## Install From A Local Clone
+## Install Latest Release
 
-From the repository root:
-
-```bash
-./scripts/mpt-skills.sh install 1.0.0
-```
-
-You can also use the installed command after the first install:
+Install the latest GitHub release with the release installer asset:
 
 ```bash
-mpt-skills install 1.0.0
+curl -LsSf https://github.com/softwareone-platform/mpt-extension-skills/releases/latest/download/mpt-extensions-skills-install.sh | bash
 ```
 
-## What Gets Installed
+## Install Specific Release
 
-The installer installs:
-
-- `bin/`
-- `skills/`
-- `standards/`
-- `knowledge/`
-- `docs/`
-- `manifest.json`
-
-## Installed Commands
-
-The package installs the CLI into the versioned package and exposes the user-facing command as:
+Install a specific release version:
 
 ```bash
-mpt-skills
-```
-
-By default this command is linked into:
-
-```text
-~/.local/bin/mpt-skills
+curl -LsSf https://github.com/softwareone-platform/mpt-extension-skills/releases/download/1.0.0/mpt-extensions-skills-install.sh | bash
 ```
 
 ## Runtime Selection
 
 By default, the installer auto-detects installed runtimes and wires only those.
-If Codex and Claude runtime directories are both present, `install` without flags behaves like installing for both runtimes.
-
-You can also target runtimes explicitly:
+Pass runtime flags through the shell command when explicit targeting is needed:
 
 ```bash
-./scripts/mpt-skills.sh install 1.0.0 --codex
-./scripts/mpt-skills.sh install 1.0.0 --claude
-./scripts/mpt-skills.sh install 1.0.0 --all
+curl -LsSf https://github.com/softwareone-platform/mpt-extension-skills/releases/latest/download/mpt-extensions-skills-install.sh | bash -s -- --all
+curl -LsSf https://github.com/softwareone-platform/mpt-extension-skills/releases/latest/download/mpt-extensions-skills-install.sh | bash -s -- --codex
+curl -LsSf https://github.com/softwareone-platform/mpt-extension-skills/releases/latest/download/mpt-extensions-skills-install.sh | bash -s -- --claude
 ```
 
-The same runtime flags are supported for `activate`.
-The same runtime flags are supported for `deactivate`.
-Without flags, `deactivate` also auto-detects the available runtime directories and removes managed links only from the runtimes it finds.
-Use `remove --all` when you want to remove the installed package completely.
+## Installed Command
 
-## Environment Variables
-
-The installer and activation command support these environment variable overrides:
-
-- `MPT_EXTENSION_SKILLS_HOME`: root directory for installed package versions and the `current` symlink. Default: `~/.mpt-extension-skills`
-- `CODEX_SKILLS_DIR`: Codex skills directory that receives managed shared skill links during activation. Default: `~/.codex/skills`
-- `CLAUDE_SKILLS_DIR`: Claude skills directory that receives managed shared skill links during activation. Default: `~/.claude/skills`
-- `MPT_SKILLS_BIN_DIR`: directory where the user-facing `mpt-skills` command is linked. Default: `~/.local/bin`
-
-Example:
+The installer exposes the CLI as:
 
 ```bash
-export MPT_EXTENSION_SKILLS_HOME="$HOME/.local/share/mpt-extension-skills"
-export CODEX_SKILLS_DIR="$HOME/.codex/skills"
-export CLAUDE_SKILLS_DIR="$HOME/.claude/skills"
-export MPT_SKILLS_BIN_DIR="$HOME/.local/bin"
-
-./scripts/mpt-skills.sh install 1.0.0 --all
+mpt-extensions-skills
 ```
 
-Use these overrides when your runtime directories or local bin directory differ from the defaults.
-
-## Show Installed Version
-
-Use:
-
-```bash
-mpt-skills --help
-```
-
-The help output shows the currently active installed version.
-
-## List Installed Versions
-
-Use:
-
-```bash
-mpt-skills list
-```
-
-The active version is marked in the output:
+By default this command is linked into:
 
 ```text
-1.0.0 (active)
-1.1.0
+~/.local/bin/mpt-extensions-skills
 ```
 
-## Activate A Previously Installed Version
-
-Use:
-
-```bash
-mpt-skills activate 1.0.0
-```
-
-Examples with explicit runtime selection:
-
-```bash
-mpt-skills activate 1.0.0 --codex
-mpt-skills activate 1.0.0 --claude
-mpt-skills activate 1.0.0 --all
-```
-
-## Deactivate Runtime Links
-
-Use:
-
-```bash
-mpt-skills deactivate
-```
-
-When Codex and Claude runtime directories both exist, this default form removes managed links from both runtimes automatically.
-
-Examples with explicit runtime selection:
-
-```bash
-mpt-skills deactivate --codex
-mpt-skills deactivate --claude
-mpt-skills deactivate --all
-```
-
-`deactivate` removes only the managed skill links from the selected runtime directories.
-It does not delete installed versions from `~/.mpt-extension-skills` and does not remove the version metadata stored in the package install root.
-
-## Remove Everything
-
-Use:
-
-```bash
-mpt-skills remove --all
-```
-
-This command:
-
-- removes managed skill links from detected Codex and Claude runtime directories
-- removes the user command link from `~/.local/bin` or `MPT_SKILLS_BIN_DIR`
-- removes the package install root such as `~/.mpt-extension-skills`
-
-This is the destructive cleanup command.
-Use it when you want to remove the installed package entirely, not just detach runtime links.
-
-## Manual Copy Is Not Recommended
-
-Do not install individual skills by manually copying only `skills/<skill-name>` into a runtime directory unless you are debugging locally.
-
-Manual copying is discouraged because:
-
-- it does not install shared `standards/`, `knowledge/`, and `docs/`
-- installed version metadata is lost
-- updates and rollback become manual
-- local documentation links may break
+For lifecycle commands after installation, see [usage.md](./usage.md).
 
 ## Related Documents
 
+- [usage.md](./usage.md)
 - [testing.md](./testing.md)
-- [../scripts/mpt-skills.sh](../scripts/mpt-skills.sh)
+- [../scripts/mpt-extensions-skills-install.sh](../scripts/mpt-extensions-skills-install.sh)

@@ -35,7 +35,7 @@ sudo apt-get install -y shellcheck
 Run shell linting from the repository root:
 
 ```bash
-shellcheck scripts/mpt-skills.sh
+shellcheck scripts/mpt-extensions-skills.sh scripts/mpt-extensions-skills-install.sh
 ```
 
 Run shell tests from the repository root:
@@ -59,7 +59,7 @@ make review
 
 Current commands:
 
-- `make check`: runs `shellcheck`
+- `make check`: runs `shellcheck` for the CLI and release installer scripts
 - `make test`: runs the shell integration tests
 - `make check-all`: runs both validation and tests
 - `make review`: runs the local CodeRabbit review command
@@ -100,16 +100,21 @@ GitHub Actions runs the shell validation workflow on:
 
 The workflow runs:
 
-- `shellcheck 0.11.0` for `scripts/mpt-skills.sh`
+- `shellcheck 0.11.0` for `scripts/mpt-extensions-skills.sh` and `scripts/mpt-extensions-skills-install.sh`
 - `bash tests/test_mpt_skills.sh`
+
+Local `make check` uses the `SHELLCHECK` command available on the developer machine.
+Install shellcheck `0.11.0` locally when you need parity with CI; otherwise CI remains the authoritative shellcheck version gate for these two scripts.
 
 ## Related Documents
 
 - [contributing.md](./contributing.md)
 - [installation.md](./installation.md)
+- [usage.md](./usage.md)
 - [../Makefile](../Makefile)
 - [../make/external_tools.mk](../make/external_tools.mk)
 - [../make/repo.mk](../make/repo.mk)
-- [../scripts/mpt-skills.sh](../scripts/mpt-skills.sh)
+- [../scripts/mpt-extensions-skills.sh](../scripts/mpt-extensions-skills.sh)
+- [../scripts/mpt-extensions-skills-install.sh](../scripts/mpt-extensions-skills-install.sh)
 - [../tests/test_mpt_skills.sh](../tests/test_mpt_skills.sh)
 - [../README.md](../README.md)
