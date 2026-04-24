@@ -32,6 +32,12 @@ Move a Jira issue into `QA` after the reviewed pull request has been merged.
 ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 ```
 
+## Assumptions
+
+- Jira authentication is available and the target issue can be read and transitioned through `mpt-ext-tool-jira-workitem-ops`.
+- The repository workflow exposes a usable transition into `QA`.
+- The corresponding pull request has been merged, or the user explicitly confirms the work is in post-merge state.
+
 ## Workflow
 
 1. Build repository context first.

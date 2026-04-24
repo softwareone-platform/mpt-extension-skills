@@ -22,7 +22,9 @@ Current skills:
 - [mpt-ext-task-handle-pr-comments](./skills/mpt-ext-task-handle-pr-comments/SKILL.md): Address existing PR review comments with scoped fixes or thread replies
 - [mpt-ext-task-move-jira-to-qa](./skills/mpt-ext-task-move-jira-to-qa/SKILL.md): Move a Jira issue into QA after reviewed work is merged
 - [mpt-ext-workflow-start-work](./skills/mpt-ext-workflow-start-work/SKILL.md): Coordinate branch creation and Jira start-of-work setup
-- [mpt-ext-workflow-finish-work](./skills/mpt-ext-workflow-finish-work/SKILL.md): Coordinate commit, PR, review feedback handling, and Jira completion states
+- [mpt-ext-workflow-send-to-review](./skills/mpt-ext-workflow-send-to-review/SKILL.md): Coordinate validation, commit, PR creation, and Jira review handoff
+- [mpt-ext-workflow-address-review-feedback](./skills/mpt-ext-workflow-address-review-feedback/SKILL.md): Coordinate review comment handling, validation, and updated branch publication
+- [mpt-ext-workflow-complete-after-merge](./skills/mpt-ext-workflow-complete-after-merge/SKILL.md): Coordinate merge confirmation and the final Jira QA handoff
 - [mpt-ext-workflow-skill-authoring](./skills/mpt-ext-workflow-skill-authoring/SKILL.md): Shared workflow skill for creating and updating reusable skills
 
 For installation and package usage, see [docs/installation.md](./docs/installation.md).
@@ -55,7 +57,7 @@ Avoid using this directory for:
 
 Current documents in `standards/`:
 
-- [commit-messages.md](./standards/commit-messages.md): shared commit message format with tag, Jira ID, short summary, and required AI-generated description line
+- [commit-messages.md](./standards/commit-messages.md): shared commit message format with tag, Jira ID, short summary, and descriptive commit body guidance
 - [documentation.md](./standards/documentation.md): shared repository documentation structure and authoring rules for human readers and AI agents
 - [extensions-best-practices.md](./standards/extensions-best-practices.md): extension architecture and design guidance for isolation, deployability, local development, and reusability
 - [makefiles.md](./standards/makefiles.md): shared `Makefile` structure and expectations for organizing common development commands

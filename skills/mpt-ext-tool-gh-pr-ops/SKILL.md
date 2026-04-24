@@ -37,6 +37,12 @@ Operate GitHub pull requests safely and consistently through repository-supporte
 ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 ```
 
+## Assumptions
+
+- An authenticated GitHub CLI session or equivalent repository-scoped credentials are available for the requested read or write operation.
+- The command is running inside a local Git repository checkout so repository and branch context can be resolved safely.
+- Network access to GitHub is available for reading or mutating pull request state.
+
 ## Workflow
 
 1. Build repository context first.
