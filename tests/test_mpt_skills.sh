@@ -31,8 +31,8 @@ assert_before() {
   local second="$3"
   local first_line
   local second_line
-  first_line="$(printf '%s\n' "${haystack}" | grep -nF "${first}" | head -n 1 | cut -d: -f1)"
-  second_line="$(printf '%s\n' "${haystack}" | grep -nF "${second}" | head -n 1 | cut -d: -f1)"
+  first_line="$(printf '%s\n' "${haystack}" | awk -v needle="${first}" 'index($0, needle) { print NR; exit }')"
+  second_line="$(printf '%s\n' "${haystack}" | awk -v needle="${second}" 'index($0, needle) { print NR; exit }')"
   [[ -n "${first_line}" ]] || fail "Expected output to contain: ${first}"
   [[ -n "${second_line}" ]] || fail "Expected output to contain: ${second}"
   [[ "${first_line}" -lt "${second_line}" ]] || fail "Expected ${first} before ${second}"
@@ -176,6 +176,23 @@ test_list_without_install() {
   assert_contains "${output}" '1.10.0'
   assert_before "${output}" '1.10.0' '1.3.0'
   assert_before "${output}" '1.3.0' '1.2.0'
+  pass "${FUNCNAME[0]}"
+}
+
+test_list_treats_empty_versions_dir_as_no_install() {
+  local tmp_root
+  tmp_root="$(mktemp -d)"
+  local asset_dir="${tmp_root}/assets"
+  create_release_asset "1.2.0" "${asset_dir}"
+  mkdir -p "${tmp_root}/store/versions"
+
+  local output
+  output="$(run_with_release_env "${tmp_root}" "${asset_dir}" "1.2.0" list)"
+
+  assert_contains "${output}" 'No installed versions found'
+  if [[ "${output}" == *'Installed versions:'* ]]; then
+    fail 'Expected empty versions directory to skip Installed versions section'
+  fi
   pass "${FUNCNAME[0]}"
 }
 
@@ -534,6 +551,8 @@ main() {
   test_help_without_install
   TESTS_RUN=$((TESTS_RUN + 1))
   test_list_without_install
+  TESTS_RUN=$((TESTS_RUN + 1))
+  test_list_treats_empty_versions_dir_as_no_install
   TESTS_RUN=$((TESTS_RUN + 1))
   test_list_marks_active_version
   TESTS_RUN=$((TESTS_RUN + 1))

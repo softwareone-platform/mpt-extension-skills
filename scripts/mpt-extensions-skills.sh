@@ -607,11 +607,16 @@ version_is_installed() {
 
 list_installed() {
   local current_version=""
+  local installed_versions=""
   if [[ -f "${INSTALL_ROOT}/current/manifest.json" ]]; then
     current_version="$(sed -n 's/.*"version": "\(.*\)".*/\1/p' "${INSTALL_ROOT}/current/manifest.json" | head -n 1)"
   fi
 
-  if [[ ! -d "${INSTALL_ROOT}/versions" ]]; then
+  if [[ -d "${INSTALL_ROOT}/versions" ]]; then
+    installed_versions="$(find "${INSTALL_ROOT}/versions" -maxdepth 1 -mindepth 1 -type d -exec basename {} \; | sort)"
+  fi
+
+  if [[ -z "${installed_versions}" ]]; then
     echo "No installed versions found"
   else
     echo "Installed versions:"
@@ -621,7 +626,7 @@ list_installed() {
       else
         printf '  %s\n' "${version}"
       fi
-    done < <(find "${INSTALL_ROOT}/versions" -maxdepth 1 -mindepth 1 -type d -exec basename {} \; | sort)
+    done <<< "${installed_versions}"
   fi
 
   local available_versions
