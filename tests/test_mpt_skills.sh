@@ -162,20 +162,26 @@ test_list_without_install() {
   local tmp_root
   tmp_root="$(mktemp -d)"
   local asset_dir="${tmp_root}/assets"
-  create_release_asset "1.2.0" "${asset_dir}"
-  create_release_asset "1.3.0" "${asset_dir}"
-  create_release_asset "1.10.0" "${asset_dir}"
+  local version
+  for version in 1.1.0 1.2.0 1.3.0 1.4.0 1.5.0 1.6.0 1.7.0 1.8.0 1.9.0 1.10.0 1.11.0 1.12.0; do
+    create_release_asset "${version}" "${asset_dir}"
+  done
 
   local output
   output="$(run_with_release_env "${tmp_root}" "${asset_dir}" "1.2.0" list)"
 
   assert_contains "${output}" 'No installed versions found'
   assert_contains "${output}" 'Available GitHub releases:'
-  assert_contains "${output}" '1.2.0'
   assert_contains "${output}" '1.3.0'
   assert_contains "${output}" '1.10.0'
+  assert_contains "${output}" '1.12.0'
+  assert_contains "${output}" '1.11.0'
+  if [[ "${output}" == *'1.2.0'* ]]; then
+    fail 'Expected list to show only the latest 10 available releases'
+  fi
+  assert_before "${output}" '1.12.0' '1.11.0'
+  assert_before "${output}" '1.11.0' '1.10.0'
   assert_before "${output}" '1.10.0' '1.3.0'
-  assert_before "${output}" '1.3.0' '1.2.0'
   pass "${FUNCNAME[0]}"
 }
 
@@ -326,6 +332,25 @@ test_upgrade_installs_latest_release() {
   local output
   output="$(run_with_release_env "${tmp_root}" "${asset_dir}" "4.1.0" upgrade --codex)"
 
+  assert_contains "${output}" 'Upgrading from 4.0.0 to 4.1.0'
+  assert_symlink_target "${tmp_root}/store/current" "${tmp_root}/store/versions/4.1.0"
+  assert_symlink_target "${tmp_root}/codex/skills/mpt-ext-workflow-start-work" "${tmp_root}/store/current/skills/mpt-ext-workflow-start-work"
+  pass "${FUNCNAME[0]}"
+}
+
+test_upgrade_without_runtime_flags_uses_auto_detection() {
+  local tmp_root
+  tmp_root="$(mktemp -d)"
+  local asset_dir="${tmp_root}/assets"
+  create_release_asset "4.1.0" "${asset_dir}"
+
+  mkdir -p "${tmp_root}/codex"
+  install_release_for_test "${tmp_root}" 4.0.0 --codex >/dev/null
+
+  local output
+  output="$(run_with_release_env "${tmp_root}" "${asset_dir}" "4.1.0" upgrade)"
+
+  assert_contains "${output}" 'Target runtime: Codex'
   assert_contains "${output}" 'Upgrading from 4.0.0 to 4.1.0'
   assert_symlink_target "${tmp_root}/store/current" "${tmp_root}/store/versions/4.1.0"
   assert_symlink_target "${tmp_root}/codex/skills/mpt-ext-workflow-start-work" "${tmp_root}/store/current/skills/mpt-ext-workflow-start-work"
@@ -569,6 +594,8 @@ main() {
   test_install_from_local_path_uses_local_git_commit
   TESTS_RUN=$((TESTS_RUN + 1))
   test_upgrade_installs_latest_release
+  TESTS_RUN=$((TESTS_RUN + 1))
+  test_upgrade_without_runtime_flags_uses_auto_detection
   TESTS_RUN=$((TESTS_RUN + 1))
   test_upgrade_installs_specific_release
   TESTS_RUN=$((TESTS_RUN + 1))

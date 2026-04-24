@@ -241,7 +241,11 @@ parse_upgrade_selection() {
     esac
   done
 
-  parse_runtime_selection "${runtime_args[@]}"
+  if [[ "${#runtime_args[@]}" -eq 0 ]]; then
+    parse_runtime_selection
+  else
+    parse_runtime_selection "${runtime_args[@]}"
+  fi
 }
 
 log_runtime_selection() {
@@ -568,9 +572,13 @@ sort_versions_desc() {
   ' | sort -r | cut -f2-
 }
 
+latest_available_versions() {
+  sort_versions_desc | head -n 10
+}
+
 available_release_versions() {
   if [[ -n "${MPT_SKILLS_AVAILABLE_RELEASES:-}" ]]; then
-    printf '%s\n' "${MPT_SKILLS_AVAILABLE_RELEASES}" | tr ', ' '\n' | sed '/^$/d' | sort_versions_desc
+    printf '%s\n' "${MPT_SKILLS_AVAILABLE_RELEASES}" | tr ', ' '\n' | sed '/^$/d' | latest_available_versions
     return
   fi
 
@@ -578,7 +586,7 @@ available_release_versions() {
     find "${MPT_SKILLS_RELEASE_ASSET_DIR}" -maxdepth 1 -type f \
       -name 'mpt-extension-skills-*.tar.gz' -exec basename {} \; \
       | sed 's/^mpt-extension-skills-//; s/\.tar\.gz$//' \
-      | sort_versions_desc
+      | latest_available_versions
     return
   fi
 
@@ -590,14 +598,14 @@ available_release_versions() {
   fi
 
   if command -v jq >/dev/null 2>&1; then
-    printf '%s' "${response}" | jq -r '.[].tag_name // empty' 2>/dev/null | sort_versions_desc || true
+    printf '%s' "${response}" | jq -r '.[].tag_name // empty' 2>/dev/null | latest_available_versions || true
     return
   fi
 
   printf '%s' "${response}" \
     | tr '{' '\n' \
     | sed -n 's/.*"tag_name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' \
-    | sort_versions_desc
+    | latest_available_versions
 }
 
 version_is_installed() {

@@ -101,7 +101,7 @@ mpt-extensions-skills list
 ```
 
 The active version is marked in the installed versions output.
-GitHub releases that can be installed are listed separately:
+The latest 10 GitHub releases that can be installed are listed separately:
 
 ```text
 Installed versions:
