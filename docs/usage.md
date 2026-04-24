@@ -25,7 +25,7 @@ The release package and local installer install:
 
 ## Runtime Selection
 
-By default, install, update, activate, and deactivate auto-detect available runtimes.
+By default, install, upgrade, activate, and deactivate auto-detect available runtimes.
 
 Use explicit runtime flags when needed:
 
@@ -58,12 +58,18 @@ After first-time installation, install a specific GitHub release through the CLI
 mpt-extensions-skills install --version 1.0.0
 ```
 
-## Update
+## Upgrade
 
-Update to the latest GitHub release:
+Upgrade to the latest GitHub release:
 
 ```bash
-mpt-extensions-skills update
+mpt-extensions-skills upgrade
+```
+
+Install and activate a specific GitHub release:
+
+```bash
+mpt-extensions-skills upgrade --version 1.0.0
 ```
 
 ## Local Debug Installation
@@ -94,12 +100,18 @@ Use:
 mpt-extensions-skills list
 ```
 
-The active version is marked in the output:
+The active version is marked in the installed versions output.
+GitHub releases that can be installed are listed separately:
 
 ```text
-1.0.0 (active)
-1.1.0
-local
+Installed versions:
+  1.0.0 (active)
+  1.1.0
+  local
+Available GitHub releases:
+  1.10.0
+  1.3.0
+  1.2.0
 ```
 
 ## Activate A Previously Installed Version
