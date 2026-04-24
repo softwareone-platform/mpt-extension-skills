@@ -1,4 +1,4 @@
 interface:
   display_name: "Complete After Merge"
   short_description: "Finish the post-merge Jira handoff"
-  default_prompt: "Complete the workflow after merge: verify that the pull request has merged and then move the related Jira issue to QA."
+  default_prompt: "Complete the workflow after merge: verify that the pull request has merged and then move the related Jira issue to the correct post-merge status, using Done for subtasks unless repository or Jira rules define another target, and QA otherwise."
