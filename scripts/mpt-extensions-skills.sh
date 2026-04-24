@@ -50,10 +50,20 @@ Usage:
   ${COMMAND_NAME} install --path <local-repo> [--codex | --claude | --all]
   ${COMMAND_NAME} activate <version> [--codex | --claude | --all]
   ${COMMAND_NAME} deactivate [--codex | --claude | --all]
-  ${COMMAND_NAME} update [--codex | --claude | --all]
+  ${COMMAND_NAME} upgrade [--version <version>] [--codex | --claude | --all]
   ${COMMAND_NAME} remove --all
   ${COMMAND_NAME} list
   ${COMMAND_NAME} --help
+
+Commands:
+  install --version <version>  Install a package from a GitHub release
+  install --path <local-repo>  Install from a local repository checkout
+  activate <version>          Switch current to an installed version
+  deactivate                  Remove managed runtime skill links
+  upgrade                     Install and activate a GitHub release
+  remove --all                Remove installed package files and managed links
+  list                        Show installed versions and available GitHub releases
+  --help                      Show this help
 
 Runtime targeting:
   No runtime flag  Auto-detect installed runtimes and wire only those
@@ -198,6 +208,40 @@ parse_runtime_selection() {
       TARGET_CLAUDE=1
     fi
   fi
+}
+
+parse_upgrade_selection() {
+  UPGRADE_VERSION=""
+  local runtime_args=()
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --version)
+        if [[ $# -lt 2 || -z "$2" || "$2" == --* ]]; then
+          echo "Missing upgrade version after --version" >&2
+          usage
+          exit 1
+        fi
+        if [[ -n "${UPGRADE_VERSION}" ]]; then
+          echo "Upgrade version specified more than once" >&2
+          exit 1
+        fi
+        UPGRADE_VERSION="$2"
+        shift 2
+        ;;
+      --codex|--claude|--all)
+        runtime_args+=("$1")
+        shift
+        ;;
+      *)
+        echo "Unknown option: $1" >&2
+        usage
+        exit 1
+        ;;
+    esac
+  done
+
+  parse_runtime_selection "${runtime_args[@]}"
 }
 
 log_runtime_selection() {
@@ -486,7 +530,7 @@ current_installed_version() {
   fi
 }
 
-update_to_latest() {
+upgrade_to_latest() {
   local latest_version
   latest_version="$(latest_release_version)"
 
@@ -499,12 +543,12 @@ update_to_latest() {
   current_version="$(current_installed_version)"
 
   if [[ "${current_version}" == "${latest_version}" ]]; then
-    log_done "Already up to date (${current_version})"
+    log_done "Already on latest version (${current_version})"
     return
   fi
 
   if [[ -n "${current_version}" ]]; then
-    log_info "Updating from ${current_version} to ${latest_version}"
+    log_info "Upgrading from ${current_version} to ${latest_version}"
   else
     log_info "Installing latest version ${latest_version}"
   fi
@@ -512,24 +556,104 @@ update_to_latest() {
   install_release_version "${latest_version}"
 }
 
-list_installed() {
-  if [[ ! -d "${INSTALL_ROOT}/versions" ]]; then
-    echo "No installed versions found"
-    exit 0
+sort_versions_desc() {
+  awk '
+    {
+      original = $0
+      normalized = original
+      sub(/^v/, "", normalized)
+      split(normalized, parts, /[.-]/)
+      printf "%010d.%010d.%010d\t%s\n", parts[1] + 0, parts[2] + 0, parts[3] + 0, original
+    }
+  ' | sort -r | cut -f2-
+}
+
+available_release_versions() {
+  if [[ -n "${MPT_SKILLS_AVAILABLE_RELEASES:-}" ]]; then
+    printf '%s\n' "${MPT_SKILLS_AVAILABLE_RELEASES}" | tr ', ' '\n' | sed '/^$/d' | sort_versions_desc
+    return
   fi
 
+  if [[ -n "${MPT_SKILLS_RELEASE_ASSET_DIR:-}" ]]; then
+    find "${MPT_SKILLS_RELEASE_ASSET_DIR}" -maxdepth 1 -type f \
+      -name 'mpt-extension-skills-*.tar.gz' -exec basename {} \; \
+      | sed 's/^mpt-extension-skills-//; s/\.tar\.gz$//' \
+      | sort_versions_desc
+    return
+  fi
+
+  local releases_url="${GITHUB_API_BASE_URL}/releases"
+  local response
+  if ! response="$(curl -LsSf "${releases_url}")"; then
+    log_warn "list could not fetch release metadata from ${releases_url}"
+    return
+  fi
+
+  if command -v jq >/dev/null 2>&1; then
+    printf '%s' "${response}" | jq -r '.[].tag_name // empty' 2>/dev/null | sort_versions_desc || true
+    return
+  fi
+
+  printf '%s' "${response}" \
+    | tr '{' '\n' \
+    | sed -n 's/.*"tag_name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' \
+    | sort_versions_desc
+}
+
+version_is_installed() {
+  local version="$1"
+  [[ -d "${INSTALL_ROOT}/versions/${version}" ]]
+}
+
+list_installed() {
   local current_version=""
+  local installed_versions=""
   if [[ -f "${INSTALL_ROOT}/current/manifest.json" ]]; then
     current_version="$(sed -n 's/.*"version": "\(.*\)".*/\1/p' "${INSTALL_ROOT}/current/manifest.json" | head -n 1)"
   fi
 
+  if [[ -d "${INSTALL_ROOT}/versions" ]]; then
+    installed_versions="$(find "${INSTALL_ROOT}/versions" -maxdepth 1 -mindepth 1 -type d -exec basename {} \; | sort)"
+  fi
+
+  if [[ -z "${installed_versions}" ]]; then
+    echo "No installed versions found"
+  else
+    echo "Installed versions:"
+    while IFS= read -r version; do
+      if [[ -n "${current_version}" && "${version}" == "${current_version}" ]]; then
+        printf '  %s (active)\n' "${version}"
+      else
+        printf '  %s\n' "${version}"
+      fi
+    done <<< "${installed_versions}"
+  fi
+
+  local available_versions
+  available_versions="$(available_release_versions)"
+
+  if [[ -z "${available_versions}" ]]; then
+    echo "No available GitHub releases found"
+    exit 0
+  fi
+
+  echo "Available GitHub releases:"
+  local printed=0
   while IFS= read -r version; do
-    if [[ -n "${current_version}" && "${version}" == "${current_version}" ]]; then
-      printf '%s (active)\n' "${version}"
-    else
-      printf '%s\n' "${version}"
+    if [[ -z "${version}" ]]; then
+      continue
     fi
-  done < <(find "${INSTALL_ROOT}/versions" -maxdepth 1 -mindepth 1 -type d -exec basename {} \; | sort)
+    if version_is_installed "${version}"; then
+      printf '  %s (installed)\n' "${version}"
+    else
+      printf '  %s\n' "${version}"
+    fi
+    printed=$((printed + 1))
+  done <<< "${available_versions}"
+
+  if [[ "${printed}" -eq 0 ]]; then
+    echo "No available GitHub releases found"
+  fi
 }
 
 main() {
@@ -607,15 +731,19 @@ main() {
       log_runtime_selection
       deactivate_selected_runtimes
       ;;
-    update)
-      if [[ $# -gt 4 ]]; then
+    upgrade)
+      if [[ $# -gt 6 ]]; then
         usage
         exit 1
       fi
       shift
-      parse_runtime_selection "$@"
+      parse_upgrade_selection "$@"
       log_runtime_selection
-      update_to_latest
+      if [[ -n "${UPGRADE_VERSION}" ]]; then
+        install_release_version "${UPGRADE_VERSION}"
+      else
+        upgrade_to_latest
+      fi
       ;;
     remove)
       if [[ $# -ne 2 || "$2" != "--all" ]]; then

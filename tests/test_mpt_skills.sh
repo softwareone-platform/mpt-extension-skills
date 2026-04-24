@@ -25,6 +25,19 @@ assert_contains() {
   fi
 }
 
+assert_before() {
+  local haystack="$1"
+  local first="$2"
+  local second="$3"
+  local first_line
+  local second_line
+  first_line="$(printf '%s\n' "${haystack}" | awk -v needle="${first}" 'index($0, needle) { print NR; exit }')"
+  second_line="$(printf '%s\n' "${haystack}" | awk -v needle="${second}" 'index($0, needle) { print NR; exit }')"
+  [[ -n "${first_line}" ]] || fail "Expected output to contain: ${first}"
+  [[ -n "${second_line}" ]] || fail "Expected output to contain: ${second}"
+  [[ "${first_line}" -lt "${second_line}" ]] || fail "Expected ${first} before ${second}"
+}
+
 assert_exists() {
   local path="$1"
   [[ -e "${path}" ]] || fail "Expected path to exist: ${path}"
@@ -128,7 +141,12 @@ test_help_without_install() {
   if [[ "${output}" == *'install <version>'* ]]; then
     fail 'Deprecated install <version> form must not be shown in help'
   fi
-  assert_contains "${output}" 'update [--codex | --claude | --all]'
+  assert_contains "${output}" 'upgrade [--version <version>] [--codex | --claude | --all]'
+  if [[ "${output}" == *'update [--codex | --claude | --all]'* ]]; then
+    fail 'Deprecated update command must not be shown in help'
+  fi
+  assert_contains "${output}" 'Commands:'
+  assert_contains "${output}" 'list                        Show installed versions and available GitHub releases'
   assert_contains "${output}" 'Environment overrides:'
   assert_contains "${output}" 'MPT_EXTENSION_SKILLS_HOME  Install root for versioned package contents'
   assert_contains "${output}" 'CODEX_SKILLS_DIR           Codex skills directory to wire during activation'
@@ -143,11 +161,38 @@ test_help_without_install() {
 test_list_without_install() {
   local tmp_root
   tmp_root="$(mktemp -d)"
+  local asset_dir="${tmp_root}/assets"
+  create_release_asset "1.2.0" "${asset_dir}"
+  create_release_asset "1.3.0" "${asset_dir}"
+  create_release_asset "1.10.0" "${asset_dir}"
 
   local output
-  output="$(run_with_env "${tmp_root}" list)"
+  output="$(run_with_release_env "${tmp_root}" "${asset_dir}" "1.2.0" list)"
 
   assert_contains "${output}" 'No installed versions found'
+  assert_contains "${output}" 'Available GitHub releases:'
+  assert_contains "${output}" '1.2.0'
+  assert_contains "${output}" '1.3.0'
+  assert_contains "${output}" '1.10.0'
+  assert_before "${output}" '1.10.0' '1.3.0'
+  assert_before "${output}" '1.3.0' '1.2.0'
+  pass "${FUNCNAME[0]}"
+}
+
+test_list_treats_empty_versions_dir_as_no_install() {
+  local tmp_root
+  tmp_root="$(mktemp -d)"
+  local asset_dir="${tmp_root}/assets"
+  create_release_asset "1.2.0" "${asset_dir}"
+  mkdir -p "${tmp_root}/store/versions"
+
+  local output
+  output="$(run_with_release_env "${tmp_root}" "${asset_dir}" "1.2.0" list)"
+
+  assert_contains "${output}" 'No installed versions found'
+  if [[ "${output}" == *'Installed versions:'* ]]; then
+    fail 'Expected empty versions directory to skip Installed versions section'
+  fi
   pass "${FUNCNAME[0]}"
 }
 
@@ -161,10 +206,22 @@ test_list_marks_active_version() {
   run_with_env "${tmp_root}" activate 1.0.0 --codex >/dev/null
 
   local output
-  output="$(run_with_env "${tmp_root}" list)"
+  local asset_dir="${tmp_root}/assets"
+  create_release_asset "1.2.0" "${asset_dir}"
+  create_release_asset "1.3.0" "${asset_dir}"
+  create_release_asset "1.10.0" "${asset_dir}"
 
+  output="$(run_with_release_env "${tmp_root}" "${asset_dir}" "1.2.0" list)"
+
+  assert_contains "${output}" 'Installed versions:'
   assert_contains "${output}" '1.0.0 (active)'
   assert_contains "${output}" '1.1.0'
+  assert_contains "${output}" 'Available GitHub releases:'
+  assert_contains "${output}" '1.2.0'
+  assert_contains "${output}" '1.3.0'
+  assert_contains "${output}" '1.10.0'
+  assert_before "${output}" '1.10.0' '1.3.0'
+  assert_before "${output}" '1.3.0' '1.2.0'
   pass "${FUNCNAME[0]}"
 }
 
@@ -253,7 +310,7 @@ test_install_from_local_path_uses_local_git_commit() {
   pass "${FUNCNAME[0]}"
 }
 
-test_update_installs_latest_release() {
+test_upgrade_installs_latest_release() {
   local tmp_root
   tmp_root="$(mktemp -d)"
   local asset_dir="${tmp_root}/assets"
@@ -263,11 +320,47 @@ test_update_installs_latest_release() {
   install_release_for_test "${tmp_root}" 4.0.0 --codex >/dev/null
 
   local output
-  output="$(run_with_release_env "${tmp_root}" "${asset_dir}" "4.1.0" update --codex)"
+  output="$(run_with_release_env "${tmp_root}" "${asset_dir}" "4.1.0" upgrade --codex)"
 
-  assert_contains "${output}" 'Updating from 4.0.0 to 4.1.0'
+  assert_contains "${output}" 'Upgrading from 4.0.0 to 4.1.0'
   assert_symlink_target "${tmp_root}/store/current" "${tmp_root}/store/versions/4.1.0"
   assert_symlink_target "${tmp_root}/codex/skills/mpt-ext-workflow-start-work" "${tmp_root}/store/current/skills/mpt-ext-workflow-start-work"
+  pass "${FUNCNAME[0]}"
+}
+
+test_upgrade_installs_specific_release() {
+  local tmp_root
+  tmp_root="$(mktemp -d)"
+  local asset_dir="${tmp_root}/assets"
+  create_release_asset "4.1.0" "${asset_dir}"
+  create_release_asset "4.2.0" "${asset_dir}"
+
+  mkdir -p "${tmp_root}/codex"
+  install_release_for_test "${tmp_root}" 4.0.0 --codex >/dev/null
+
+  local output
+  output="$(run_with_release_env "${tmp_root}" "${asset_dir}" "4.2.0" upgrade --codex --version 4.1.0)"
+
+  assert_contains "${output}" 'Installing version 4.1.0 from release'
+  assert_symlink_target "${tmp_root}/store/current" "${tmp_root}/store/versions/4.1.0"
+  assert_symlink_target "${tmp_root}/codex/skills/mpt-ext-workflow-start-work" "${tmp_root}/store/current/skills/mpt-ext-workflow-start-work"
+  assert_not_exists "${tmp_root}/store/versions/4.2.0"
+  pass "${FUNCNAME[0]}"
+}
+
+test_upgrade_rejects_missing_version_value() {
+  local tmp_root
+  tmp_root="$(mktemp -d)"
+  local asset_dir="${tmp_root}/assets"
+  create_release_asset "4.1.0" "${asset_dir}"
+
+  local output
+  if output="$(run_with_release_env "${tmp_root}" "${asset_dir}" "4.1.0" upgrade --version --codex 2>&1)"; then
+    fail 'Expected upgrade --version --codex to fail'
+  fi
+
+  assert_contains "${output}" 'Missing upgrade version after --version'
+  assert_not_exists "${tmp_root}/store/versions/4.1.0"
   pass "${FUNCNAME[0]}"
 }
 
@@ -459,6 +552,8 @@ main() {
   TESTS_RUN=$((TESTS_RUN + 1))
   test_list_without_install
   TESTS_RUN=$((TESTS_RUN + 1))
+  test_list_treats_empty_versions_dir_as_no_install
+  TESTS_RUN=$((TESTS_RUN + 1))
   test_list_marks_active_version
   TESTS_RUN=$((TESTS_RUN + 1))
   test_install_codex_only
@@ -469,7 +564,11 @@ main() {
   TESTS_RUN=$((TESTS_RUN + 1))
   test_install_from_local_path_uses_local_git_commit
   TESTS_RUN=$((TESTS_RUN + 1))
-  test_update_installs_latest_release
+  test_upgrade_installs_latest_release
+  TESTS_RUN=$((TESTS_RUN + 1))
+  test_upgrade_installs_specific_release
+  TESTS_RUN=$((TESTS_RUN + 1))
+  test_upgrade_rejects_missing_version_value
   TESTS_RUN=$((TESTS_RUN + 1))
   test_install_claude_only
   TESTS_RUN=$((TESTS_RUN + 1))
