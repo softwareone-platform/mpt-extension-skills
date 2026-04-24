@@ -93,10 +93,12 @@ Optional supporting structure:
 Use optional directories only when they serve a clear purpose:
 
 - `references/`: supporting material that is too detailed to inline in `SKILL.md`
-- `scripts/`: reusable automation that reduces error-prone manual execution
+- `scripts/`: reusable automation that reduces error-prone manual execution, especially for deterministic calculations, parsing, rendering, validation, or data transformation
 - `assets/`: non-code supporting assets required by the skill
 
 Do not add placeholder folders or speculative files for future use.
+
+Scripts inside a skill must use Bash or Python. Do not introduce other scripting or programming languages for skill-local automation unless the repository defines an explicit exception.
 
 ## Required OpenAI Adapter
 
@@ -178,6 +180,8 @@ The exact headings may vary, but the content should remain explicit and easy to 
 - Keep the top-level flow readable without forcing the reader to open many extra files.
 - Use `references/` only for detail that genuinely supports execution.
 - Use `scripts/` when the scripted path is safer or more repeatable than prose instructions alone.
+- Prefer `scripts/` for deterministic operations such as calculations, parsing, rendering, validation, file generation, and data transformations. A skill should describe when to run the script and how to interpret its result instead of asking the agent to reproduce deterministic logic through prompting.
+- Keep skill scripts in Bash or Python, with Python preferred when structured parsing, JSON/YAML handling, or non-trivial validation is required.
 - Prefer deterministic steps over open-ended suggestions when the task has a known correct workflow.
 - Call out assumptions explicitly when the workflow depends on environment, auth, repository state, or external systems.
 
