@@ -53,10 +53,17 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 - Read shared package documents only when the repository explicitly points to them.
 
 2. Resolve the base branch from the branch type.
-- Use `main` for `feature` and `bugfix`.
-- Use the latest `release/*` branch for `hotfix` and `backport`.
-- Treat the latest release branch as the `release/*` branch with the highest numeric suffix.
-- If no `release/*` branch exists for `hotfix` or `backport`, stop and report the blocker.
+- Use the bundled deterministic script to resolve the base branch:
+
+```bash
+python3 "${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skills/mpt-ext-tool-git-branch-ops/scripts/resolve_base_branch.py" \
+  --branch-type feature \
+  --remote-name origin
+```
+
+- For `feature` and `bugfix`, the script returns `main`.
+- For `hotfix` and `backport`, the script returns the latest remote `release/*` branch by numeric suffix.
+- If the script reports that no remote `release/*` branch exists for `hotfix` or `backport`, stop and report the blocker.
 
 3. Inspect the current Git state.
 - Check the current branch and worktree status.
@@ -92,15 +99,14 @@ git status --short --branch
 git branch --list
 git branch --remotes
 
-# Determine latest release branch
-git for-each-ref --format='%(refname:short)' "refs/remotes/<remote_name>/release/*" \
-  | sed "s#^<remote_name>/##" \
-  | sort -V \
-  | tail -n 1
+# Resolve base branch
+base_branch="$(python3 "${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skills/mpt-ext-tool-git-branch-ops/scripts/resolve_base_branch.py" \
+  --branch-type <branch_type> \
+  --remote-name <remote_name>)"
 
 # Switch to base branch and update it
-git checkout main
-git pull <remote_name> main
+git checkout "${base_branch}"
+git pull <remote_name> "${base_branch}"
 
 # Create target branch
 git checkout -b feature/MPT-1234/example-short-description
@@ -109,10 +115,18 @@ git checkout -b feature/MPT-1234/example-short-description
 ## Guardrails
 
 - Never continue past a dirty worktree without explicit user confirmation.
+- Never hand-select the base branch when the bundled script can resolve it.
 - Never silently reuse an existing local or remote branch with the same name.
 - Never invent a release branch when none exists.
 - Never rewrite history or delete branches as part of this skill.
 - Never generate business-specific branch names from Jira content inside this tool skill; accept the target branch name as input.
+
+## Bundled Resources
+
+- `scripts/resolve_base_branch.py`
+  - Inputs: branch type and optional remote name
+  - Output: base branch name, or JSON with `base_branch`
+  - Runtime path: `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skills/mpt-ext-tool-git-branch-ops/scripts/resolve_base_branch.py`
 
 ## Expected Outcome
 

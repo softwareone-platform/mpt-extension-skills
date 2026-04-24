@@ -65,12 +65,14 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 - Show the PR URL.
 - When the Jira issue key is available, try to resolve the Jira site through `acli jira auth status` and build the Jira item URL as `https://<site>/browse/<issue-key>`.
 - Include testing status in the user-facing result message.
-- Use this compact result format for user-facing output after successful PR creation or update:
+- Use the bundled deterministic script to render the compact user-facing output after successful PR creation or update:
 
-```text
-PR: <pr-url>
-Jira: <jira-url>
-Testing: <testing-status>
+```bash
+python3 "${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skills/mpt-ext-task-open-pull-request/scripts/render_result.py" \
+  --pr-url "<pr-url>" \
+  --jira-site "<site-from-acli-jira-auth-status>" \
+  --jira-key MPT-1234 \
+  --testing "<testing-status>"
 ```
 
 - If the Jira item URL is not available safely, omit that line instead of inventing it.
@@ -83,6 +85,13 @@ Testing: <testing-status>
 - Never invent PR formatting rules; read repository context first.
 - Never mix commit creation, branch creation, or Jira transitions into this task.
 - Never silently choose the wrong base branch when repo context or user intent is ambiguous.
+
+## Bundled Resources
+
+- `scripts/render_result.py`
+  - Inputs: PR URL, testing status, optional Jira site, and optional Jira key
+  - Output: compact user-facing `PR`, optional `Jira`, and `Testing` lines
+  - Runtime path: `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skills/mpt-ext-task-open-pull-request/scripts/render_result.py`
 
 ## Expected Outcome
 

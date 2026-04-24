@@ -41,6 +41,8 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 
 - Jira authentication is active so the issue title and description can be read before branch creation.
 - Local repository access and Git tooling are available for the underlying branch-creation step.
+- Python 3.9 or later is available as `python3` for the deterministic branch-name rendering script.
+- The shared skills package is installed or updated locally, and `scripts/render_branch_name.py` is readable through `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current`.
 - The repository state is clean enough for branch creation, or the user is available to decide how to proceed when the underlying Git branch tool reports a dirty worktree or branch conflict.
 
 ## Workflow
@@ -56,31 +58,22 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 - Use the description only as fallback when the title is not sufficient.
 
 3. Derive the short branch description.
-- Normalize the issue text into a concise, action-oriented, repository-safe slug.
-- Prefer lowercase letters, digits, and hyphens.
-- Remove punctuation and redundant filler words.
-- If the result is unclear or ambiguous, ask the user before continuing.
+- Use the bundled deterministic script to render the short description and target branch name from the Jira key, branch type, and issue text:
 
-4. Build the target branch name.
-- Use this standard pattern for `feature` and `bugfix`:
-
-```text
-<type>/<jira>/<short-description>
+```bash
+python3 "${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skills/mpt-ext-task-create-work-branch/scripts/render_branch_name.py" \
+  --jira-key MPT-1234 \
+  --branch-type feature \
+  --title "Add property validation" \
+  --json
 ```
 
-- Use this pattern for `hotfix`:
+- Use the script output fields `short_description` and `branch_name`.
+- If the script cannot produce a slug, or if the generated slug is unclear or ambiguous for the requested work, ask the user before continuing.
 
-```text
-hotfix-<type>/<jira>/<short-description>
-```
-
-- Use this pattern for `backport`:
-
-```text
-backport-<type>/<jira>/<short-description>
-```
-
+4. Review the target branch name.
 - Keep the Jira key uppercase in the branch name.
+- Confirm the generated branch name follows the branch type pattern returned by the script.
 
 5. Create the branch through the Git branch tool skill.
 - Pass the resolved `branch_type` and the final `target_branch_name` to `mpt-ext-tool-git-branch-ops`.
@@ -95,10 +88,18 @@ backport-<type>/<jira>/<short-description>
 ## Guardrails
 
 - Never invent Jira issue content; read the actual issue first.
+- Never hand-build the branch slug or branch name when the bundled script can render it.
 - Never hide the generated branch name from the user.
 - Never bypass the Git branch tool skill for branch creation.
 - Never embed Jira status transitions, sprint updates, or PR creation inside this task.
 - Never continue with an unclear or low-quality branch slug when a short clarification from the user is needed.
+
+## Bundled Resources
+
+- `scripts/render_branch_name.py`
+  - Inputs: Jira key, branch type, and Jira title or fallback description
+  - Output: repository-safe branch name, or JSON with `short_description` and `branch_name`
+  - Runtime path: `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skills/mpt-ext-task-create-work-branch/scripts/render_branch_name.py`
 
 ## Expected Outcome
 
