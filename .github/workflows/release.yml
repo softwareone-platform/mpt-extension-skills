@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Validate version
         env:
@@ -48,14 +48,48 @@ jobs:
           chmod +x dist/mpt-extensions-skills-install.sh
           shasum -a 256 "dist/mpt-extension-skills-${VERSION}.tar.gz" dist/mpt-extensions-skills-install.sh > dist/SHA256SUMS
 
+      - name: Create annotated tag
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          existing_tag_commit="$(git ls-remote --tags origin "refs/tags/${VERSION}^{}" | awk '{print $1}')"
+          if [ -z "${existing_tag_commit}" ]; then
+            existing_tag_commit="$(git ls-remote --tags origin "refs/tags/${VERSION}" | awk '{print $1}')"
+          fi
+
+          if [ -n "${existing_tag_commit}" ]; then
+            if [ "${existing_tag_commit}" = "${GITHUB_SHA}" ]; then
+              echo "Tag ${VERSION} already exists for ${GITHUB_SHA}; skipping tag creation"
+              exit 0
+            fi
+
+            echo "Tag ${VERSION} already exists for ${existing_tag_commit}, expected ${GITHUB_SHA}" >&2
+            exit 1
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "${VERSION}" -m "v${VERSION}" "${GITHUB_SHA}"
+          git push origin "refs/tags/${VERSION}"
+
       - name: Create GitHub release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ inputs.version }}
-          name: v${{ inputs.version }}
-          target_commitish: ${{ github.sha }}
-          fail_on_unmatched_files: true
-          files: |
-            dist/mpt-extensions-skills-install.sh
-            dist/mpt-extension-skills-${{ inputs.version }}.tar.gz
-            dist/SHA256SUMS
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          if gh release view "${VERSION}" >/dev/null 2>&1; then
+            echo "Release ${VERSION} already exists; uploading assets"
+            gh release upload "${VERSION}" \
+              dist/mpt-extensions-skills-install.sh \
+              "dist/mpt-extension-skills-${VERSION}.tar.gz" \
+              dist/SHA256SUMS \
+              --clobber
+          else
+            gh release create "${VERSION}" \
+              dist/mpt-extensions-skills-install.sh \
+              "dist/mpt-extension-skills-${VERSION}.tar.gz" \
+              dist/SHA256SUMS \
+              --title "v${VERSION}" \
+              --generate-notes \
+              --verify-tag
+          fi

@@ -154,7 +154,8 @@ This command:
 ## Release Workflow
 
 Repository maintainers publish a release manually from the GitHub Actions `Release` workflow.
-The workflow accepts a version without a `v` prefix, creates the tag with the same value, and creates the GitHub release title as `v<version>`.
+The workflow accepts a version without a `v` prefix, creates an annotated Git tag with the same value, and creates the GitHub release title as `v<version>`.
+The GitHub release body is generated automatically with GitHub release notes.
 
 Each release publishes:
 
