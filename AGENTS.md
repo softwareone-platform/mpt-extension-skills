@@ -112,7 +112,9 @@ Treat `knowledge/` as reusable guidance. Repository-specific commands and except
 - [mpt-ext-task-handle-pr-comments](./skills/mpt-ext-task-handle-pr-comments/SKILL.md): Task for reading PR review feedback, applying scoped fixes, and replying in review threads
 - [mpt-ext-task-move-jira-to-qa](./skills/mpt-ext-task-move-jira-to-qa/SKILL.md): Task for transitioning a merged Jira issue into QA
 - [mpt-ext-workflow-start-work](./skills/mpt-ext-workflow-start-work/SKILL.md): Workflow for coordinating branch creation and Jira start-state setup
-- [mpt-ext-workflow-finish-work](./skills/mpt-ext-workflow-finish-work/SKILL.md): Workflow for finishing development work through commit, PR, review, and post-merge Jira handoff
+- [mpt-ext-workflow-send-to-review](./skills/mpt-ext-workflow-send-to-review/SKILL.md): Workflow for validating changes, creating or updating the PR, and moving Jira into Code Review
+- [mpt-ext-workflow-address-review-feedback](./skills/mpt-ext-workflow-address-review-feedback/SKILL.md): Workflow for processing review comments, validating the resulting changes, and updating the review branch
+- [mpt-ext-workflow-complete-after-merge](./skills/mpt-ext-workflow-complete-after-merge/SKILL.md): Workflow for confirming merge completion and moving Jira into QA
 - [mpt-ext-workflow-skill-authoring](./skills/mpt-ext-workflow-skill-authoring/SKILL.md): Skill authoring workflow for creating or updating reusable shared skills
 
 ## Agent Expectations

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Send To Review"
+  short_description: "Publish finished work for review"
+  default_prompt: "Send the current implementation to review: run repository validation first, fix repository and pre-commit failures when present, create the commit, open or update the pull request, and move Jira to Code Review."
