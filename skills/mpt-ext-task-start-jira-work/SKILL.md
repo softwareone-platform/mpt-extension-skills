@@ -35,6 +35,12 @@ Prepare a Jira issue for active development by setting the correct working state
 ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 ```
 
+## Assumptions
+
+- Jira authentication is active and the current user can read, transition, and update the target issue and its parent chain.
+- The current user has the Jira permissions needed for state transitions, sprint updates, and assignee changes when confirmed by the user.
+- The repository or board context is sufficient to determine the active sprint, or the user is available to provide the missing board or sprint context before changes are made.
+
 ## Workflow
 
 1. Build repository context first.

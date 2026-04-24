@@ -37,6 +37,12 @@ Create a correctly named work branch from Jira issue context.
 ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 ```
 
+## Assumptions
+
+- Jira authentication is active so the issue title and description can be read before branch creation.
+- Local repository access and Git tooling are available for the underlying branch-creation step.
+- The repository state is clean enough for branch creation, or the user is available to decide how to proceed when the underlying Git branch tool reports a dirty worktree or branch conflict.
+
 ## Workflow
 
 1. Build repository context first.

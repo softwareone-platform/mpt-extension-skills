@@ -21,8 +21,6 @@ Define a shared format for commit titles and commit descriptions.
    - the Jira issue key
    - a short summary in imperative form
 3. The commit description must contain a more detailed explanation of what changed.
-4. The first line of the commit description must be exactly:
-   - `AI Generated.`
 
 ## Allowed Tags
 
@@ -38,7 +36,6 @@ GOOD
 ```text
 doc: MPT-1234 add property
 
-AI Generated.
 Update the shared documentation for the new property naming rule and link the related standards.
 ```
 
@@ -47,7 +44,6 @@ GOOD
 ```text
 fix: MPT-4567 handle empty payload
 
-AI Generated.
 Prevent the parser from failing when the upstream payload is empty and keep the existing response shape.
 ```
 
