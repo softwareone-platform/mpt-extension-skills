@@ -217,7 +217,8 @@ parse_upgrade_selection() {
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --version)
-        if [[ $# -lt 2 ]]; then
+        if [[ $# -lt 2 || -z "$2" || "$2" == --* ]]; then
+          echo "Missing upgrade version after --version" >&2
           usage
           exit 1
         fi
@@ -529,7 +530,7 @@ current_installed_version() {
   fi
 }
 
-update_to_latest() {
+upgrade_to_latest() {
   local latest_version
   latest_version="$(latest_release_version)"
 
@@ -542,12 +543,12 @@ update_to_latest() {
   current_version="$(current_installed_version)"
 
   if [[ "${current_version}" == "${latest_version}" ]]; then
-    log_done "Already up to date (${current_version})"
+    log_done "Already on latest version (${current_version})"
     return
   fi
 
   if [[ -n "${current_version}" ]]; then
-    log_info "Updating from ${current_version} to ${latest_version}"
+    log_info "Upgrading from ${current_version} to ${latest_version}"
   else
     log_info "Installing latest version ${latest_version}"
   fi
@@ -736,7 +737,7 @@ main() {
       if [[ -n "${UPGRADE_VERSION}" ]]; then
         install_release_version "${UPGRADE_VERSION}"
       else
-        update_to_latest
+        upgrade_to_latest
       fi
       ;;
     remove)

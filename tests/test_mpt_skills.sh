@@ -305,7 +305,7 @@ test_upgrade_installs_latest_release() {
   local output
   output="$(run_with_release_env "${tmp_root}" "${asset_dir}" "4.1.0" upgrade --codex)"
 
-  assert_contains "${output}" 'Updating from 4.0.0 to 4.1.0'
+  assert_contains "${output}" 'Upgrading from 4.0.0 to 4.1.0'
   assert_symlink_target "${tmp_root}/store/current" "${tmp_root}/store/versions/4.1.0"
   assert_symlink_target "${tmp_root}/codex/skills/mpt-ext-workflow-start-work" "${tmp_root}/store/current/skills/mpt-ext-workflow-start-work"
   pass "${FUNCNAME[0]}"
@@ -328,6 +328,22 @@ test_upgrade_installs_specific_release() {
   assert_symlink_target "${tmp_root}/store/current" "${tmp_root}/store/versions/4.1.0"
   assert_symlink_target "${tmp_root}/codex/skills/mpt-ext-workflow-start-work" "${tmp_root}/store/current/skills/mpt-ext-workflow-start-work"
   assert_not_exists "${tmp_root}/store/versions/4.2.0"
+  pass "${FUNCNAME[0]}"
+}
+
+test_upgrade_rejects_missing_version_value() {
+  local tmp_root
+  tmp_root="$(mktemp -d)"
+  local asset_dir="${tmp_root}/assets"
+  create_release_asset "4.1.0" "${asset_dir}"
+
+  local output
+  if output="$(run_with_release_env "${tmp_root}" "${asset_dir}" "4.1.0" upgrade --version --codex 2>&1)"; then
+    fail 'Expected upgrade --version --codex to fail'
+  fi
+
+  assert_contains "${output}" 'Missing upgrade version after --version'
+  assert_not_exists "${tmp_root}/store/versions/4.1.0"
   pass "${FUNCNAME[0]}"
 }
 
@@ -532,6 +548,8 @@ main() {
   test_upgrade_installs_latest_release
   TESTS_RUN=$((TESTS_RUN + 1))
   test_upgrade_installs_specific_release
+  TESTS_RUN=$((TESTS_RUN + 1))
+  test_upgrade_rejects_missing_version_value
   TESTS_RUN=$((TESTS_RUN + 1))
   test_install_claude_only
   TESTS_RUN=$((TESTS_RUN + 1))
