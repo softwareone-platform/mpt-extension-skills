@@ -112,7 +112,7 @@ git pull --rebase origin <base-branch>
 - Refresh `uv.lock` through the target repository dependency-management workflow.
 
 7. Validate sequentially.
-- Run the shared build and validation workflow required after dependency changes.
+- If `uv.lock` changed, run `make build` first, then `make check-all` using the shared build and validation workflow.
 - If either command fails, stop before commit or push, preserve the full command output, and ask the user how to proceed.
 
 8. Commit and push to the same Dependabot branch.
@@ -126,7 +126,7 @@ git add pyproject.toml uv.lock .pre-commit-config.yaml
 
 ```bash
 git commit --amend --no-edit
-git push -f origin <head-branch>
+git push --force-with-lease origin <head-branch>
 ```
 
 - Do not create a new PR and do not push to a personal fork.

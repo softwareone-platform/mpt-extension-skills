@@ -191,8 +191,7 @@ The exact headings may vary, but the content should remain explicit and easy to 
 - Use the skill only for the reusable operational behavior that should be applied by an agent.
 - Link to shared documents instead of copying long policy sections into the skill body.
 - When reviewing a draft skill, actively compare the skill body against the referenced shared docs and remove duplicated policy or operational guidance.
-- Use the shared-doc resolution rule when linking shared `standards/`, `knowledge/`, or package documentation from a skill.
-- Resolve shared package links from `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current` when available. Use repo-local paths only when the task is explicitly working in the source repository, and use the `main` branch of the shared GitHub repository only when local shared guidance is unavailable.
+- When linking shared `standards/`, `knowledge/`, or package documentation, follow General Rules 19-21 for repository context and shared-doc resolution.
 - Keep the top-level flow readable without forcing the reader to open many extra files.
 - Use `references/` only for detail that genuinely supports execution.
 - Use `scripts/` when the scripted path is safer or more repeatable than prose instructions alone.

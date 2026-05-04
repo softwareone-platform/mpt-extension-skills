@@ -33,6 +33,28 @@ DEV_SECTION_NAMES = {
     "tool.uv.sources",
 }
 
+PYPROJECT_DEPENDENCY_SECTIONS = {
+    "dependency-groups",
+    "project",
+    "project.dependencies",
+    "project.optional-dependencies",
+    "tool.poetry.dependencies",
+    "tool.poetry.group",
+}
+
+NON_DEPENDENCY_ASSIGNMENT_KEYS = {
+    "authors",
+    "classifiers",
+    "description",
+    "dynamic",
+    "keywords",
+    "license",
+    "name",
+    "readme",
+    "requires-python",
+    "version",
+}
+
 PACKAGE_NAME_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]*")
 QUOTED_DEP_RE = re.compile(r"""["']([A-Za-z0-9][A-Za-z0-9_.-]*)\s*([<>=!~^].*?)["']""")
 ASSIGNMENT_DEP_RE = re.compile(
@@ -107,10 +129,15 @@ def added_removed_diff_lines(diff_text: str) -> tuple[list[str], list[str]]:
 def extract_package_names_from_line(line: str) -> set[str]:
     names: set[str] = set()
     stripped = line.strip()
-    for pattern in (QUOTED_DEP_RE, ASSIGNMENT_DEP_RE, LOCK_NAME_RE):
-        match = pattern.search(stripped)
-        if match:
-            names.add(match.group(1).lower())
+    for match in QUOTED_DEP_RE.finditer(stripped):
+        names.add(match.group(1).lower())
+
+    assignment_match = ASSIGNMENT_DEP_RE.search(stripped)
+    if assignment_match:
+        names.add(assignment_match.group(1).lower())
+
+    for match in LOCK_NAME_RE.finditer(stripped):
+        names.add(match.group(1).lower())
     return names
 
 
@@ -127,12 +154,25 @@ def detect_opentelemetry_packages(lines: list[str]) -> list[str]:
 
 def detect_broad_pyproject_specifiers(lines: list[str]) -> list[dict[str, str]]:
     violations: list[dict[str, str]] = []
+    active_section = ""
     for line in lines:
         stripped = line.strip().rstrip(",")
         if not stripped or stripped.startswith("#"):
             continue
 
-        match = QUOTED_DEP_RE.search(stripped) or ASSIGNMENT_DEP_RE.search(stripped)
+        section_match = re.fullmatch(r"\[([^\]]+)\]", stripped)
+        if section_match:
+            active_section = section_match.group(1).lower()
+            continue
+
+        match = QUOTED_DEP_RE.search(stripped)
+        if not match:
+            assignment_match = ASSIGNMENT_DEP_RE.search(stripped)
+            if assignment_match and is_dependency_assignment(
+                assignment_match.group(1).lower(),
+                active_section,
+            ):
+                match = assignment_match
         if not match:
             continue
 
@@ -150,6 +190,17 @@ def detect_broad_pyproject_specifiers(lines: list[str]) -> list[dict[str, str]]:
                 }
             )
     return violations
+
+
+def is_dependency_assignment(package_name: str, active_section: str) -> bool:
+    if package_name in NON_DEPENDENCY_ASSIGNMENT_KEYS:
+        return False
+    if not active_section:
+        return True
+    return any(
+        active_section == section or active_section.startswith(f"{section}.")
+        for section in PYPROJECT_DEPENDENCY_SECTIONS
+    )
 
 
 def detect_dev_dependency_indicators(lines: list[str]) -> list[str]:
