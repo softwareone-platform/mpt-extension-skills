@@ -1,20 +1,20 @@
 ---
 name: mpt-ext-task-dependabot-pr-policy-fix
-description: Fix open Dependabot pull requests in SoftwareOne extension repositories by applying shared dependency policy, syncing pre-commit dependency pins when needed, reverting opentelemetry-family dependency bumps, validating through the shared workflow, and pushing fixes back to the same Dependabot branches.
+description: Apply dependency-policy fixes to an already selected Dependabot PR or checked-out Dependabot branch by syncing dev dependency pins, reverting opentelemetry-family bumps, and refreshing dependency lock state.
 ---
 
 # Dependabot PR Policy Fix
 
 ## Purpose
 
-Apply SoftwareOne dependency policy fixes directly to open Dependabot pull requests in extension repositories.
+Apply SoftwareOne dependency policy fixes to one already selected Dependabot PR or currently checked-out Dependabot branch in an extension repository.
 
 ## Use When
 
-- The user wants to process open Dependabot PRs for an extension repository.
-- A Dependabot PR changes Python dependencies in `pyproject.toml`, `uv.lock`, or `.pre-commit-config.yaml`.
-- The work requires enforcing shared dependency policy before the Dependabot PR can be reviewed or merged.
-- The fix must be pushed back to the existing Dependabot branch.
+- A specific Dependabot PR or Dependabot branch has already been selected.
+- The selected PR changes Python dependencies in `pyproject.toml`, `uv.lock`, or `.pre-commit-config.yaml`.
+- The work requires enforcing shared dependency policy on the dependency files only.
+- A broader workflow will handle PR discovery, branch checkout, validation, commit amendment, and push.
 
 ## Do Not Use When
 
@@ -22,15 +22,16 @@ Apply SoftwareOne dependency policy fixes directly to open Dependabot pull reque
 - The user wants to bump dependencies manually from a normal feature branch.
 - The repository does not follow the shared Python dependency-management and validation workflow.
 - The task requires changing dependency policy itself rather than applying the existing policy.
+- The user wants an end-to-end Dependabot PR processing workflow including discovery, checkout, validation, auto-fixing checks, commit amendment, and push.
 
 ## Inputs
 
 - Target repository under the `softwareone-platform` organization.
-- Open Dependabot PR number or permission to process all open Dependabot PRs in the repository.
-- GitHub authentication that can read PR metadata and push to Dependabot branches in the upstream repository.
+- One selected Dependabot PR, or the current local checkout already positioned on the matching Dependabot branch.
+- Analyzer inputs for the selected PR: `pr.json`, `files.json`, and `pr.diff`.
 - Local Git checkout of the target upstream repository.
 - Repository dependency and validation workflow that follows the shared package guidance.
-- Python 3.12 or later is available as `python3` for the deterministic PR analysis and report rendering scripts.
+- Python 3.12 or later is available as `python3` for the deterministic PR analysis script.
 
 ## Shared References
 
@@ -60,21 +61,10 @@ This task applies shared dependency policy with these Dependabot-specific additi
 - Read repository-specific docs when they exist, because they may extend or override shared guidance.
 - Read shared docs only when the repository explicitly points to them, using the resolution rule from Shared References.
 
-2. Find the target Dependabot PRs.
-- If the user provided a PR number, inspect only that PR.
-- Otherwise list open Dependabot PRs in the upstream repository:
-
-```bash
-gh pr list --repo softwareone-platform/<repo> --state open --author 'dependabot[bot]' --limit 200 --json number,title,url,headRefName,baseRefName
-```
-
-- Collect PR number, title, URL, head branch, and base branch.
-
-3. Read each PR before changing anything.
-- Read PR metadata, changed files, and diff.
-- Verify the PR head branch is a Dependabot branch.
-- Verify the changed files are dependency-related before applying this task.
-- Skip PRs that have no relevant dependency policy issue and report them as no-op.
+2. Confirm the selected Dependabot context.
+- Verify the selected PR is authored by Dependabot, or verify the current branch is the selected Dependabot head branch.
+- Verify the selected change is dependency-related before applying this task.
+- If the PR has no relevant dependency policy issue, report it as no-op and do not edit files.
 - Use the bundled analyzer to make deterministic PR classification and policy-signal detection repeatable:
 
 ```bash
@@ -85,74 +75,35 @@ python3 "${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skill
   --pretty
 ```
 
+- For branch-only mode, generate equivalent `pr.json`, `files.json`, and `pr.diff` from the checked-out branch before running the analyzer. If those inputs cannot be generated, run a preflight check and stop with a clear `missing required analyzer inputs` blocker instead of continuing from partial context.
 - Use the analyzer output fields `is_dependabot`, `is_dependency_related`, `skip_reason`, `changed_dependency_files`, `opentelemetry_packages`, `dev_dependency_indicators`, `pre_commit_sync_needed`, and `pyproject_policy_violations`.
 
-4. Detect policy violations.
+3. Detect policy violations.
 - Use the analyzer output as the initial violation plan.
 - Inspect the implicated files directly before editing to confirm the deterministic findings in repository context.
 - Record which shared or Dependabot-specific rules were violated.
 
-5. Check out the exact Dependabot branch.
-- Fetch the base and head branches from upstream.
-- Check out the existing Dependabot branch directly.
-- Rebase the Dependabot branch on the latest base branch before editing:
-
-```bash
-git fetch origin <base-branch> <head-branch>
-git checkout <head-branch>
-git pull --rebase origin <base-branch>
-```
-
-- Do not create a new work branch.
-
-6. Apply fixes in place.
+4. Apply fixes in place.
 - Convert invalid `pyproject.toml` dependency specifiers according to the shared dependency policy.
 - Revert all `*opentelemetry*` dependency version changes to the base branch version.
 - Update `.pre-commit-config.yaml` when the corresponding dev dependency changed.
 - Refresh `uv.lock` through the target repository dependency-management workflow.
 
-7. Validate sequentially.
-- If `uv.lock` changed, run `make build` first, then `make check-all` using the shared build and validation workflow.
-- If either command fails, stop before commit or push, preserve the full command output, and ask the user how to proceed.
-
-8. Commit and push to the same Dependabot branch.
-- Stage only files that actually changed, typically:
-
-```bash
-git add pyproject.toml uv.lock .pre-commit-config.yaml
-```
-
-- Amend the existing Dependabot commit:
-
-```bash
-git commit --amend --no-edit
-git push --force-with-lease origin <head-branch>
-```
-
-- Do not create a new PR and do not push to a personal fork.
-
-9. Report results.
-- Record processed and skipped PR results in JSON.
-- Render the final report with the bundled result renderer:
-
-```bash
-python3 "${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skills/mpt-ext-task-dependabot-pr-policy-fix/scripts/render_result.py" \
-  --results-json results.json
-```
-
-- Include PR number and URL, status, violated or fixed rules, changed files, validation commands and results, amended commit SHA, push result, and skip reasons.
+5. Report the policy-fix result.
+- State whether dependency-policy changes were applied or the selected PR was a no-op.
+- List the changed files.
+- List the violated or fixed rules.
+- Leave validation, commit amendment, push, and multi-PR reporting to the workflow that invoked this task.
 
 ## Guardrails
 
 - Never process non-Dependabot PRs with this task.
-- Never create a new branch or PR for this workflow.
-- Never push fixes anywhere except the original Dependabot branch in upstream.
+- Never discover PRs, create branches, amend commits, push branches, or create pull requests from this task.
 - Never leave `pyproject.toml` dependency specifiers broader than the shared dependency policy allows.
 - Never keep Dependabot `opentelemetry`-family version bumps in the PR.
 - Never update `.pre-commit-config.yaml` opportunistically for unrelated tools.
-- Never continue to commit or push after failed validation without explicit user direction.
-- Never run repository-required validation steps in parallel when the shared validation workflow requires a sequence.
+- Never fix validation failures that are unrelated to the dependency-policy files handled by this task.
 
 ## Expected Outcome
 
-Open Dependabot PRs that violate dependency policy are fixed in their existing upstream Dependabot branches, validated with the repository-required checks, amended in place, and pushed back for review, or the workflow stops with a clear blocker and full failure context.
+The selected Dependabot PR or checked-out Dependabot branch has dependency-policy violations fixed in place, with changed files and applied rules reported clearly for the invoking workflow to validate and publish.
