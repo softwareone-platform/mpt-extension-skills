@@ -5,6 +5,15 @@ import sys
 from urllib.parse import urlparse
 
 
+MIN_PYTHON = (3, 12)
+
+
+def require_python_version() -> None:
+    if sys.version_info < MIN_PYTHON:
+        print("error: Python 3.12 or later is required", file=sys.stderr)
+        raise SystemExit(1)
+
+
 def normalize_jira_site(site: str) -> str:
     normalized_site = site.strip().removeprefix("Site:").strip()
     if not normalized_site:
@@ -26,6 +35,8 @@ def render_jira_url(site: str, issue_key: str) -> str:
 
 
 def main() -> int:
+    require_python_version()
+
     parser = argparse.ArgumentParser(
         description="Render compact pull request result output."
     )

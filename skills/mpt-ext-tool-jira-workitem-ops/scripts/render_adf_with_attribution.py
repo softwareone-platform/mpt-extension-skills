@@ -4,7 +4,18 @@ import json
 import sys
 
 
+MIN_PYTHON = (3, 12)
+
+
+def require_python_version() -> None:
+    if sys.version_info < MIN_PYTHON:
+        print("error: Python 3.12 or later is required", file=sys.stderr)
+        raise SystemExit(1)
+
+
 def main() -> int:
+    require_python_version()
+
     parser = argparse.ArgumentParser(
         description="Render Jira ADF document with AI attribution panel."
     )

@@ -14,6 +14,7 @@ Current skills:
 - [mpt-ext-task-start-jira-work](./skills/mpt-ext-task-start-jira-work/SKILL.md): Move Jira issues and parent chain into active development state
 - [mpt-ext-task-commit-changes](./skills/mpt-ext-task-commit-changes/SKILL.md): Stage intended files and create a repository-compliant commit
 - [mpt-ext-task-create-work-branch](./skills/mpt-ext-task-create-work-branch/SKILL.md): Create a work branch from Jira issue context and branch type
+- [mpt-ext-task-dependabot-pr-policy-fix](./skills/mpt-ext-task-dependabot-pr-policy-fix/SKILL.md): Fix Dependabot PR dependency policy issues in upstream extension branches
 - [mpt-ext-task-run-repository-checks](./skills/mpt-ext-task-run-repository-checks/SKILL.md): Run the repository-required local validation flow for the current change scope
 - [mpt-ext-task-fix-repository-check-failures](./skills/mpt-ext-task-fix-repository-check-failures/SKILL.md): Work through failing local checks and tests one blocker at a time
 - [mpt-ext-task-fix-pre-commit-failures](./skills/mpt-ext-task-fix-pre-commit-failures/SKILL.md): Resolve commit-time pre-commit hook failures one blocker at a time

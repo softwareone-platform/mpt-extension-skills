@@ -42,8 +42,8 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 
 1. Build repository context first.
 - If not already done for the current task, read the target repository `AGENTS.md`.
-- Read repository-specific docs that define PR workflow, PR title rules, PR description rules, or review expectations.
-- Read shared package docs only when the repository explicitly points to them.
+- Read repository-specific docs when they exist, because they may extend or override shared guidance.
+- Read shared docs only when the repository explicitly points to them. Resolve those shared docs from `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current` when available; otherwise read them from the `main` branch of the shared GitHub repository.
 
 2. Resolve the target PR context.
 - Determine the current repository and head branch.
@@ -52,7 +52,7 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 
 3. Read PR rules before mutation.
 - Use repository PR rules from repo docs first.
-- When the repository relies on this shared package standard for PR formatting, use `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/standards/pull-requests.md` as the source of truth.
+- When the repository relies on this shared package standard for PR formatting, read `standards/pull-requests.md` using the shared-doc resolution rule from the repository context step, and use it as the source of truth.
 - Build the PR title and description from those rules.
 
 4. Create or update the PR.

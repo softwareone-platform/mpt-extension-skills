@@ -43,12 +43,12 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 
 1. Build repository context first.
 - If not already done for the current task, read the target repository `AGENTS.md`.
-- Read repository-specific commit and validation docs first.
-- Read shared package docs only when the repository explicitly points to them.
+- Read repository-specific docs when they exist, because they may extend or override shared guidance.
+- Read shared docs only when the repository explicitly points to them. Resolve those shared docs from `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current` when available; otherwise read them from the `main` branch of the shared GitHub repository.
 
 2. Confirm the pre-commit requirement.
 - Use repository commit and validation docs as the source of truth for commit-time hooks.
-- For repositories that follow this shared package guidance, use `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/knowledge/build-and-checks.md` as the shared reference instead of restating the policy in this skill.
+- For repositories that follow this shared package guidance, read `knowledge/build-and-checks.md` using the shared-doc resolution rule from the repository context step instead of restating the policy in this skill.
 
 3. Read the failed hook output.
 - Identify which hook failed and whether any hooks rewrote files automatically.

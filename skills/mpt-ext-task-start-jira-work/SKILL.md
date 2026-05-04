@@ -45,8 +45,8 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 
 1. Build repository context first.
 - If not already done for the current task, read the target repository `AGENTS.md`.
-- Read repository-specific docs only when the repository defines Jira workflow or contribution exceptions.
-- Read shared package docs only when the repository explicitly points to them.
+- Read repository-specific docs when they exist, because they may extend or override shared guidance.
+- Read shared docs only when the repository explicitly points to them. Resolve those shared docs from `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current` when available; otherwise read them from the `main` branch of the shared GitHub repository.
 
 2. Read the Jira issue and Jira auth context.
 - Use `mpt-ext-tool-jira-workitem-ops` to fetch the current issue state.
@@ -62,25 +62,48 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 - Transition each parent issue in the chain to `In Progress` when it is not already there.
 - Preserve already-correct status values rather than rewriting them unnecessarily.
 
-5. Verify sprint placement.
-- Check whether the Jira issue belongs to the active sprint.
-- If the issue is missing from the active sprint, add it.
-- If the active sprint cannot be determined reliably from the available Jira context, ask the user for the correct board or sprint context before changing sprint placement.
+5. Resolve active sprint and sprint target.
+- Check whether the Jira issue already belongs to an active sprint in `customfield_10020`.
+- If it already has an active sprint, preserve sprint placement and report it as already correct.
+- If the issue has only closed or future sprint entries, derive the board id from `customfield_10020[].boardId`.
+- If the target issue is a subtask and does not expose useful sprint history, read the direct parent and derive the board id from the parent sprint history.
+- If no board id can be determined from the issue or the relevant parent, ask the user for the correct board id before changing sprint placement.
+- Resolve the active sprint for the board with:
 
-6. Verify assignee.
+```bash
+acli jira board list-sprints --id <board-id> --state active --json
+```
+
+- If the board has no active sprint, stop and report the sprint blocker.
+- If multiple active sprints are returned, stop and ask the user which sprint should be used.
+
+6. Apply sprint placement to the correct issue.
+- Read `issuetype.subtask` for the target issue before editing sprint placement.
+- If `issuetype.subtask` is `false`, add the active sprint to the target issue itself.
+- If `issuetype.subtask` is `true`, do not add sprint to the subtask directly. Jira subtasks inherit sprint placement from their direct parent, and Jira rejects direct subtask sprint assignment.
+- For subtasks, add the active sprint to the direct parent issue instead, then re-read the original subtask and verify that it shows the active sprint through inheritance.
+- If the direct parent already has the active sprint, preserve it and only verify the subtask.
+- If editing arbitrary Jira fields is not supported by the available CLI command, use the available Jira issue edit API or connector for the sprint field. If no safe edit path exists, stop and report the blocker instead of guessing a payload.
+
+7. Verify assignee.
 - Compare the issue assignee with the current Jira-authenticated user.
 - If they differ, ask the user whether the issue should be reassigned to the current Jira user.
 - Reassign only when the user confirms.
 
-7. Report the result clearly.
+8. Report the result clearly.
 - State whether the issue moved to `In Progress`.
 - State whether any parent issues moved to `In Progress`.
 - State whether sprint placement changed.
+- State which issue received the sprint update: the target issue itself, or the direct parent when the target is a subtask.
+- State the active sprint name and id when resolved.
 - State whether reassignment was requested, skipped, or completed.
 
 ## Guardrails
 
 - Never assume the active sprint if Jira context is ambiguous.
+- Never use JQL `openSprints()` as the only active-sprint resolution path when a board id is available; prefer `acli jira board list-sprints --id <board-id> --state active --json`.
+- Never assign sprint directly to a subtask. Update the direct parent and verify inherited sprint placement on the subtask.
+- Never silently move a parent to a sprint when the target is a subtask without reporting that the parent was the sprint edit target.
 - Never reassign the issue automatically when the assignee differs from the current Jira-authenticated user.
 - Never stop at the direct parent when a longer parent chain exists.
 - Never rewrite already-correct Jira state without need.

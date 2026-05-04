@@ -5,6 +5,15 @@ import re
 import sys
 
 
+MIN_PYTHON = (3, 12)
+
+
+def require_python_version() -> None:
+    if sys.version_info < MIN_PYTHON:
+        print("error: Python 3.12 or later is required", file=sys.stderr)
+        raise SystemExit(1)
+
+
 STOP_WORDS = {
     "a",
     "an",
@@ -45,6 +54,8 @@ def render_branch_name(branch_type: str, jira_key: str, slug: str) -> str:
 
 
 def main() -> int:
+    require_python_version()
+
     parser = argparse.ArgumentParser(
         description="Render a Jira-based work branch name from issue text."
     )
