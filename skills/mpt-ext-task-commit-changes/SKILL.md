@@ -40,8 +40,8 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 
 1. Build repository context first.
 - If not already done for the current task, read the target repository `AGENTS.md`.
-- Read repository-specific docs that define commit or validation requirements.
-- Read shared package docs only when the repository explicitly points to them.
+- Read repository-specific docs when they exist, because they may extend or override shared guidance.
+- Read shared docs only when the repository explicitly points to them. Resolve those shared docs from `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current` when available; otherwise read them from the `main` branch of the shared GitHub repository.
 
 2. Inspect the current change scope.
 - Review the current branch and diff.
@@ -52,7 +52,7 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 3. Confirm validation state.
 - Check whether the repository-required validation has already been completed.
 - If repository docs require checks before commit and they have not been run yet, stop and direct the flow back to the validation task instead of silently committing.
-- If the repository relies on shared validation guidance from this package, use `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/knowledge/build-and-checks.md` as the source of truth for commit-time validation and `pre-commit` expectations.
+- If the repository relies on shared validation guidance from this package, read `knowledge/build-and-checks.md` using the shared-doc resolution rule from the repository context step, and use it as the source of truth for commit-time validation and `pre-commit` expectations.
 - If repository-required commit-time validation prerequisites are missing, stop and direct the flow back to the validation or pre-commit-fix task instead of attempting a blind commit.
 
 4. Stage only the intended files.
@@ -68,7 +68,7 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 6. Build the commit message.
 - Follow repository commit rules from repo docs first.
 - Use shared standards only when the repository points to them or does not define a stricter local rule.
-- For repositories that follow this package standard, use `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/standards/commit-messages.md` as the source of truth.
+- For repositories that follow this package standard, read `standards/commit-messages.md` using the shared-doc resolution rule from the repository context step, and use it as the source of truth.
 
 7. Create the commit.
 - Amend the existing branch commit when the branch already has one and the user did not request separate history.

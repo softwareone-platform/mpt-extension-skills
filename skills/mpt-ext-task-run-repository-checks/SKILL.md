@@ -44,18 +44,18 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 
 1. Build repository context first.
 - If not already done for the current task, read the target repository `AGENTS.md`.
-- Read repository-specific validation and testing docs first.
-- Read shared package docs only when the repository explicitly points to them.
+- Read repository-specific docs when they exist, because they may extend or override shared guidance.
+- Read shared docs only when the repository explicitly points to them. Resolve those shared docs from `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current` when available; otherwise read them from the `main` branch of the shared GitHub repository.
 
 2. Resolve the required validation flow.
 - Determine which local commands are required for the current change scope.
 - Use repository docs as the source of truth for command names and ordering.
-- For repositories that follow this shared package validation guidance, use `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/knowledge/build-and-checks.md` and related repository docs as the shared reference.
+- For repositories that follow this shared package validation guidance, read `knowledge/build-and-checks.md` using the shared-doc resolution rule from the repository context step, and use it with related repository docs as the shared reference.
 
 3. Prepare the environment only as required by the repo workflow.
 - Confirm prerequisite tooling required by the repository validation flow.
 - If the repository requires environment refresh after dependency-lock changes, include that step before running checks.
-- If the repository relies on shared validation guidance from this package, use `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/knowledge/build-and-checks.md` as the source of truth for commit-oriented preparation such as `pre-commit`.
+- If the repository relies on shared validation guidance from this package, read `knowledge/build-and-checks.md` using the shared-doc resolution rule from the repository context step, and use it as the source of truth for commit-oriented preparation such as `pre-commit`.
 - Do not run unrelated setup steps that are not required for the current validation flow.
 
 4. Run the required checks in order.

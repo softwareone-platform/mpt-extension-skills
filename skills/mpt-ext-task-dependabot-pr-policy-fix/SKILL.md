@@ -30,15 +30,10 @@ Apply SoftwareOne dependency policy fixes directly to open Dependabot pull reque
 - GitHub authentication that can read PR metadata and push to Dependabot branches in the upstream repository.
 - Local Git checkout of the target upstream repository.
 - Repository dependency and validation workflow that follows the shared package guidance.
-- Shared package root when shared package guidance is needed:
-
-```text
-${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
-```
 
 ## Shared References
 
-Use these local shared documents as the source of truth instead of restating their policy. When a target repository points to shared documentation, resolve it from `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current`; do not read the shared standard or knowledge from the internet, GitHub web pages, or remote documentation URLs.
+Use these shared documents as the source of truth instead of restating their policy. When shared guidance is needed, resolve it from `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current` when available; otherwise read the same path from the `main` branch of the shared GitHub repository.
 
 - `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/standards/packages-and-dependencies.md`
 - `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/knowledge/manage-dependencies.md`
@@ -61,8 +56,8 @@ This task applies shared dependency policy with these Dependabot-specific additi
 
 1. Build repository context first.
 - If not already done for the current task, read the target repository `AGENTS.md`.
-- Read repository-specific docs only when the repository defines branch naming or contribution exceptions.
-- Read shared docs only when the repository explicitly points to them, and resolve those shared docs from `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current`.
+- Read repository-specific docs when they exist, because they may extend or override shared guidance.
+- Read shared docs only when the repository explicitly points to them, using the resolution rule from Shared References.
 
 2. Find the target Dependabot PRs.
 - If the user provided a PR number, inspect only that PR.

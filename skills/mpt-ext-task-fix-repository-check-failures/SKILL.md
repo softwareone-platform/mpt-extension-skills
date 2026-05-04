@@ -43,8 +43,8 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 
 1. Build repository context first.
 - If not already done for the current task, read the target repository `AGENTS.md`.
-- Read repository-specific validation and testing docs first.
-- Read shared package docs only when the repository explicitly points to them.
+- Read repository-specific docs when they exist, because they may extend or override shared guidance.
+- Read shared docs only when the repository explicitly points to them. Resolve those shared docs from `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current` when available; otherwise read them from the `main` branch of the shared GitHub repository.
 
 2. Read the failing validation result.
 - Start from the current failing command output instead of rerunning everything blindly.
@@ -75,7 +75,7 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 - Never batch unrelated speculative fixes together when the validation output identifies a narrower blocker.
 - Never treat environment/setup failures as product-code failures.
 - Never mix commit creation, PR creation, or Jira transitions into this task.
-- For repositories that follow this shared package validation guidance, use `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/knowledge/build-and-checks.md` as the shared reference for the validation loop.
+- For repositories that follow this shared package validation guidance, read `knowledge/build-and-checks.md` using the shared-doc resolution rule from the repository context step as the shared reference for the validation loop.
 
 ## Expected Outcome
 
