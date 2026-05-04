@@ -30,6 +30,7 @@ Apply SoftwareOne dependency policy fixes directly to open Dependabot pull reque
 - GitHub authentication that can read PR metadata and push to Dependabot branches in the upstream repository.
 - Local Git checkout of the target upstream repository.
 - Repository dependency and validation workflow that follows the shared package guidance.
+- Python 3.9 or later is available as `python3` for the deterministic PR analysis and report rendering scripts.
 
 ## Shared References
 
@@ -74,12 +75,22 @@ gh pr list --repo softwareone-platform/<repo> --state open --author 'dependabot[
 - Verify the PR head branch is a Dependabot branch.
 - Verify the changed files are dependency-related before applying this task.
 - Skip PRs that have no relevant dependency policy issue and report them as no-op.
+- Use the bundled analyzer to make deterministic PR classification and policy-signal detection repeatable:
+
+```bash
+python3 "${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skills/mpt-ext-task-dependabot-pr-policy-fix/scripts/analyze_dependabot_pr.py" \
+  --metadata-json pr.json \
+  --changed-files-json files.json \
+  --diff-file pr.diff \
+  --pretty
+```
+
+- Use the analyzer output fields `is_dependabot`, `is_dependency_related`, `skip_reason`, `changed_dependency_files`, `opentelemetry_packages`, `dev_dependency_indicators`, `pre_commit_sync_needed`, and `pyproject_policy_violations`.
 
 4. Detect policy violations.
-- Inspect `pyproject.toml` changes for dependency specifiers that violate the shared patch-level version policy.
-- Inspect `pyproject.toml` and `uv.lock` changes for dev dependency bumps that require `.pre-commit-config.yaml` updates.
-- Inspect all dependency declaration and lockfile changes for package names containing `opentelemetry`.
-- For each PR, record which shared or Dependabot-specific rules were violated.
+- Use the analyzer output as the initial violation plan.
+- Inspect the implicated files directly before editing to confirm the deterministic findings in repository context.
+- Record which shared or Dependabot-specific rules were violated.
 
 5. Check out the exact Dependabot branch.
 - Fetch the base and head branches from upstream.
@@ -121,12 +132,15 @@ git push -f origin <head-branch>
 - Do not create a new PR and do not push to a personal fork.
 
 9. Report results.
-- For each PR, report PR number and URL.
-- State which policy rules were violated and fixed.
-- State which files changed.
-- State the shared validation commands that were run and their results.
-- State amended commit SHA and push result.
-- For skipped PRs, state why no change was needed.
+- Record processed and skipped PR results in JSON.
+- Render the final report with the bundled result renderer:
+
+```bash
+python3 "${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skills/mpt-ext-task-dependabot-pr-policy-fix/scripts/render_result.py" \
+  --results-json results.json
+```
+
+- Include PR number and URL, status, violated or fixed rules, changed files, validation commands and results, amended commit SHA, push result, and skip reasons.
 
 ## Guardrails
 
