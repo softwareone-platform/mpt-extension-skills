@@ -7,6 +7,15 @@ from pathlib import Path
 from typing import Any, Optional
 
 
+MIN_PYTHON = (3, 12)
+
+
+def require_python_version() -> None:
+    if sys.version_info < MIN_PYTHON:
+        print("error: Python 3.12 or later is required", file=sys.stderr)
+        raise SystemExit(1)
+
+
 DEPENDENCY_FILES = {
     ".pre-commit-config.yaml",
     ".pre-commit-config.yml",
@@ -230,6 +239,8 @@ def build_analysis(
 
 
 def main() -> int:
+    require_python_version()
+
     parser = argparse.ArgumentParser(
         description="Analyze a Dependabot PR for deterministic dependency policy signals."
     )

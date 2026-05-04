@@ -6,6 +6,15 @@ import subprocess
 import sys
 
 
+MIN_PYTHON = (3, 12)
+
+
+def require_python_version() -> None:
+    if sys.version_info < MIN_PYTHON:
+        print("error: Python 3.12 or later is required", file=sys.stderr)
+        raise SystemExit(1)
+
+
 def release_sort_key(branch: str) -> tuple[int, str]:
     suffix = branch.removeprefix("release/")
     match = re.fullmatch(r"(\d+)(?:[.-].*)?", suffix)
@@ -58,6 +67,8 @@ def resolve_base_branch(branch_type: str, remote_name: str) -> str:
 
 
 def main() -> int:
+    require_python_version()
+
     parser = argparse.ArgumentParser(
         description="Resolve the base branch for a work branch type."
     )

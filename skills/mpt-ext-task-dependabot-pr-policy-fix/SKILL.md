@@ -30,7 +30,7 @@ Apply SoftwareOne dependency policy fixes directly to open Dependabot pull reque
 - GitHub authentication that can read PR metadata and push to Dependabot branches in the upstream repository.
 - Local Git checkout of the target upstream repository.
 - Repository dependency and validation workflow that follows the shared package guidance.
-- Python 3.9 or later is available as `python3` for the deterministic PR analysis and report rendering scripts.
+- Python 3.12 or later is available as `python3` for the deterministic PR analysis and report rendering scripts.
 
 ## Shared References
 

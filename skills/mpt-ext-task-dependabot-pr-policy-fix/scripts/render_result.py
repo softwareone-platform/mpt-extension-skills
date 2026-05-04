@@ -6,6 +6,15 @@ from pathlib import Path
 from typing import Any
 
 
+MIN_PYTHON = (3, 12)
+
+
+def require_python_version() -> None:
+    if sys.version_info < MIN_PYTHON:
+        print("error: Python 3.12 or later is required", file=sys.stderr)
+        raise SystemExit(1)
+
+
 def read_json(path: str) -> Any:
     with Path(path).open(encoding="utf-8") as file_obj:
         return json.load(file_obj)
@@ -81,6 +90,8 @@ def normalize_results(raw: Any) -> list[dict[str, Any]]:
 
 
 def main() -> int:
+    require_python_version()
+
     parser = argparse.ArgumentParser(
         description="Render a stable markdown report for Dependabot PR policy fixes."
     )

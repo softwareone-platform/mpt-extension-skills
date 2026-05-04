@@ -88,6 +88,7 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 7. Plan the minimum useful structure.
 - Follow the required and optional structure from the installed skill standard.
 - Add only the supporting directories that materially improve correctness, reuse, or maintainability.
+- For Python scripts, require Python 3.12 or later as `python3` and include a clear runtime guard for older interpreters.
 
 8. Write `SKILL.md` for fast execution.
 - Keep frontmatter limited to `name` and `description`.

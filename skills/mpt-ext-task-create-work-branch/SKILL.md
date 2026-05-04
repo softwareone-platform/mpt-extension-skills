@@ -41,7 +41,7 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 
 - Jira authentication is active so the issue title and description can be read before branch creation.
 - Local repository access and Git tooling are available for the underlying branch-creation step.
-- Python 3.9 or later is available as `python3` for the deterministic branch-name rendering script.
+- Python 3.12 or later is available as `python3` for the deterministic branch-name rendering script.
 - The shared skills package is installed or updated locally, and `scripts/render_branch_name.py` is readable through `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current`.
 - The repository state is clean enough for branch creation, or the user is available to decide how to proceed when the underlying Git branch tool reports a dirty worktree or branch conflict.
 

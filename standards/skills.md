@@ -113,7 +113,7 @@ Use optional directories only when they serve a clear purpose:
 
 Do not add placeholder folders or speculative files for future use.
 
-Scripts inside a skill must use Bash or Python. Do not introduce other scripting or programming languages for skill-local automation unless the repository defines an explicit exception.
+Scripts inside a skill must use Bash or Python. Python skill scripts require Python 3.12 or later and must be invokable as `python3`. Do not introduce other scripting or programming languages for skill-local automation unless the repository defines an explicit exception.
 
 ## Required OpenAI Adapter
 
@@ -199,6 +199,7 @@ The exact headings may vary, but the content should remain explicit and easy to 
 - Prefer `scripts/` for deterministic operations such as calculations, parsing, rendering, validation, file generation, and data transformations. A skill should describe when to run the script and how to interpret its result instead of asking the agent to reproduce deterministic logic through prompting.
 - When reviewing a draft skill, identify deterministic prose instructions and either move them into a script or explicitly keep them in prose only when scripting would add more maintenance than reliability.
 - Keep skill scripts in Bash or Python, with Python preferred when structured parsing, JSON/YAML handling, or non-trivial validation is required.
+- Add an explicit runtime guard to Python skill scripts so `python3` versions older than 3.12 fail with a clear error message.
 - Prefer deterministic steps over open-ended suggestions when the task has a known correct workflow.
 - Call out assumptions explicitly when the workflow depends on environment, auth, repository state, or external systems.
 
