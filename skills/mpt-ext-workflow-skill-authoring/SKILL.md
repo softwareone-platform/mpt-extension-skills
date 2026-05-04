@@ -96,25 +96,44 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 - Include every required section defined by the installed skill standard.
 - Use imperative instructions and short concrete examples.
 
-9. Keep the skill concise with progressive disclosure.
+9. Review the draft for duplicated shared guidance.
+- Compare the draft skill against every relevant shared `standards/`, `knowledge/`, and package `docs/` reference.
+- Remove copied policy, detailed how-to guidance, or reusable operational rules that already belong to shared docs.
+- Replace duplicated material with direct references that use the Shared References resolution rule.
+- Keep only skill-specific execution behavior and non-obvious guardrails in `SKILL.md`.
+
+10. Review deterministic operations.
+- Identify calculations, parsing, rendering, validation, file generation, JSON/YAML transformations, naming decisions, and repeatable classification logic described in prose.
+- Move deterministic operations into `scripts/` when a script is safer or more repeatable than agent interpretation.
+- Keep deterministic behavior in prose only when scripting would add more maintenance than reliability, and make that choice explicit in the skill.
+- Update `SKILL.md` to show when to run each script and how to interpret its output.
+
+11. Verify repository context and shared references.
+- For skills that operate on a target repository, make `Build repository context first` the first workflow step.
+- Ensure that step reads `AGENTS.md`, reads repository-specific docs when they exist, and reads shared docs through the Shared References resolution rule.
+- Ensure `Shared References` lists the exact shared standards, knowledge, or package docs used by the skill.
+- Ensure direct references to shared docs elsewhere in the skill use the same resolution rule instead of hard-coding only one source.
+
+12. Keep the skill concise with progressive disclosure.
 - Keep the top-level workflow readable without loading unnecessary files.
 - Assume the agent is already capable; include only non-obvious guidance.
 - Move detailed schemas, variants, examples, or long reference material into `references/`.
 - Link supporting material directly from `SKILL.md` so it is discoverable without bulk-loading the whole package.
 
-10. Add the OpenAI adapter.
+13. Add the OpenAI adapter.
 - Add the required `agents/openai.yaml` adapter described by the installed skill standard.
 - Keep adapter values aligned with the actual skill scope.
 - Regenerate or update the file whenever `SKILL.md` meaning changes.
 
-11. Validate the skill as a package.
+14. Validate the skill as a package.
 - Check that the skill still has a single clear responsibility.
 - Check that required sections are present and easy to scan.
 - Check that links to shared standards, knowledge, or package docs follow the Shared References resolution rule for runtime use.
 - Check that the skill links to shared `standards/` or `knowledge/` instead of copying their policy content.
+- Check that deterministic operations are backed by scripts when a script is safer or more repeatable than prose.
 - If the environment provides a scaffold or validator for skills, use it; otherwise perform a manual structure and content review.
 
-12. Iterate using realistic tasks.
+15. Iterate using realistic tasks.
 - Re-test the skill against concrete requests that should trigger it.
 - Tighten vague steps, missing prerequisites, or weak guardrails.
 - Add supporting files only when the repeated task justifies the extra maintenance.

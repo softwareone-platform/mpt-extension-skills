@@ -54,22 +54,33 @@ Examples:
 16. A `workflow` skill may reference or rely on task-level actions, but it should not hide unrelated side effects or branch into multiple unrelated processes.
 17. Avoid deep or ambiguous composition between skills. Keep the execution model easy to understand from reading the skill.
 18. Do not duplicate shared standards or shared operational guidance inside a skill. Link to the relevant document in `standards/` or `knowledge/` instead.
-19. Skills that operate on a target repository must build repository context before mutation:
- - read the target repository `AGENTS.md` when it has not already been read for the current task
- - read repository-specific docs when they exist, because they may extend or override shared guidance
- - read shared docs only when the repository explicitly points to them
-20. When resolving shared package documents at runtime, prefer the installed package root:
+19. Skills that operate on a target repository must make repository context the first workflow step:
+
+```text
+1. Build repository context first.
+- If not already done for the current task, read the target repository `AGENTS.md`.
+- Read repository-specific docs when they exist, because they may extend or override shared guidance.
+- Read shared docs using the resolution rule from Shared References.
+```
+
+20. When a skill depends on shared guidance, include a `Shared References` section that lists the exact shared `standards/`, `knowledge/`, or package `docs/` paths the skill expects to use.
+21. When resolving shared package documents at runtime, prefer the installed package root:
 
 ```text
 ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 ```
 
 Use paths under that root such as `standards/skills.md`, `standards/documentation.md`, `knowledge/...`, or `docs/...` when the skill needs shared guidance from this package. If the installed root is unavailable, read the same path from the `main` branch of the shared GitHub repository.
-21. Do not treat repository-specific behavior as reusable truth unless the skill is explicitly intended for that repository or repository family.
-22. Write skills in direct, operational language. Prefer explicit instructions and guardrails over narrative explanation.
-23. State destructive or high-risk actions explicitly. Do not hide them inside vague steps.
-24. Keep examples short, concrete, and directly relevant to the skill.
-25. Add supporting files only when they materially improve reuse, correctness, or maintainability.
+22. After drafting or updating a skill, review it iteratively before finalizing:
+ - remove duplicated policy or how-to material that belongs in shared `standards/`, `knowledge/`, or package `docs/`
+ - replace deterministic operations with `scripts/` when scripted execution is safer or more repeatable than prose
+ - verify that repository context, `Shared References`, and shared-doc resolution follow this standard
+ - verify that the OpenAI adapter still matches the final skill scope
+23. Do not treat repository-specific behavior as reusable truth unless the skill is explicitly intended for that repository or repository family.
+24. Write skills in direct, operational language. Prefer explicit instructions and guardrails over narrative explanation.
+25. State destructive or high-risk actions explicitly. Do not hide them inside vague steps.
+26. Keep examples short, concrete, and directly relevant to the skill.
+27. Add supporting files only when they materially improve reuse, correctness, or maintainability.
 
 ## Required Structure
 
@@ -179,12 +190,14 @@ The exact headings may vary, but the content should remain explicit and easy to 
 - Move reusable operational how-to material into `knowledge/`.
 - Use the skill only for the reusable operational behavior that should be applied by an agent.
 - Link to shared documents instead of copying long policy sections into the skill body.
+- When reviewing a draft skill, actively compare the skill body against the referenced shared docs and remove duplicated policy or operational guidance.
 - Use the shared-doc resolution rule when linking shared `standards/`, `knowledge/`, or package documentation from a skill.
 - Resolve shared package links from `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current` when available. Use repo-local paths only when the task is explicitly working in the source repository, and use the `main` branch of the shared GitHub repository only when local shared guidance is unavailable.
 - Keep the top-level flow readable without forcing the reader to open many extra files.
 - Use `references/` only for detail that genuinely supports execution.
 - Use `scripts/` when the scripted path is safer or more repeatable than prose instructions alone.
 - Prefer `scripts/` for deterministic operations such as calculations, parsing, rendering, validation, file generation, and data transformations. A skill should describe when to run the script and how to interpret its result instead of asking the agent to reproduce deterministic logic through prompting.
+- When reviewing a draft skill, identify deterministic prose instructions and either move them into a script or explicitly keep them in prose only when scripting would add more maintenance than reliability.
 - Keep skill scripts in Bash or Python, with Python preferred when structured parsing, JSON/YAML handling, or non-trivial validation is required.
 - Prefer deterministic steps over open-ended suggestions when the task has a known correct workflow.
 - Call out assumptions explicitly when the workflow depends on environment, auth, repository state, or external systems.
