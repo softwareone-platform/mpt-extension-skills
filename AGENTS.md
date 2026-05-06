@@ -105,7 +105,7 @@ Treat `knowledge/` as reusable guidance. Repository-specific commands and except
 - [mpt-ext-task-start-jira-work](./skills/mpt-ext-task-start-jira-work/SKILL.md): Task for moving a Jira issue and its parent chain into In Progress and resolving sprint or assignee mismatches
 - [mpt-ext-task-commit-changes](./skills/mpt-ext-task-commit-changes/SKILL.md): Task for staging intended files and creating a repository-compliant commit
 - [mpt-ext-task-create-work-branch](./skills/mpt-ext-task-create-work-branch/SKILL.md): Task for reading Jira context and creating a correctly named work branch
-- [mpt-ext-task-dependabot-pr-policy-fix](./skills/mpt-ext-task-dependabot-pr-policy-fix/SKILL.md): Task for fixing Dependabot PR dependency policy issues in upstream extension branches
+- [mpt-ext-task-dependabot-pr-policy-fix](./skills/mpt-ext-task-dependabot-pr-policy-fix/SKILL.md): Task for applying dependency-policy fixes to a selected Dependabot PR or checked-out branch
 - [mpt-ext-task-run-repository-checks](./skills/mpt-ext-task-run-repository-checks/SKILL.md): Task for running the repository-defined local validation flow for current changes
 - [mpt-ext-task-fix-repository-check-failures](./skills/mpt-ext-task-fix-repository-check-failures/SKILL.md): Task for fixing failing repository checks and tests one blocker at a time
 - [mpt-ext-task-fix-pre-commit-failures](./skills/mpt-ext-task-fix-pre-commit-failures/SKILL.md): Task for resolving failed pre-commit hooks triggered during git commit
@@ -114,6 +114,7 @@ Treat `knowledge/` as reusable guidance. Repository-specific commands and except
 - [mpt-ext-task-handle-pr-comments](./skills/mpt-ext-task-handle-pr-comments/SKILL.md): Task for reading PR review feedback, applying scoped fixes, and replying in review threads
 - [mpt-ext-task-move-jira-to-qa](./skills/mpt-ext-task-move-jira-to-qa/SKILL.md): Task for transitioning a merged Jira issue into its correct post-merge status
 - [mpt-ext-workflow-start-work](./skills/mpt-ext-workflow-start-work/SKILL.md): Workflow for coordinating branch creation and Jira start-state setup
+- [mpt-ext-workflow-fix-dependabot-prs](./skills/mpt-ext-workflow-fix-dependabot-prs/SKILL.md): Workflow for coordinating Dependabot PR discovery, policy fixes, validation, scoped check fixes, amend, and push
 - [mpt-ext-workflow-send-to-review](./skills/mpt-ext-workflow-send-to-review/SKILL.md): Workflow for validating changes, creating or updating the PR, and moving Jira into Code Review
 - [mpt-ext-workflow-address-review-feedback](./skills/mpt-ext-workflow-address-review-feedback/SKILL.md): Workflow for processing review comments, validating the resulting changes, and updating the review branch
 - [mpt-ext-workflow-complete-after-merge](./skills/mpt-ext-workflow-complete-after-merge/SKILL.md): Workflow for confirming merge completion and moving Jira into its correct post-merge status
