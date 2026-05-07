@@ -202,8 +202,15 @@ def render_context(
     if not source_commits:
         blockers.append("source_pr_commits_missing")
 
-    base_ref = str(pr.get("baseRefName") or pr.get("base_ref") or "").strip()
-    if base_ref and base_ref != "main":
+    base_ref = str(
+        pr.get("baseRefName")
+        or pr.get("base_ref")
+        or nested_get(pr, "base", "ref")
+        or ""
+    ).strip()
+    if not base_ref:
+        blockers.append("source_pr_base_missing")
+    elif base_ref != "main":
         blockers.append(f"source_pr_base_is_{base_ref}")
 
     return {
