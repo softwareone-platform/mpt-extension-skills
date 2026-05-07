@@ -52,11 +52,13 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 2. Run repository validation.
 - Use `mpt-ext-task-run-repository-checks` to execute the repository-required local validation flow for the current change scope.
 - If repository checks or tests fail, use `mpt-ext-task-fix-repository-check-failures` to work through the blockers step by step and rerun the required validation.
+- Run at most 5 validation-fix iterations before stopping.
 - Stop and redirect back to implementation when validation still fails or the work is not yet ready to publish.
 
 3. Create the commit.
 - Use `mpt-ext-task-commit-changes` to stage the intended files and create a repository-compliant commit.
 - If the commit is blocked by automatic `pre-commit` hook failures or hook-generated file rewrites, use `mpt-ext-task-fix-pre-commit-failures` before retrying the commit.
+- Run at most 5 pre-commit fix-and-retry iterations before stopping.
 
 4. Publish the branch for review.
 - Push the committed branch before creating or updating the PR so review state is based on the published branch instead of unpublished local history.
@@ -80,6 +82,7 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 - Never duplicate the lower-level instructions already owned by the task skills used in this workflow.
 - Never skip repository-required validation before commit and PR creation.
 - Never retry failing validation or `pre-commit` loops blindly without routing through the relevant failure-handling task.
+- Never run more than 5 validation-fix iterations or 5 pre-commit fix-and-retry iterations before stopping with a blocker.
 - Never rely on unpublished local commits when opening or updating the review PR; publish the branch first.
 - Never move Jira to `Code Review` without a review-ready PR.
 - Never continue into review-comment or post-merge handling inside this workflow.

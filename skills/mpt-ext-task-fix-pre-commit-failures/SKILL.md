@@ -1,13 +1,13 @@
 ---
 name: mpt-ext-task-fix-pre-commit-failures
-description: Fix pre-commit hook failures step by step when a git commit is blocked by automatic hook execution. Use this task to read the hook output, keep or inspect hook-generated file changes, address one remaining hook failure at a time, rerun the relevant validation when needed, and retry the commit only after the hook set is expected to pass cleanly.
+description: Fix pre-commit hook failures step by step when a git commit is blocked by automatic hook execution. Use this task to read the hook output, keep or inspect hook-generated file changes, address one remaining hook failure at a time, rerun the relevant validation when needed, and retry the commit for at most 5 fix iterations only after the hook set is expected to pass cleanly.
 ---
 
 # Fix Pre-commit Failures
 
 ## Purpose
 
-Resolve `pre-commit` hook failures that block a `git commit`, one hook failure at a time.
+Resolve `pre-commit` hook failures that block a `git commit`, one hook failure at a time, with at most 5 fix-and-retry iterations.
 
 ## Use When
 
@@ -64,6 +64,7 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 - Rerun the narrowest safe validation needed to confirm the hook-related fix.
 - Retry the commit only after the current hook blockers are addressed.
 - Confirm that the automatic `pre-commit` run triggered by the retried commit passes cleanly.
+- Stop when the commit is still blocked after 5 fix-and-retry iterations, and report the remaining hook output as the blocker.
 
 6. Report the result clearly.
 - State which hooks failed and which were fixed.
@@ -75,9 +76,10 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 - Never ignore a failed `pre-commit` run and pretend the commit succeeded.
 - Never discard hook-generated file rewrites without inspecting them first.
 - Never retry commits blindly without addressing the current hook failures.
+- Never run more than 5 pre-commit fix-and-retry iterations before stopping with a blocker.
 - Never mix PR creation or Jira transitions into this task.
 - Never bypass repository-required hooks unless the user explicitly directs that and repository policy allows it.
 
 ## Expected Outcome
 
-The `pre-commit` failures triggered by `git commit` are resolved step by step, hook-generated fixes are handled safely, and the commit can be retried only when the automatic hook run is expected to pass cleanly.
+The `pre-commit` failures triggered by `git commit` are resolved step by step, hook-generated fixes are handled safely, and the commit can be retried only when the automatic hook run is expected to pass cleanly, up to the 5-iteration limit.

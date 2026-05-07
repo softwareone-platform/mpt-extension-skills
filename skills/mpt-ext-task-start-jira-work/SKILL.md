@@ -56,6 +56,7 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 - Read the direct parent of the issue if it exists.
 - Continue reading parent issues until the full parent chain is known.
 - Stop only when the chain has no further parent.
+- Stop and report a Jira hierarchy blocker if more than 10 parent links are traversed.
 
 4. Move the issue and parent chain to `In Progress`.
 - Transition the current issue to `In Progress` when it is not already there.
@@ -106,6 +107,7 @@ acli jira board list-sprints --id <board-id> --state active --json
 - Never silently move a parent to a sprint when the target is a subtask without reporting that the parent was the sprint edit target.
 - Never reassign the issue automatically when the assignee differs from the current Jira-authenticated user.
 - Never stop at the direct parent when a longer parent chain exists.
+- Never traverse more than 10 parent links without stopping and reporting a Jira hierarchy blocker.
 - Never rewrite already-correct Jira state without need.
 - Never mix branch creation or PR operations into this task.
 
