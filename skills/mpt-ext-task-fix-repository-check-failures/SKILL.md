@@ -1,13 +1,13 @@
 ---
 name: mpt-ext-task-fix-repository-check-failures
-description: Fix repository validation failures step by step after local checks or tests fail. Use this task to read the failing validation output, isolate one blocker at a time, apply the smallest required fix, rerun the relevant checks, and continue until the repository-required validation flow is clean or a clear blocker remains.
+description: Fix repository validation failures step by step after local checks or tests fail. Use this task to read the failing validation output, isolate one blocker at a time, apply the smallest required fix, rerun the relevant checks, and continue for at most 5 fix iterations until the repository-required validation flow is clean or a clear blocker remains.
 ---
 
 # Fix Repository Check Failures
 
 ## Purpose
 
-Fix failing repository checks or tests in a controlled step-by-step loop until the required validation flow passes or a clear blocker remains.
+Fix failing repository checks or tests in a controlled step-by-step loop until the required validation flow passes, a clear blocker remains, or 5 fix iterations have been attempted.
 
 ## Use When
 
@@ -60,9 +60,10 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 - Rerun the narrowest safe command that confirms the fix for the current blocker.
 - When the repository workflow requires a broader rerun before the work is considered clean, run the broader check after the targeted rerun passes.
 
-5. Repeat until clean or blocked.
+5. Repeat until clean, blocked, or iteration limit reached.
 - Continue through the next failing blocker only after the current one is resolved or explicitly understood.
 - Stop when all required validation passes or when the remaining failure needs user input, unavailable environment access, or a broader design decision.
+- Stop when validation still fails after 5 fix iterations, and report the last failing command output as the blocker.
 
 6. Report the result clearly.
 - State which failures were fixed.
@@ -74,9 +75,10 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 - Never guess the cause of a failure without reading the reported output first.
 - Never batch unrelated speculative fixes together when the validation output identifies a narrower blocker.
 - Never treat environment/setup failures as product-code failures.
+- Never run more than 5 validation-fix iterations before stopping with a blocker.
 - Never mix commit creation, PR creation, or Jira transitions into this task.
 - For repositories that follow this shared package validation guidance, read `knowledge/build-and-checks.md` using the shared-doc resolution rule from the repository context step as the shared reference for the validation loop.
 
 ## Expected Outcome
 
-Repository validation failures are addressed one by one with scoped fixes and targeted reruns until the required checks pass or a precise blocker remains.
+Repository validation failures are addressed one by one with scoped fixes and targeted reruns until the required checks pass, a precise blocker remains, or the 5-iteration limit is reached.

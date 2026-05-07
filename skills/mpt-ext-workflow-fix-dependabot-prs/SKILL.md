@@ -103,8 +103,10 @@ git pull --rebase origin <base-branch>
 
 7. Fix actionable validation failures.
 - If validation fails, invoke `mpt-ext-task-fix-repository-check-failures` with the failing command output.
+- Run at most 5 validation-fix iterations per Dependabot PR.
 - Fix only failures that are clearly caused by the Dependabot dependency change, dependency lock refresh, pre-commit pin sync, or validation fallout from those files.
 - After each fix, rerun the narrowest safe validation command, then rerun the repository-required check flow before publishing.
+- Stop without committing or pushing when validation still fails after 5 fix iterations.
 - Stop without committing or pushing when the remaining failure is environment-related, unrelated to the Dependabot change, or requires a product or design decision.
 
 8. Amend and push to the same Dependabot branch.
@@ -139,6 +141,7 @@ git push --force-with-lease origin <head-branch>
 - Never keep Dependabot `opentelemetry`-family version bumps in the PR.
 - Never update `.pre-commit-config.yaml` opportunistically for unrelated tools.
 - Never continue to amend or push after failed validation unless the failure has been fixed and the required validation flow passes.
+- Never run more than 5 validation-fix iterations for one Dependabot PR before stopping with a blocker.
 - Never use validation auto-fix as permission to make unrelated product-code changes in a Dependabot PR.
 - Never run repository-required validation steps in parallel when the shared validation workflow requires a sequence.
 

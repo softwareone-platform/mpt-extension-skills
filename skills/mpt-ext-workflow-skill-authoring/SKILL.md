@@ -138,6 +138,7 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 - Re-test the skill against concrete requests that should trigger it.
 - Tighten vague steps, missing prerequisites, or weak guardrails.
 - Add supporting files only when the repeated task justifies the extra maintenance.
+- Run at most 5 realistic-task iteration passes before stopping and reporting the remaining skill quality gaps.
 
 ## Guardrails
 
@@ -147,6 +148,7 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 - Do not hide destructive or high-risk actions inside vague steps.
 - Do not add auxiliary files such as `README.md`, `CHANGELOG.md`, or quick-reference notes inside the skill folder unless they are truly required by the runtime.
 - Prefer links to shared docs resolved from the installed local package when available over copied policy text.
+- Never run more than 5 skill-authoring review iterations before stopping with the remaining gaps.
 
 ## Expected Outcome
 

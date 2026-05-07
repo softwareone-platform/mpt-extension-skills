@@ -56,11 +56,13 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 3. Run repository validation for the applied fixes.
 - Use `mpt-ext-task-run-repository-checks` to execute the repository-required local validation flow for the changed scope.
 - If repository checks or tests fail, use `mpt-ext-task-fix-repository-check-failures` to work through the blockers step by step and rerun the required validation.
+- Run at most 5 validation-fix iterations before stopping.
 - Stop when validation still fails or the updated branch is not ready to send back for review.
 
 4. Update the commit history for the branch.
 - Use `mpt-ext-task-commit-changes` to stage the intended files and amend or create the repository-compliant commit for this review iteration.
 - If the commit is blocked by automatic `pre-commit` hook failures or hook-generated file rewrites, use `mpt-ext-task-fix-pre-commit-failures` before retrying the commit.
+- Run at most 5 pre-commit fix-and-retry iterations before stopping.
 
 5. Update the pull request branch.
 - Push the updated branch so the existing PR reflects the latest review fixes.
@@ -76,6 +78,7 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 
 - Never start from already resolved or already answered review threads unless the user explicitly asks to revisit them.
 - Never skip repository-required validation after code changes made for review feedback.
+- Never run more than 5 validation-fix iterations or 5 pre-commit fix-and-retry iterations before stopping with a blocker.
 - Never create a duplicate pull request when updating the existing review branch.
 - Never move Jira to `Code Review` or `QA` inside this workflow.
 - Never assume every review comment must be fixed; use explanation or pushback when that is the correct outcome.
