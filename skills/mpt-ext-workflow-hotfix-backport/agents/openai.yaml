@@ -1,0 +1,4 @@
+interface:
+  display_name: "Hotfix And Backport"
+  short_description: "Prepare release-branch hotfix and backport PRs"
+  default_prompt: "Prepare a hotfix or backport release-branch pull request: find the open or merged main PR from the Jira issue or explicit PR number, read its commits, resolve the active release branch, create the release work branch, cherry-pick the PR commits one by one, run repository validation, open or update the release PR, and move Jira to Code Review when ready."
