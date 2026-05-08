@@ -54,6 +54,8 @@ This repository exposes the main validation commands through `make`:
 make check
 make test
 make check-all
+make install-skills
+make update-skills
 make review
 ```
 
@@ -62,6 +64,8 @@ Current commands:
 - `make check`: runs `shellcheck` for the CLI and release installer scripts
 - `make test`: runs the shell integration tests
 - `make check-all`: runs both validation and tests
+- `make install-skills`: installs skills from the local repository checkout
+- `make update-skills`: upgrades installed skills from GitHub Releases
 - `make review`: runs the local CodeRabbit review command
 
 Use `make help` to see the available commands.
