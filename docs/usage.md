@@ -82,6 +82,22 @@ mpt-extensions-skills install --path /path/to/mpt-extension-skills
 
 The `local` version replaces any previous local installation and becomes the active `current` target.
 
+From this repository checkout, the same local installation is available through `make`:
+
+```bash
+make install-skills
+make install-skills runtime="--codex"
+make install-skills runtime="--all"
+```
+
+To upgrade an installed package from GitHub Releases through `make`, use:
+
+```bash
+make update-skills
+make update-skills version=1.0.0
+make update-skills runtime="--codex"
+```
+
 ## Show Installed Version
 
 Use:
