@@ -1,0 +1,4 @@
+interface:
+  display_name: "Apply Dashboard Jira Decision"
+  short_description: "Apply one approved dashboard failure decision to MPT Jira"
+  default_prompt: "Apply one approved dashboard failure decision by creating, updating, reopening, merging, or skipping an MPT Jira bug with dashboard evidence, HitCount, Environment, Keywords, fixVersions, and component fields."

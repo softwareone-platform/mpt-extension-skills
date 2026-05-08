@@ -1,0 +1,4 @@
+interface:
+  display_name: "Dashboard Failure Triage"
+  short_description: "Batch triage App Insights dashboard failures into MPT Jira bugs"
+  default_prompt: "Process dashboard monitoring failures from an App Insights query or exported CSV/JSON, propose Jira actions for all findings in one review table, then create, update, reopen, merge, or skip MPT bugs only after the user approves the batch plan."
