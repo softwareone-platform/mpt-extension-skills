@@ -16,4 +16,5 @@ install-skills:  ## Install skills from this local checkout. Pass runtime="--cod
 	./scripts/mpt-extensions-skills.sh install --path "$(CURDIR)" $(runtime)
 
 update-skills:  ## Upgrade installed skills from GitHub Releases. Pass version=<version> or runtime="--codex|--claude|--all"
+	@command -v mpt-extensions-skills >/dev/null 2>&1 || { echo "Error: mpt-extensions-skills CLI not found. Run 'make install-skills' first."; exit 1; }
 	mpt-extensions-skills upgrade $(if $(version),--version $(version)) $(runtime)
