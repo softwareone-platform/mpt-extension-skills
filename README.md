@@ -18,11 +18,13 @@ Current skills:
 - [mpt-ext-task-run-repository-checks](./skills/mpt-ext-task-run-repository-checks/SKILL.md): Run the repository-required local validation flow for the current change scope
 - [mpt-ext-task-fix-repository-check-failures](./skills/mpt-ext-task-fix-repository-check-failures/SKILL.md): Work through failing local checks and tests one blocker at a time
 - [mpt-ext-task-fix-pre-commit-failures](./skills/mpt-ext-task-fix-pre-commit-failures/SKILL.md): Resolve commit-time pre-commit hook failures one blocker at a time
+- [mpt-ext-task-apply-dashboard-jira-decision](./skills/mpt-ext-task-apply-dashboard-jira-decision/SKILL.md): Apply one approved dashboard failure decision to MPT Jira
 - [mpt-ext-task-open-pull-request](./skills/mpt-ext-task-open-pull-request/SKILL.md): Create or update a repository-compliant pull request
 - [mpt-ext-task-move-jira-to-code-review](./skills/mpt-ext-task-move-jira-to-code-review/SKILL.md): Move a Jira issue into Code Review when branch work is ready for review
 - [mpt-ext-task-handle-pr-comments](./skills/mpt-ext-task-handle-pr-comments/SKILL.md): Address existing PR review comments with scoped fixes or thread replies
 - [mpt-ext-task-move-jira-to-qa](./skills/mpt-ext-task-move-jira-to-qa/SKILL.md): Move a Jira issue into its correct post-merge status after reviewed work is merged
 - [mpt-ext-workflow-start-work](./skills/mpt-ext-workflow-start-work/SKILL.md): Coordinate branch creation and Jira start-of-work setup
+- [mpt-ext-workflow-dashboard-failure-triage](./skills/mpt-ext-workflow-dashboard-failure-triage/SKILL.md): Batch triage App Insights dashboard failures into MPT Jira bugs
 - [mpt-ext-workflow-fix-dependabot-prs](./skills/mpt-ext-workflow-fix-dependabot-prs/SKILL.md): Coordinate Dependabot PR discovery, policy fixes, validation, scoped check fixes, amend, and push
 - [mpt-ext-workflow-hotfix-backport](./skills/mpt-ext-workflow-hotfix-backport/SKILL.md): Coordinate release-branch hotfix and backport PR preparation
 - [mpt-ext-workflow-send-to-review](./skills/mpt-ext-workflow-send-to-review/SKILL.md): Coordinate validation, commit, PR creation, and Jira review handoff

@@ -1,0 +1,198 @@
+let failed_requests = materialize(
+    requests
+    | where cloud_RoleName in ("Swo.Extensions.AdobeVIPM", "Swo.Extensions.AWS")
+        and client_Type != "Browser"
+        and success == false
+    | extend masked_url = replace_regex(name, @'[[:alpha:]]+(-[[:digit:]]+)+', @'{id}')
+    | project
+        operation_Id,
+        request_timestamp=timestamp,
+        name,
+        url,
+        masked_url,
+        resultCode,
+        duration,
+        cloud_RoleName,
+        cloud_RoleInstance
+    );
+let dependency_context = materialize(
+    dependencies
+    | where cloud_RoleName in ("Swo.Extensions.AdobeVIPM", "Swo.Extensions.AWS")
+    | extend
+        dependency_custom_dimensions = tostring(customDimensions),
+        dependency_text = strcat(name, " ", data)
+    | extend
+        dependency_order_id_from_dimensions = tostring(coalesce(
+            tostring(customDimensions["order.id"]),
+            tostring(customDimensions["order_id"]),
+            tostring(customDimensions["orderId"])
+        )),
+        dependency_agreement_id_from_dimensions = tostring(coalesce(
+            tostring(customDimensions["agreement.id"]),
+            tostring(customDimensions["agreement_id"]),
+            tostring(customDimensions["agreementId"])
+        )),
+        dependency_order_id_from_text = extract(@"(ORD-[0-9]{4}-[0-9]{4}-[0-9]{4})", 1, dependency_text),
+        dependency_agreement_id_from_text = extract(@"(AGR-[0-9]{4}-[0-9]{4}-[0-9]{4})", 1, dependency_text)
+    | extend
+        dependency_order_id = iff(
+            isnotempty(dependency_order_id_from_dimensions),
+            dependency_order_id_from_dimensions,
+            dependency_order_id_from_text
+        ),
+        dependency_agreement_id = iff(
+            isnotempty(dependency_agreement_id_from_dimensions),
+            dependency_agreement_id_from_dimensions,
+            dependency_agreement_id_from_text
+        )
+    | where isnotempty(dependency_order_id)
+        or isnotempty(dependency_agreement_id)
+        or name startswith "Event orders for "
+    | project
+        operation_Id,
+        dependency_timestamp=timestamp,
+        dependency_name=name,
+        dependency_data=data,
+        dependency_target=target,
+        dependency_type=type,
+        dependency_resultCode=resultCode,
+        dependency_success=success,
+        dependency_order_id,
+        dependency_agreement_id,
+        dependency_custom_dimensions
+    );
+let marketplace_exceptions = materialize(
+    exceptions
+    | where cloud_RoleName in ("Swo.Extensions.AdobeVIPM", "Swo.Extensions.AWS")
+    | extend
+        stack_trace = tostring(customDimensions["error"]),
+        message = outerMessage,
+        type = outerType,
+        custom_dimensions = tostring(customDimensions),
+        order_id = tostring(coalesce(
+            customDimensions["order_id"],
+            customDimensions["orderId"],
+            customDimensions["order"],
+            customDimensions["order.id"],
+            customDimensions["mpt_order_id"]
+        )),
+        agreement_id = tostring(coalesce(
+            customDimensions["agreement_id"],
+            customDimensions["agreementId"],
+            customDimensions["agreement"],
+            customDimensions["agreement.id"],
+            customDimensions["mpt_agreement_id"]
+        )),
+        product_id = tostring(coalesce(
+            customDimensions["product_id"],
+            customDimensions["productId"],
+            customDimensions["product"],
+            customDimensions["product.id"]
+        )),
+        account_id = tostring(coalesce(
+            customDimensions["account_id"],
+            customDimensions["accountId"],
+            customDimensions["aws_account_id"],
+            customDimensions["target_account_id"],
+            customDimensions["customer_id"],
+            customDimensions["customerId"]
+        )),
+        flow = tostring(coalesce(
+            customDimensions["flow"],
+            customDimensions["pipeline"],
+            customDimensions["process"]
+        )),
+        step = tostring(coalesce(
+            customDimensions["step"],
+            customDimensions["phase"],
+            customDimensions["template_id"],
+            customDimensions["templateId"]
+        ))
+    | project
+        operation_Id,
+        exception_item_id=itemId,
+        exception_timestamp=timestamp,
+        type,
+        innermostType,
+        message,
+        innermostMessage,
+        problemId,
+        cloud_RoleName,
+        cloud_RoleInstance,
+        stack_trace,
+        custom_dimensions,
+        order_id,
+        agreement_id,
+        product_id,
+        account_id,
+        flow,
+        step
+    );
+marketplace_exceptions
+| join kind=leftouter failed_requests on operation_Id
+| join kind=leftouter dependency_context on operation_Id
+| extend
+    role = coalesce(cloud_RoleName, cloud_RoleName1),
+    role_instance = coalesce(cloud_RoleInstance, cloud_RoleInstance1),
+    failure_time = coalesce(exception_timestamp, request_timestamp),
+    exception_identity = coalesce(
+        exception_item_id,
+        strcat(operation_Id, "|", tostring(exception_timestamp), "|", type, "|", problemId)
+    ),
+    grouped_masked_url = coalesce(masked_url, ""),
+    grouped_order_id = coalesce(order_id, dependency_order_id),
+    grouped_agreement_id = coalesce(agreement_id, dependency_agreement_id)
+| summarize
+    first_seen=min(failure_time),
+    last_seen=max(failure_time),
+    sample_operation_ids=make_set(operation_Id, 5),
+    sample_order_ids=make_set_if(grouped_order_id, isnotempty(grouped_order_id), 10),
+    sample_agreement_ids=make_set_if(grouped_agreement_id, isnotempty(grouped_agreement_id), 10),
+    sample_product_ids=make_set_if(product_id, isnotempty(product_id), 10),
+    sample_account_ids=make_set_if(account_id, isnotempty(account_id), 10),
+    sample_flows=make_set_if(flow, isnotempty(flow), 10),
+    sample_steps=make_set_if(step, isnotempty(step), 10),
+    sample_dependency_names=make_set_if(dependency_name, isnotempty(dependency_name), 10),
+    sample_dependency_urls=make_set_if(dependency_data, isnotempty(dependency_data), 10),
+    any_message=any(message),
+    any_innermostMessage=any(innermostMessage),
+    any_stack_trace=any(stack_trace),
+    any_custom_dimensions=any(custom_dimensions),
+    any_dependency_custom_dimensions=any(dependency_custom_dimensions),
+    sample_request_names=make_set(name, 5),
+    sample_urls=make_set(url, 5),
+    sample_role_instances=make_set(role_instance, 5),
+    result_codes=make_set(resultCode, 5),
+    avg_duration_ms=avg(duration),
+    failures_count=dcount(exception_identity)
+    by role, grouped_masked_url, resultCode, type, innermostType, problemId
+| project
+    cloud_RoleName=role,
+    masked_url=grouped_masked_url,
+    resultCode,
+    type,
+    innermostType,
+    problemId,
+    first_seen,
+    last_seen,
+    sample_operation_ids,
+    sample_order_ids,
+    sample_agreement_ids,
+    sample_product_ids,
+    sample_account_ids,
+    sample_flows,
+    sample_steps,
+    sample_dependency_names,
+    sample_dependency_urls,
+    any_message,
+    any_innermostMessage,
+    any_stack_trace,
+    any_custom_dimensions,
+    any_dependency_custom_dimensions,
+    sample_request_names,
+    sample_urls,
+    sample_role_instances,
+    result_codes,
+    avg_duration_ms,
+    failures_count
+| sort by cloud_RoleName asc, failures_count desc

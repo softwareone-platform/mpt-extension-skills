@@ -109,11 +109,13 @@ Treat `knowledge/` as reusable guidance. Repository-specific commands and except
 - [mpt-ext-task-run-repository-checks](./skills/mpt-ext-task-run-repository-checks/SKILL.md): Task for running the repository-defined local validation flow for current changes
 - [mpt-ext-task-fix-repository-check-failures](./skills/mpt-ext-task-fix-repository-check-failures/SKILL.md): Task for fixing failing repository checks and tests one blocker at a time
 - [mpt-ext-task-fix-pre-commit-failures](./skills/mpt-ext-task-fix-pre-commit-failures/SKILL.md): Task for resolving failed pre-commit hooks triggered during git commit
+- [mpt-ext-task-apply-dashboard-jira-decision](./skills/mpt-ext-task-apply-dashboard-jira-decision/SKILL.md): Task for applying one approved dashboard failure decision to MPT Jira
 - [mpt-ext-task-open-pull-request](./skills/mpt-ext-task-open-pull-request/SKILL.md): Task for opening or updating a repository-compliant pull request
 - [mpt-ext-task-move-jira-to-code-review](./skills/mpt-ext-task-move-jira-to-code-review/SKILL.md): Task for transitioning a ready Jira issue into Code Review
 - [mpt-ext-task-handle-pr-comments](./skills/mpt-ext-task-handle-pr-comments/SKILL.md): Task for reading PR review feedback, applying scoped fixes, and replying in review threads
 - [mpt-ext-task-move-jira-to-qa](./skills/mpt-ext-task-move-jira-to-qa/SKILL.md): Task for transitioning a merged Jira issue into its correct post-merge status
 - [mpt-ext-workflow-start-work](./skills/mpt-ext-workflow-start-work/SKILL.md): Workflow for coordinating branch creation and Jira start-state setup
+- [mpt-ext-workflow-dashboard-failure-triage](./skills/mpt-ext-workflow-dashboard-failure-triage/SKILL.md): Workflow for batch triaging App Insights dashboard failures into MPT Jira decisions
 - [mpt-ext-workflow-fix-dependabot-prs](./skills/mpt-ext-workflow-fix-dependabot-prs/SKILL.md): Workflow for coordinating Dependabot PR discovery, policy fixes, validation, scoped check fixes, amend, and push
 - [mpt-ext-workflow-hotfix-backport](./skills/mpt-ext-workflow-hotfix-backport/SKILL.md): Workflow for coordinating release-branch hotfix and backport PR preparation
 - [mpt-ext-workflow-send-to-review](./skills/mpt-ext-workflow-send-to-review/SKILL.md): Workflow for validating changes, creating or updating the PR, and moving Jira into Code Review
