@@ -62,6 +62,10 @@ ASSIGNMENT_DEP_RE = re.compile(
 )
 LOCK_NAME_RE = re.compile(r"""name\s*=\s*["']([^"']+)["']""")
 PRE_COMMIT_RE = re.compile(r"""(?:repo:|id:|rev:|additional_dependencies:)""")
+PRE_COMMIT_HOOK_ID_RE = re.compile(r"""^\s*-\s*id:\s*["']?([A-Za-z0-9][A-Za-z0-9_.-]*)["']?\s*$""")
+PRE_COMMIT_ADDL_ENTRY_RE = re.compile(
+    r"""(?:^\s*-\s*|^\s*\[\s*|,\s*)["']?([A-Za-z0-9][A-Za-z0-9_.-]*)["']?\s*(?:\[[^\]]*\])?\s*(?:[<>=!~^][^,\]"']*)?""",
+)
 
 
 def read_json(path: Optional[str], default: Any) -> Any:
@@ -228,10 +232,70 @@ def detect_pre_commit_indicators(lines: list[str]) -> bool:
     return any(PRE_COMMIT_RE.search(line) for line in lines)
 
 
+def extract_pre_commit_pinned_packages(text: str) -> set[str]:
+    """Extract package names pinned in a .pre-commit-config.yaml file.
+
+    Covers two sources of pinning:
+    - hook `id:` entries, which usually match the tool's package name
+      (for example `id: mypy`, `id: flake8`).
+    - `additional_dependencies:` list entries, which pin specific package
+      versions for hooks like mirrors-mypy.
+    """
+    pinned: set[str] = set()
+    in_addl_block = False
+    addl_indent: Optional[int] = None
+    for raw_line in text.splitlines():
+        line = raw_line.rstrip()
+        if not line.strip():
+            continue
+        indent = len(line) - len(line.lstrip())
+
+        hook_id_match = PRE_COMMIT_HOOK_ID_RE.match(line)
+        if hook_id_match:
+            pinned.add(hook_id_match.group(1).lower())
+
+        stripped = line.strip()
+        if stripped.startswith("additional_dependencies:"):
+            in_addl_block = True
+            addl_indent = indent
+            inline = stripped[len("additional_dependencies:"):].strip()
+            if inline:
+                for match in PRE_COMMIT_ADDL_ENTRY_RE.finditer(inline):
+                    pinned.add(match.group(1).lower())
+                if inline.endswith("]"):
+                    in_addl_block = False
+                    addl_indent = None
+            continue
+
+        if in_addl_block:
+            if addl_indent is not None and indent <= addl_indent and not stripped.startswith("-"):
+                in_addl_block = False
+                addl_indent = None
+            else:
+                for match in PRE_COMMIT_ADDL_ENTRY_RE.finditer(stripped):
+                    pinned.add(match.group(1).lower())
+                if stripped.endswith("]"):
+                    in_addl_block = False
+                    addl_indent = None
+                continue
+    return {name for name in pinned if name}
+
+
+def detect_pre_commit_pins_to_sync(
+    changed_packages: set[str],
+    pre_commit_text: str,
+) -> list[str]:
+    if not pre_commit_text or not changed_packages:
+        return []
+    pinned = extract_pre_commit_pinned_packages(pre_commit_text)
+    return sorted(pkg for pkg in changed_packages if pkg in pinned)
+
+
 def build_analysis(
     metadata: dict[str, Any],
     changed_files: list[str],
     diff_text: str,
+    pre_commit_text: str = "",
 ) -> dict[str, Any]:
     added_lines, removed_lines = added_removed_diff_lines(diff_text)
     changed_dependency_files = [path for path in changed_files if is_dependency_file(path)]
@@ -257,6 +321,16 @@ def build_analysis(
         for path in changed_files
     ) or detect_pre_commit_indicators(added_pre_commit_lines)
 
+    changed_packages = set(extract_package_names(all_changed_lines))
+    pre_commit_pins_to_sync = detect_pre_commit_pins_to_sync(
+        changed_packages,
+        pre_commit_text,
+    )
+
+    pre_commit_sync_needed = (
+        bool(dev_dependency_indicators) or bool(pre_commit_pins_to_sync)
+    ) and not pre_commit_changed
+
     skip_reason = ""
     if not dependabot:
         skip_reason = "PR is not authored by Dependabot and does not use a Dependabot head branch."
@@ -266,6 +340,7 @@ def build_analysis(
         opentelemetry_packages
         or pyproject_policy_violations
         or dev_dependency_indicators
+        or pre_commit_pins_to_sync
     ):
         skip_reason = "No deterministic dependency policy issue was detected."
 
@@ -283,7 +358,8 @@ def build_analysis(
         "opentelemetry_packages": opentelemetry_packages,
         "dev_dependency_indicators": dev_dependency_indicators,
         "pre_commit_changed": pre_commit_changed,
-        "pre_commit_sync_needed": bool(dev_dependency_indicators) and not pre_commit_changed,
+        "pre_commit_pins_to_sync": pre_commit_pins_to_sync,
+        "pre_commit_sync_needed": pre_commit_sync_needed,
         "pyproject_policy_violations": pyproject_policy_violations,
         "skip_reason": skip_reason,
     }
@@ -307,6 +383,14 @@ def main() -> int:
         help="Changed file path; may be provided multiple times",
     )
     parser.add_argument("--diff-file", required=True, help="PR diff file")
+    parser.add_argument(
+        "--pre-commit-config",
+        help=(
+            "Path to the current .pre-commit-config.yaml on the checked-out branch. "
+            "Used to detect runtime/dev deps pinned in hook rev/additional_dependencies "
+            "that must be synced when Dependabot bumps the underlying package."
+        ),
+    )
     parser.add_argument("--pretty", action="store_true", help="Pretty-print JSON output")
     args = parser.parse_args()
 
@@ -321,7 +405,8 @@ def main() -> int:
     changed_files = sorted(set(changed_files))
 
     diff_text = read_text(args.diff_file)
-    analysis = build_analysis(metadata, changed_files, diff_text)
+    pre_commit_text = read_text(args.pre_commit_config) if args.pre_commit_config else ""
+    analysis = build_analysis(metadata, changed_files, diff_text, pre_commit_text)
     json.dump(analysis, sys.stdout, indent=2 if args.pretty else None, sort_keys=True)
     sys.stdout.write("\n")
     return 0

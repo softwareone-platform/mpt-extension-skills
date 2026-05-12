@@ -1,4 +1,4 @@
 interface:
   display_name: "Dependabot PR Policy Fix"
   short_description: "Apply dependency-policy fixes to one selected Dependabot PR or checked-out branch"
-  default_prompt: "Apply dependency-policy fixes to an already selected Dependabot pull request or checked-out Dependabot branch in a softwareone-platform extension repository by syncing pre-commit dependency pins when relevant dev dependencies change, reverting opentelemetry-family dependency bumps, refreshing lock state through the repository workflow, and reporting changed files and fixed rules without validating, amending, or pushing."
+  default_prompt: "Apply dependency-policy fixes to an already selected Dependabot pull request or checked-out Dependabot branch in a softwareone-platform extension repository by syncing pre-commit dependency pins when any package referenced through hook rev or additional_dependencies changes, reverting opentelemetry-family dependency bumps, refreshing lock state through the repository workflow, and reporting changed files and fixed rules without validating, amending, or pushing."

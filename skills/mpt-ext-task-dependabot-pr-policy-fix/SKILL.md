@@ -46,9 +46,11 @@ Use these shared documents as the source of truth instead of restating their pol
 
 This task applies shared dependency policy with these Dependabot-specific additions:
 
-1. Dev dependency bumps must stay in sync with pre-commit:
-- If a dev dependency changes in `pyproject.toml` or `uv.lock`, and the same tool is pinned or referenced in `.pre-commit-config.yaml`, update `.pre-commit-config.yaml` in the same PR.
-- Examples commonly include linters, formatters, type checkers, and hook `additional_dependencies`.
+1. Dependency bumps must stay in sync with pre-commit:
+- If any dependency changes in `pyproject.toml` or `uv.lock`, and the same package is pinned or referenced in `.pre-commit-config.yaml`, update `.pre-commit-config.yaml` in the same PR.
+- This rule applies regardless of whether the bumped package is a dev dependency, a runtime dependency, or an optional dependency, because pre-commit hooks may pin runtime packages as well, for example through `additional_dependencies` used to feed types or imports into type checkers.
+- Pre-commit references covered by this rule include hook `rev` values that name the tool's upstream release and hook `additional_dependencies` entries that pin specific package versions.
+- Examples commonly include linters, formatters, type checkers, and any runtime package version pinned inside a hook's `additional_dependencies` block.
 
 2. Dependencies whose package name contains `opentelemetry` must not be bumped by Dependabot in this workflow:
 - Match package names containing `opentelemetry`, including names like `azure-monitor-opentelemetry-exporter` and `*-opentelemetry-*`.
@@ -72,11 +74,15 @@ python3 "${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skill
   --metadata-json pr.json \
   --changed-files-json files.json \
   --diff-file pr.diff \
+  --pre-commit-config .pre-commit-config.yaml \
   --pretty
 ```
 
+- Pass `--pre-commit-config` from the checked-out branch when the repository has a `.pre-commit-config.yaml`; the analyzer reads it to detect runtime or dev dependencies pinned through hook `rev` or `additional_dependencies` and populates `pre_commit_pins_to_sync` accordingly.
+
 - For branch-only mode, generate equivalent `pr.json`, `files.json`, and `pr.diff` from the checked-out branch before running the analyzer. If those inputs cannot be generated, run a preflight check and stop with a clear `missing required analyzer inputs` blocker instead of continuing from partial context.
-- Use the analyzer output fields `is_dependabot`, `is_dependency_related`, `skip_reason`, `changed_dependency_files`, `opentelemetry_packages`, `dev_dependency_indicators`, `pre_commit_sync_needed`, and `pyproject_policy_violations`.
+- Use the analyzer output fields `is_dependabot`, `is_dependency_related`, `skip_reason`, `changed_dependency_files`, `opentelemetry_packages`, `dev_dependency_indicators`, `pre_commit_sync_needed`, `pre_commit_pins_to_sync`, and `pyproject_policy_violations`.
+- `pre_commit_pins_to_sync` lists the specific package names that are pinned in `.pre-commit-config.yaml` (through hook `rev` or `additional_dependencies`) and were also changed by the Dependabot PR; treat this list as the authoritative scope for pre-commit synchronization.
 
 3. Detect policy violations.
 - Use the analyzer output as the initial violation plan.
@@ -86,7 +92,7 @@ python3 "${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skill
 4. Apply fixes in place.
 - Convert invalid `pyproject.toml` dependency specifiers according to the shared dependency policy.
 - Revert all `*opentelemetry*` dependency version changes to the base branch version.
-- Update `.pre-commit-config.yaml` when the corresponding dev dependency changed.
+- Update `.pre-commit-config.yaml` when a Dependabot-changed package is pinned there, regardless of whether it is a dev, runtime, or optional dependency; use `pre_commit_pins_to_sync` from the analyzer as the list of packages whose hook `rev` or `additional_dependencies` entries must be updated to match the new `pyproject.toml`/`uv.lock` versions.
 - Refresh `uv.lock` through the target repository dependency-management workflow.
 
 5. Report the policy-fix result.

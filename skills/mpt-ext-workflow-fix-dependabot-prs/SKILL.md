@@ -73,10 +73,12 @@ python3 "${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skill
   --metadata-json pr.json \
   --changed-files-json files.json \
   --diff-file pr.diff \
+  --pre-commit-config .pre-commit-config.yaml \
   --pretty
 ```
 
 - Skip PRs that are not Dependabot-authored, are not dependency-related, or have no relevant policy signal.
+- Pass `--pre-commit-config` from the checked-out branch when the repository has a `.pre-commit-config.yaml`, so the analyzer can detect runtime or dev dependencies that are pinned through hook `rev` or `additional_dependencies` and would otherwise drift on Dependabot bumps.
 
 4. Check out the exact Dependabot branch.
 - Fetch the base and head branches from upstream.
