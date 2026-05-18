@@ -14,39 +14,33 @@ Define a shared format for commit titles and commit descriptions.
 
 ## General Rules
 
-1. Every commit message must use this title format:
-   - `<tag>: <JIRA-ID> <short summary>`
-2. The title must contain:
-   - a tag
-   - the Jira issue key
-   - a short summary in imperative form
-3. The commit description must contain a more detailed explanation of what changed.
+Follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification for title format, allowed types, and breaking-change markers. The rule below extends it for this repository:
 
-## Allowed Tags
-
-- `doc`: documentation changes
-- `fix`: bug fixes
-- `refactor`: refactoring without intended behavior change
-- `feature`: new functionality
+1. The commit body is required and must explain what changed and why.
 
 ## Examples
 
 GOOD
 
 ```text
-doc: MPT-1234 add property
+docs: add property
 
-Update the shared documentation for the new property naming rule and link the related standards.
+Update the shared documentation for the new property naming rule and
+link the related standards.
 ```
 
-GOOD
+GOOD (breaking change)
 
 ```text
-fix: MPT-4567 handle empty payload
+feat(api)!: drop deprecated v1 endpoints
 
-Prevent the parser from failing when the upstream payload is empty and keep the existing response shape.
+Remove the v1 routes that were marked deprecated in the previous
+release. Clients must migrate to v2.
+
+BREAKING CHANGE: v1 endpoints are no longer served.
 ```
 
 ## Related Documents
 
 - [pull-requests.md](./pull-requests.md)
+- [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/)
