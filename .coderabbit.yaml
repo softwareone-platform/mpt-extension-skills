@@ -102,7 +102,7 @@ reviews:
       - name: "AI Warning Line In PR Description"
         mode: "error"
         instructions: |
-          Check Rule 8 from `standards/pull-requests.md` deterministically.
+          Check Rule 8 from `standards/pull-requests.md` deterministically by using byte-level comparison.
           Use that rule as the source of truth for the AI warning line requirement in the PR description.
   tools:
     ast-grep:
