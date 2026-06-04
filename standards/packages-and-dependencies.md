@@ -23,18 +23,26 @@ Define how Python repositories should declare dependencies in `pyproject.toml` a
 
 BAD
 ```toml
-django = "^4.2.2"
-django = ">=4.2,<6.0"
+[project]
+dependencies = [
+  "django>=4.2,<6.0",
+]
 ```
 
 GOOD
 ```toml
-django = "==4.2.*"
+[project]
+dependencies = [
+  "django==4.2.*",
+]
 ```
 
 4. Pin an exact version only when the repository has a documented reason to do so, such as compatibility or reproducibility requirements.
 
 GOOD
 ```toml
-django = "==4.2.2"
+[project]
+dependencies = [
+  "django==4.2.2",
+]
 ```
