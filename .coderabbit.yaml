@@ -9,7 +9,7 @@ reviews:
   request_changes_workflow: true
   high_level_summary: true
   high_level_summary_instructions: |
-    1. Extract the Jira issue key from the PR title (format: MPT-XXXX).
+    1. Extract the Jira issue key from the PR title. Valid title prefixes are "MPT-XXXX", "[HF] MPT-XXXX", and "[BACKPORT] MPT-XXXX".
     2. If an issue key is found, start the summary with: "Closes [MPT-XXXX](https://softwareone.atlassian.net/browse/MPT-XXXX)" where MPT-XXXX is replaced with the actual issue key.
   high_level_summary_placeholder: "@coderabbitai summary"
   high_level_summary_in_walkthrough: false
@@ -91,6 +91,7 @@ reviews:
         instructions: |
           Validate PR and commit formatting against `standards/pull-requests.md` and `standards/commit-messages.md`.
           Use those documents as the source of truth and verify all applicable requirements except Rule 8 from `standards/pull-requests.md`, which is checked separately.
+          Treat `[HF] MPT-1234 <summary>` and `[BACKPORT] MPT-1234 <summary>` as valid PR title formats for pull requests opened against release branches.
           Verify:
           - PR title
           - PR description
