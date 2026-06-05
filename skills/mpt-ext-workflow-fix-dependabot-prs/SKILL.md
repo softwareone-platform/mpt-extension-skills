@@ -1,6 +1,6 @@
 ---
 name: mpt-ext-workflow-fix-dependabot-prs
-description: Process Dependabot PRs end to end by finding relevant PRs, checking out their upstream branches, applying dependency-policy fixes, running repository checks, fixing actionable validation failures, amending the Dependabot commit, and pushing back to the same branch.
+description: Process Dependabot PRs end to end: find relevant PRs, check out their branches, apply dependency-policy fixes, run checks, fix failures, amend the Dependabot commit, and push back.
 ---
 
 # Fix Dependabot PRs
@@ -37,13 +37,13 @@ Coordinate the full SoftwareOne Dependabot PR remediation workflow for extension
 
 Use these shared documents as the source of truth instead of restating their policy. When shared guidance is needed, resolve it from `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current` when available; otherwise read the same path from the `main` branch of the shared GitHub repository.
 
-- `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/standards/packages-and-dependencies.md`
-- `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/knowledge/manage-dependencies.md`
-- `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/knowledge/build-and-checks.md`
-- `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/standards/pull-requests.md`
-- `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skills/mpt-ext-task-dependabot-pr-policy-fix/SKILL.md`
-- `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skills/mpt-ext-task-run-repository-checks/SKILL.md`
-- `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skills/mpt-ext-task-fix-repository-check-failures/SKILL.md`
+- `standards/packages-and-dependencies.md`
+- `knowledge/manage-dependencies.md`
+- `knowledge/build-and-checks.md`
+- `standards/pull-requests.md`
+- `skills/mpt-ext-task-dependabot-pr-policy-fix/SKILL.md`
+- `skills/mpt-ext-task-run-repository-checks/SKILL.md`
+- `skills/mpt-ext-task-fix-repository-check-failures/SKILL.md`
 
 ## Workflow
 

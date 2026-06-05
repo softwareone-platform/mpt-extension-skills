@@ -1,6 +1,6 @@
 ---
 name: mpt-ext-tool-git-branch-ops
-description: Create and switch Git branches when users need to start work on a feature, bugfix, hotfix, or backport. Use this tool skill to select the correct base branch from context, update the base branch locally, detect dirty worktrees or naming conflicts, and create the target branch safely.
+description: Create and switch Git branches for feature, bugfix, hotfix, or backport work. Selects and updates the base branch, detects dirty worktrees or conflicts, and creates the branch safely.
 ---
 
 # Git Branch Ops

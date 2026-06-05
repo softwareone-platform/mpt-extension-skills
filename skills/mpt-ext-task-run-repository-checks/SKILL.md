@@ -1,6 +1,6 @@
 ---
 name: mpt-ext-task-run-repository-checks
-description: Run the repository-required local validation flow when users need to verify that changes are ready for commit or review. Use this task to read repository validation docs, determine the correct local checks for the changed scope, run them in the required order, and report failures clearly so the next task can decide whether to fix issues or stop.
+description: Run the repository-required local validation flow to verify changes are ready for commit or review. Determines the right checks for the changed scope, runs them in order, and reports failures.
 ---
 
 # Run Repository Checks

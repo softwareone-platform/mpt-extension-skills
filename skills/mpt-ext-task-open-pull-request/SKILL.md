@@ -1,6 +1,6 @@
 ---
 name: mpt-ext-task-open-pull-request
-description: Open or update a repository-compliant pull request when users want to publish committed work for review. Use this task to inspect branch PR state, build the pull request title and description from repository rules, create a new PR when needed, or update the existing PR instead of creating a duplicate.
+description: Open or update a repository-compliant pull request to publish committed work. Builds title and body from repo rules, and updates the existing PR instead of creating a duplicate.
 ---
 
 # Open Pull Request

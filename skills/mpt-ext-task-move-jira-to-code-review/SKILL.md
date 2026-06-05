@@ -1,6 +1,6 @@
 ---
 name: mpt-ext-task-move-jira-to-code-review
-description: Move a Jira issue into Code Review when development is complete and a pull request is ready for review. Use this task to verify the issue, confirm PR context is already in place, transition the Jira issue to Code Review, and report blockers clearly when the workflow state is not ready.
+description: Move a Jira issue to Code Review when development is done and a PR is ready. Verifies PR context, transitions the issue, and reports blockers when the state is not ready.
 ---
 
 # Move Jira To Code Review

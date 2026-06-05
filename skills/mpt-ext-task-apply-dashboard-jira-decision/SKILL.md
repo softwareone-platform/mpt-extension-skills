@@ -1,6 +1,6 @@
 ---
 name: mpt-ext-task-apply-dashboard-jira-decision
-description: Apply one approved dashboard failure Jira decision by creating, updating, reopening, merging, or skipping an MPT bug with dashboard evidence fields.
+description: Apply one approved dashboard-failure Jira decision: create, update, reopen, merge, or skip an MPT bug with dashboard evidence fields.
 ---
 
 # Apply Dashboard Jira Decision
@@ -48,9 +48,9 @@ Apply one user-approved dashboard failure decision to Jira with the standard das
 
 ## Shared References
 
-- `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skills/mpt-ext-tool-jira-workitem-ops/SKILL.md`
+The path below is relative to the installed package root `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current`. If that root is unavailable while editing this source repository, use the same path under the repository root.
 
-If the installed package root is unavailable while editing this source repository, use the same path under the repository root.
+- `skills/mpt-ext-tool-jira-workitem-ops/SKILL.md`
 
 ## Bundled Resources
 

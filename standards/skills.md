@@ -136,6 +136,13 @@ Required field expectations:
 - `short_description`: concise summary of the skill purpose
 - `default_prompt`: default runtime prompt aligned with the skill scope and intent
 
+Like the `SKILL.md` `description`, these fields are a token surface for the Codex/OpenAI runtime: `short_description` is loaded as an always-on selector and `default_prompt` is loaded when the skill runs. Keep them tight:
+
+- `short_description`: roughly 15 words or fewer; it is a selector, not a summary.
+- `default_prompt`: roughly 50 words or fewer; state the scope and intent, do not restate every workflow step (the steps live in `SKILL.md`).
+
+`make token-budget` reports these alongside the `SKILL.md` surfaces, and `make token-budget-check` fails when a field is over budget.
+
 `SKILL.md` remains the main behavior document, but `agents/openai.yaml` is a required adapter for cross-runtime compatibility.
 
 ## SKILL.md Requirements
@@ -167,6 +174,16 @@ Every `SKILL.md` must include these required fields or sections:
 - The result the skill is expected to produce.
 
 These may be expressed with equivalent headings, but all of the information above must be present in every skill.
+
+## Description Field
+
+The frontmatter `description` is loaded into the agent context for every session, whether or not the skill is used. Treat it as an always-on token cost and keep it tight.
+
+1. Keep the `description` to roughly 30 words, in one or two sentences.
+2. Lead with the trigger condition (what situation should select this skill) and state the outcome.
+3. Do not restate every workflow step. The step list belongs in the `Workflow` section, not the description.
+4. Do not duplicate the `Use When` / `Do Not Use When` content; the description is a selector, not a summary of the whole skill.
+5. Keep the distinguishing keywords that help an agent pick this skill over a sibling skill.
 
 ## Recommended SKILL.md Shape
 

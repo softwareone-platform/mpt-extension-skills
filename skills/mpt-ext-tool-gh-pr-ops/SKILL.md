@@ -1,6 +1,6 @@
 ---
 name: mpt-ext-tool-gh-pr-ops
-description: Read, create, update, inspect, and comment on GitHub pull requests when users need PR-level operations. Use this tool skill to work with pull request metadata, PR status, merge state, review comments, and comment replies through gh CLI or repository-supported GitHub tooling.
+description: Read, create, update, inspect, and comment on GitHub pull requests via gh CLI: PR metadata, status, merge state, review comments, and replies.
 ---
 
 # GH PR Ops
