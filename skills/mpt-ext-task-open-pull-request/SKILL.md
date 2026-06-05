@@ -53,10 +53,10 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 3. Read PR rules before mutation.
 - Use repository PR rules from repo docs first.
 - When the repository relies on this shared package standard for PR formatting, read `standards/pull-requests.md` using the shared-doc resolution rule from the repository context step, and use it as the source of truth.
-- Build the PR title and description from those rules.
+- Build the complete PR title and final description, including the `🤖 AI-generated PR — Please review carefully.` warning line when the content is AI-generated, before creating the PR.
 
 4. Create or update the PR.
-- If no PR exists for the branch, create a new PR through `mpt-ext-tool-gh-pr-ops`.
+- If no PR exists for the branch, create a new PR through `mpt-ext-tool-gh-pr-ops` with the complete description set in the create call so automated reviewers do not review a stale description. When the description cannot be finalized at creation time, create the PR as a draft and only mark it ready after the description is complete.
 - If a PR already exists for the branch, update the existing PR instead of creating a duplicate.
 
 5. Report the result clearly.
@@ -82,6 +82,7 @@ python3 "${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skill
 ## Guardrails
 
 - Never create a duplicate PR when one already exists for the branch.
+- Never open a PR with an empty or placeholder description and add the description or AI-generated warning line in a later edit; set the complete description at creation time, or use a draft PR until the description is finalized.
 - Never invent PR formatting rules; read repository context first.
 - Never mix commit creation, branch creation, or Jira transitions into this task.
 - Never silently choose the wrong base branch when repo context or user intent is ambiguous.

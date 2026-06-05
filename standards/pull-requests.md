@@ -42,6 +42,35 @@ git pull --rebase origin main
 ```
 
 10. For hotfixes and backports, open the pull request for the `main` branch first and then create the corresponding pull request for the release branch.
+11. The complete pull request description, including the AI-generated warning line from rule 8 when it applies, must be present in the initial pull request creation request. Do not open a pull request with an empty or placeholder description and then add the required description or warning line in a later edit.
+12. When the final description cannot be set at creation time, open the pull request as a draft, set the complete description while it is still a draft, and only then mark it ready for review.
+
+## Description Must Be Complete At Creation
+
+Automated reviewers such as CodeRabbit start their first review on the `pull request opened` event and read the description as it exists at that moment. If the pull request is opened with an empty or placeholder body and the required content — including the `🤖 AI-generated PR — Please review carefully.` warning line — is added in a later edit, the first automated review and the pre-merge description checks run against the stale description and can report false-positive failures.
+
+To avoid this:
+
+- Build the final description first, then create the pull request with that description in a single step.
+
+GOOD
+```bash
+gh pr create --base main --head <branch> --title "<JIRA-ID> <short summary>" --body-file pr_body.md
+```
+
+BAD
+```bash
+gh pr create --base main --head <branch> --title "<JIRA-ID> <short summary>"   # empty/placeholder body
+gh pr edit <pr-number> --body-file pr_body.md                                  # warning line added too late
+```
+
+- If the description cannot be finalized at creation time, open the pull request as a draft. Reviewers configured with `drafts: false` do not review drafts, so finalize the description while the pull request is still a draft and only then mark it ready for review.
+
+GOOD
+```bash
+gh pr create --draft --base main --head <branch> --title "<JIRA-ID> <short summary>" --body-file pr_body.md
+gh pr ready <pr-number>
+```
 
 ## Examples
 
