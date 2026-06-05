@@ -1,6 +1,6 @@
 ---
 name: mpt-ext-task-commit-changes
-description: Create a repository-compliant Git commit when users want to save completed work. Use this task to inspect the current diff, stage only the intended files, build the commit message from repository rules, and create the commit after repository-required validation is complete.
+description: Create a repository-compliant Git commit when saving completed work. Stages only the intended files, builds the message from repo rules, and commits after required validation.
 ---
 
 # Commit Changes

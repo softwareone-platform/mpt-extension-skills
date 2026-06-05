@@ -1,6 +1,6 @@
 ---
 name: mpt-ext-task-fix-repository-check-failures
-description: Fix repository validation failures step by step after local checks or tests fail. Use this task to read the failing validation output, isolate one blocker at a time, apply the smallest required fix, rerun the relevant checks, and continue for at most 5 fix iterations until the repository-required validation flow is clean or a clear blocker remains.
+description: Fix repository validation failures after local checks or tests fail. Isolates one blocker at a time, applies the smallest fix, and reruns checks (max 5 iterations) until clean or blocked.
 ---
 
 # Fix Repository Check Failures

@@ -10,7 +10,13 @@ check:  ## Run shellcheck validation
 test:  ## Run shell tests
 	bash tests/test_mpt_skills.sh
 
-check-all: check test  ## Run all validation and tests
+token-budget:  ## Report the token footprint of skill descriptions and bodies. Pass args="--check" to fail on over-limit descriptions
+	python3 scripts/skill_token_budget.py $(args)
+
+token-budget-check:  ## Fail if any skill description exceeds the token budget
+	python3 scripts/skill_token_budget.py --check
+
+check-all: check test token-budget-check  ## Run all validation and tests
 
 install-skills:  ## Install skills from this local checkout. Pass runtime="--codex|--claude|--all" to target a runtime
 	./scripts/mpt-extensions-skills.sh install --path "$(CURDIR)" $(runtime)

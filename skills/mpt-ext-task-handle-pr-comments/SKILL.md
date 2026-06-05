@@ -1,6 +1,6 @@
 ---
 name: mpt-ext-task-handle-pr-comments
-description: Handle pull request review comments on an existing PR when users want to process review feedback. Use this task to read unresolved review threads with comments that still need a first reply or follow-up, decide whether each selected comment should be fixed or answered, apply code or documentation changes when needed, and post an explicit follow-up reply in the review thread after each fix.
+description: Handle unresolved pull request review comments. Decides whether each comment needs a fix or an answer, applies changes when needed, and posts an explicit follow-up reply in the thread.
 ---
 
 # Handle PR Comments

@@ -1,6 +1,6 @@
 ---
 name: mpt-ext-workflow-address-review-feedback
-description: Address active pull request review feedback when the user wants to process comments, validate the resulting changes, update the existing branch, and send the branch back for review. Use this workflow to coordinate comment handling, validation, commit, and push-ready PR update steps without including initial PR creation or post-merge Jira completion.
+description: Address active PR review feedback end to end: process comments, validate the changes, commit, and update the branch for re-review. Excludes initial PR creation and post-merge Jira steps.
 ---
 
 # Address Review Feedback

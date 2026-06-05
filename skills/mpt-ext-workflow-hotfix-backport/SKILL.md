@@ -1,6 +1,6 @@
 ---
 name: mpt-ext-workflow-hotfix-backport
-description: Prepare hotfix or backport release-branch pull requests when a change must be carried from an open or merged main pull request to the active release branch. Use this workflow to find the main PR from Jira or an explicit PR, resolve the target release branch, cherry-pick the PR commits one by one, validate the release branch result, open or update the release PR, and keep Jira state accurate.
+description: Carry a main PR change to the active release branch as a hotfix or backport: find the source PR, cherry-pick its commits, validate, open the release PR, and keep Jira accurate.
 ---
 
 # Hotfix And Backport
@@ -46,15 +46,15 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 
 Use these shared documents and skills as the source of truth instead of restating their policy. When shared guidance is needed, resolve it from `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current` when available; otherwise read the same path from the `main` branch of the shared GitHub repository.
 
-- `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/standards/pull-requests.md`
-- `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/knowledge/backports.md`
-- `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/knowledge/build-and-checks.md`
-- `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skills/mpt-ext-tool-gh-pr-ops/SKILL.md`
-- `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skills/mpt-ext-tool-git-branch-ops/SKILL.md`
-- `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skills/mpt-ext-task-run-repository-checks/SKILL.md`
-- `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skills/mpt-ext-task-fix-repository-check-failures/SKILL.md`
-- `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skills/mpt-ext-task-open-pull-request/SKILL.md`
-- `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skills/mpt-ext-task-move-jira-to-code-review/SKILL.md`
+- `standards/pull-requests.md`
+- `knowledge/backports.md`
+- `knowledge/build-and-checks.md`
+- `skills/mpt-ext-tool-gh-pr-ops/SKILL.md`
+- `skills/mpt-ext-tool-git-branch-ops/SKILL.md`
+- `skills/mpt-ext-task-run-repository-checks/SKILL.md`
+- `skills/mpt-ext-task-fix-repository-check-failures/SKILL.md`
+- `skills/mpt-ext-task-open-pull-request/SKILL.md`
+- `skills/mpt-ext-task-move-jira-to-code-review/SKILL.md`
 
 ## Workflow
 

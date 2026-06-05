@@ -1,6 +1,6 @@
 ---
 name: mpt-ext-task-dependabot-pr-policy-fix
-description: Apply dependency-policy fixes to an already selected Dependabot PR or checked-out Dependabot branch by syncing dev dependency pins, reverting opentelemetry-family bumps, and refreshing dependency lock state.
+description: Apply dependency-policy fixes to a selected Dependabot PR or checked-out branch: sync dev dependency pins, revert opentelemetry-family bumps, and refresh the dependency lock.
 ---
 
 # Dependabot PR Policy Fix
@@ -37,10 +37,10 @@ Apply SoftwareOne dependency policy fixes to one already selected Dependabot PR 
 
 Use these shared documents as the source of truth instead of restating their policy. When shared guidance is needed, resolve it from `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current` when available; otherwise read the same path from the `main` branch of the shared GitHub repository.
 
-- `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/standards/packages-and-dependencies.md`
-- `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/knowledge/manage-dependencies.md`
-- `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/knowledge/build-and-checks.md`
-- `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/standards/pull-requests.md`
+- `standards/packages-and-dependencies.md`
+- `knowledge/manage-dependencies.md`
+- `knowledge/build-and-checks.md`
+- `standards/pull-requests.md`
 
 ## Dependabot-Specific Policy
 

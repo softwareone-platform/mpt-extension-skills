@@ -1,6 +1,6 @@
 ---
 name: mpt-ext-workflow-dashboard-failure-triage
-description: Process MPT extension dashboard failures from App Insights or CSV, prepare a batch review of findings with proposed Jira actions, then coordinate approved Jira decisions through the dashboard Jira decision task.
+description: Triage MPT extension dashboard failures from App Insights or CSV: prepare a batch review of findings with proposed Jira actions, then apply approved decisions via the dashboard Jira task.
 ---
 
 # Dashboard Failure Triage
@@ -39,11 +39,11 @@ Process dashboard monitoring failures for MPT extensions as a batch: collect fin
 
 ## Shared References
 
-- `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/standards/skills.md`
-- `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skills/mpt-ext-tool-jira-workitem-ops/SKILL.md`
-- `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skills/mpt-ext-task-apply-dashboard-jira-decision/SKILL.md`
+Paths below are relative to the installed package root `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current`. If that root is unavailable while editing this source repository, use the same paths under the repository root.
 
-If the installed package root is unavailable while editing this source repository, use the same paths under the repository root.
+- `standards/skills.md`
+- `skills/mpt-ext-tool-jira-workitem-ops/SKILL.md`
+- `skills/mpt-ext-task-apply-dashboard-jira-decision/SKILL.md`
 
 ## Bundled Resources
 

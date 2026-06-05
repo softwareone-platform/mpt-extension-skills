@@ -1,6 +1,6 @@
 ---
 name: mpt-ext-workflow-send-to-review
-description: Send completed implementation to review when the user wants to validate the change, create or update the pull request, and move Jira into Code Review. Use this workflow to coordinate the existing validation, commit, PR, and Jira review-handoff task skills without including later review-feedback or post-merge steps.
+description: Send completed implementation to review: validate the change, create or update the PR, and move Jira to Code Review. Excludes review-feedback and post-merge steps.
 ---
 
 # Send To Review

@@ -1,6 +1,6 @@
 ---
 name: mpt-ext-workflow-skill-authoring
-description: Create or update reusable shared skills when users ask to design, add, refactor, or improve an agent skill. Use this workflow to classify the skill as tool, task, or workflow, apply the shared naming and structure rules, keep the skill concise and reusable, add required agents/openai.yaml metadata, and separate skill-specific behavior from shared standards or knowledge.
+description: Create or update a reusable shared skill: classify it as tool, task, or workflow, apply shared naming and structure rules, keep it concise, add required metadata, and avoid duplicating standards.
 ---
 
 # Skill Authoring
@@ -39,15 +39,9 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 
 Read these shared documents before making substantial skill changes, using the resolution rule from `standards/skills.md`:
 
-- `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/standards/skills.md`
-- `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/standards/documentation.md`
-- `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/docs/installation.md`
-
-When working inside the source repository rather than an installed package, the equivalent repo-local paths are:
-
-- [../../standards/skills.md](../../standards/skills.md)
-- [../../standards/documentation.md](../../standards/documentation.md)
-- [../../docs/installation.md](../../docs/installation.md)
+- `standards/skills.md`
+- `standards/documentation.md`
+- `docs/installation.md`
 
 ## Workflow
 

@@ -1,6 +1,6 @@
 ---
 name: mpt-ext-workflow-complete-after-merge
-description: Complete the final Jira handoff after a pull request has merged when the user wants to verify merge state and move the related Jira issue into its correct post-merge status. Use this workflow to coordinate the post-merge verification and Jira completion step without including review publication or review-feedback handling.
+description: Complete the final Jira handoff after a PR is merged: verify merge state and move the issue to its correct post-merge status. Excludes review publication and feedback handling.
 ---
 
 # Complete After Merge
