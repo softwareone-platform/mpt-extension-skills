@@ -102,8 +102,14 @@ reviews:
       - name: "AI Warning Line In PR Description"
         mode: "error"
         instructions: |
-          Check Rule 8 from `standards/pull-requests.md` deterministically by using byte-level comparison.
-          Use that rule as the source of truth for the AI warning line requirement in the PR description.
+          Check Rule 8 from `standards/pull-requests.md`.
+          Pass only when the first line of the pull request description is exactly:
+          `🤖 AI-generated PR — Please review carefully.`
+          The required line uses the robot emoji, normal spaces, and an em dash between
+          `PR` and `Please`.
+          Fail only when the pull request description is readable and the first line is
+          missing, appears later, or differs from the required line.
+          Do not perform byte-level or rendered Markdown comparison for this check.
   tools:
     ast-grep:
       rule_dirs: []
