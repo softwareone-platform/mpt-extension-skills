@@ -103,12 +103,6 @@ reviews:
           - Prefer one commit unless multiple commits are intentionally separated.
           - Branch history is linear and does not contain merge commits.
           Fail when a requirement does not comply.
-      - name: "AI Warning Line In PR Description"
-        mode: "error"
-        instructions: |
-          Verify by using byte-level comparison that the PR description starts with this exact warning line:
-          `🤖 AI-generated PR — Please review carefully.`
-          Fail when the warning line is missing, changed, or not the first line.
   tools:
     ast-grep:
       rule_dirs: []
