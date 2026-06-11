@@ -23,14 +23,17 @@ Current skills:
 - [mpt-ext-task-move-jira-to-code-review](./skills/mpt-ext-task-move-jira-to-code-review/SKILL.md): Move a Jira issue into Code Review when branch work is ready for review
 - [mpt-ext-task-handle-pr-comments](./skills/mpt-ext-task-handle-pr-comments/SKILL.md): Address existing PR review comments with scoped fixes or thread replies
 - [mpt-ext-task-move-jira-to-qa](./skills/mpt-ext-task-move-jira-to-qa/SKILL.md): Move a Jira issue into its correct post-merge status after reviewed work is merged
+- [mpt-ext-task-write-documentation](./skills/mpt-ext-task-write-documentation/SKILL.md): Author or refresh a repository's required documentation set following the documentation guideline
+- [mpt-ext-task-update-docs-from-changes](./skills/mpt-ext-task-update-docs-from-changes/SKILL.md): Update repository documentation from a code change set (unstaged, uncommitted, last commit, or branch diff)
 - [mpt-ext-workflow-start-work](./skills/mpt-ext-workflow-start-work/SKILL.md): Coordinate branch creation and Jira start-of-work setup
 - [mpt-ext-workflow-dashboard-failure-triage](./skills/mpt-ext-workflow-dashboard-failure-triage/SKILL.md): Batch triage App Insights dashboard failures into MPT Jira bugs
 - [mpt-ext-workflow-fix-dependabot-prs](./skills/mpt-ext-workflow-fix-dependabot-prs/SKILL.md): Coordinate Dependabot PR discovery, policy fixes, validation, scoped check fixes, amend, and push
 - [mpt-ext-workflow-hotfix-backport](./skills/mpt-ext-workflow-hotfix-backport/SKILL.md): Coordinate release-branch hotfix and backport PR preparation
-- [mpt-ext-workflow-send-to-review](./skills/mpt-ext-workflow-send-to-review/SKILL.md): Coordinate validation, commit, PR creation, and Jira review handoff
+- [mpt-ext-workflow-send-to-review](./skills/mpt-ext-workflow-send-to-review/SKILL.md): Coordinate documentation update, validation, commit, PR creation, and Jira review handoff
 - [mpt-ext-workflow-address-review-feedback](./skills/mpt-ext-workflow-address-review-feedback/SKILL.md): Coordinate review comment handling, validation, and updated branch publication
 - [mpt-ext-workflow-complete-after-merge](./skills/mpt-ext-workflow-complete-after-merge/SKILL.md): Coordinate merge confirmation and the final Jira post-merge handoff
 - [mpt-ext-workflow-skill-authoring](./skills/mpt-ext-workflow-skill-authoring/SKILL.md): Shared workflow skill for creating and updating reusable skills
+- [mpt-ext-workflow-update-documentation](./skills/mpt-ext-workflow-update-documentation/SKILL.md): Coordinate updating documentation for a change set: update affected docs, self-check, and stage
 
 For first-time installation from GitHub Releases, see [docs/installation.md](./docs/installation.md).
 For installed CLI commands, updates, local debug installs, and release lifecycle usage, see [docs/usage.md](./docs/usage.md).
@@ -100,6 +103,7 @@ Current documents in `knowledge/`:
 
 Repository docs in `docs/`:
 
+- [architecture.md](./docs/architecture.md): repository structure, the skills/standards/knowledge/docs layout, and how the parts fit together
 - [contributing.md](./docs/contributing.md): repository-specific contribution workflow and links to shared standards
 - [documentation.md](./docs/documentation.md): repository-specific documentation validation rules and local linking requirements
 - [installation.md](./docs/installation.md): first-time installation from GitHub Releases
