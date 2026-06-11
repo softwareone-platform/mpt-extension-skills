@@ -14,7 +14,9 @@ Output is JSON on stdout.
 
 import argparse
 import json
+import re
 import sys
+import tomllib
 from pathlib import Path
 
 MIN_PYTHON = (3, 12)
@@ -48,9 +50,13 @@ CONDITIONAL_DOCS = {
     ],
     "docs/migrations.md": ["**/migrations/", "migrations/"],
     "docs/e2e.md": ["**/e2e/", "e2e/", "**/tests/e2e/"],
-    "docs/external-integrations.md": [],  # judgement call; never auto-recommended
     "docs/documentation.md": [],  # optional repository documentation guideline
 }
+
+# Recommended for MPT extensions specifically (they almost always integrate with
+# external systems). Handled via the is_extension() signal below rather than a
+# path glob, because there is no single file path that marks an integration.
+EXTENSION_DOC = "docs/external-integrations.md"
 
 
 def repo_has(root: Path, pattern: str) -> bool:
@@ -60,6 +66,29 @@ def repo_has(root: Path, pattern: str) -> bool:
         target = pattern.rstrip("/")
         return any(p.is_dir() for p in root.glob(target))
     return any(root.glob(pattern))
+
+
+def is_extension(root: Path) -> bool:
+    """True when the repository is an MPT extension built on the extension SDK.
+
+    Detected by a dependency on `mpt-extension-sdk` in pyproject.toml (root or
+    backend/), excluding the SDK package itself. Extensions integrate with
+    external systems, so they should document those integrations.
+    """
+    for rel in ("pyproject.toml", "backend/pyproject.toml"):
+        pyproject = root / rel
+        if not pyproject.is_file():
+            continue
+        text = pyproject.read_text(encoding="utf-8", errors="ignore")
+        try:
+            name = tomllib.loads(text).get("project", {}).get("name")
+        except tomllib.TOMLDecodeError:
+            name = None
+        if name == "mpt-extension-sdk":
+            continue  # this is the SDK itself, not an extension built on it
+        if re.search(r"mpt[-_]extension[-_]sdk", text):
+            return True
+    return False
 
 
 def audit(root: Path) -> dict:
@@ -72,6 +101,10 @@ def audit(root: Path) -> dict:
             continue
         if signals and any(repo_has(root, sig) for sig in signals):
             recommended.append(doc)
+
+    # Extensions integrate with external systems; recommend documenting them.
+    if is_extension(root) and not (root / EXTENSION_DOC).is_file():
+        recommended.append(EXTENSION_DOC)
 
     existing_docs = sorted(
         str(p.relative_to(root))
