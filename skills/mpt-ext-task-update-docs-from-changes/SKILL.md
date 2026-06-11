@@ -87,7 +87,7 @@ python3 "${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skill
 
 - `scripts/collect_changes.py`
   - Inputs: `--source {unstaged,uncommitted,last-commit,branch-diff}`, optional `--base`
-  - Output: JSON with `changed_files`, `affected_docs`, `missing_doc_updates`, `always_review`, and `unmapped_code`
+  - Output: JSON with `source`, `base`, `changed_files`, `code_changes`, `doc_changes`, `affected_docs`, `missing_doc_updates`, `always_review`, and `unmapped_code`
   - Runtime path: `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skills/mpt-ext-task-update-docs-from-changes/scripts/collect_changes.py`
 
 ## Expected Outcome
