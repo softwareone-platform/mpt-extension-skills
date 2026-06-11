@@ -1,6 +1,6 @@
 ---
 name: mpt-ext-workflow-send-to-review
-description: Send completed implementation to review: validate the change, create or update the PR, and move Jira to Code Review. Excludes review-feedback and post-merge steps.
+description: Send completed implementation to review: update affected documentation, validate the change, create or update the PR, and move Jira to Code Review. Excludes review-feedback and post-merge steps.
 ---
 
 # Send To Review
@@ -49,30 +49,34 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 - Read repository-specific docs when they exist, because they may extend or override shared guidance.
 - Read shared docs only when the repository explicitly points to them. Resolve those shared docs from `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current` when available; otherwise read them from the `main` branch of the shared GitHub repository.
 
-2. Run repository validation.
+2. Bring documentation up to date for the change.
+- Use `mpt-ext-workflow-update-documentation` against the uncommitted change set to update and stage the documentation affected by the current work, so docs are validated and committed together with the change.
+- The underlying workflow no-ops when the change has no documentation impact, so this step is safe to always run.
+
+3. Run repository validation.
 - Use `mpt-ext-task-run-repository-checks` to execute the repository-required local validation flow for the current change scope.
 - If repository checks or tests fail, use `mpt-ext-task-fix-repository-check-failures` to work through the blockers step by step and rerun the required validation.
 - Run at most 5 validation-fix iterations before stopping.
 - Stop and redirect back to implementation when validation still fails or the work is not yet ready to publish.
 
-3. Create the commit.
+4. Create the commit.
 - Use `mpt-ext-task-commit-changes` to stage the intended files and create a repository-compliant commit.
 - If the commit is blocked by automatic `pre-commit` hook failures or hook-generated file rewrites, use `mpt-ext-task-fix-pre-commit-failures` before retrying the commit.
 - Run at most 5 pre-commit fix-and-retry iterations before stopping.
 
-4. Publish the branch for review.
+5. Publish the branch for review.
 - Push the committed branch before creating or updating the PR so review state is based on the published branch instead of unpublished local history.
 - Stop and report the blocker when branch push permissions, remote configuration, or branch protection prevent publication.
 
-5. Open or update the pull request.
+6. Open or update the pull request.
 - Use `mpt-ext-task-open-pull-request` to create or update the PR for the current branch.
 - Keep PR formatting, base-branch rules, and reporting format delegated to the task skill and repository docs.
 
-6. Move Jira to `Code Review`.
+7. Move Jira to `Code Review`.
 - Use `mpt-ext-task-move-jira-to-code-review` after the PR is ready for review.
 - Stop if the issue should not move to review yet.
 
-7. Report the handoff clearly.
+8. Report the handoff clearly.
 - State that the branch is now ready for review.
 - Follow the reporting format defined by `mpt-ext-task-open-pull-request` so the user receives the PR URL, Jira item URL when available, and testing status in a compact final message.
 - Surface blockers clearly when repository rules, Git push permissions, Jira workflow, GitHub permissions, or failing validation stop the flow.
@@ -81,6 +85,7 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 
 - Never duplicate the lower-level instructions already owned by the task skills used in this workflow.
 - Never skip repository-required validation before commit and PR creation.
+- Never publish a change that affects documented behaviour without updating documentation first; delegate the update to `mpt-ext-workflow-update-documentation`.
 - Never retry failing validation or `pre-commit` loops blindly without routing through the relevant failure-handling task.
 - Never run more than 5 validation-fix iterations or 5 pre-commit fix-and-retry iterations before stopping with a blocker.
 - Never rely on unpublished local commits when opening or updating the review PR; publish the branch first.
