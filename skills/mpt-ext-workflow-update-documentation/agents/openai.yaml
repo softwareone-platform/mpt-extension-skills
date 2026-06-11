@@ -1,0 +1,4 @@
+interface:
+  display_name: "Update Documentation Workflow"
+  short_description: "Update, verify, and stage docs for a change set"
+  default_prompt: "Bring documentation up to date for a change set end to end: build repository context, update affected docs via mpt-ext-task-update-docs-from-changes, re-collect changes to self-check that every affected doc was updated (max 3 iterations), then stage the updated docs/README/AGENTS. Do not commit, push, or open a PR."
