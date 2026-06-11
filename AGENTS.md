@@ -91,6 +91,7 @@ Treat `knowledge/` as reusable guidance. Repository-specific commands and except
 
 ## Repository Docs
 
+- [architecture.md](./docs/architecture.md): repository structure and how skills, standards, knowledge, docs, and scripts fit together
 - [contributing.md](./docs/contributing.md): repository-specific contribution workflow and links to shared standards
 - [documentation.md](./docs/documentation.md): repository-specific documentation validation rules and local linking requirements
 - [installation.md](./docs/installation.md): first-time installation from GitHub Releases
@@ -114,14 +115,17 @@ Treat `knowledge/` as reusable guidance. Repository-specific commands and except
 - [mpt-ext-task-move-jira-to-code-review](./skills/mpt-ext-task-move-jira-to-code-review/SKILL.md): Task for transitioning a ready Jira issue into Code Review
 - [mpt-ext-task-handle-pr-comments](./skills/mpt-ext-task-handle-pr-comments/SKILL.md): Task for reading PR review feedback, applying scoped fixes, and replying in review threads
 - [mpt-ext-task-move-jira-to-qa](./skills/mpt-ext-task-move-jira-to-qa/SKILL.md): Task for transitioning a merged Jira issue into its correct post-merge status
+- [mpt-ext-task-write-documentation](./skills/mpt-ext-task-write-documentation/SKILL.md): Task for authoring or refreshing a repository's required documentation set per the documentation guideline
+- [mpt-ext-task-update-docs-from-changes](./skills/mpt-ext-task-update-docs-from-changes/SKILL.md): Task for updating documentation from a code change set (unstaged, uncommitted, last commit, or branch diff)
 - [mpt-ext-workflow-start-work](./skills/mpt-ext-workflow-start-work/SKILL.md): Workflow for coordinating branch creation and Jira start-state setup
 - [mpt-ext-workflow-dashboard-failure-triage](./skills/mpt-ext-workflow-dashboard-failure-triage/SKILL.md): Workflow for batch triaging App Insights dashboard failures into MPT Jira decisions
 - [mpt-ext-workflow-fix-dependabot-prs](./skills/mpt-ext-workflow-fix-dependabot-prs/SKILL.md): Workflow for coordinating Dependabot PR discovery, policy fixes, validation, scoped check fixes, amend, and push
 - [mpt-ext-workflow-hotfix-backport](./skills/mpt-ext-workflow-hotfix-backport/SKILL.md): Workflow for coordinating release-branch hotfix and backport PR preparation
-- [mpt-ext-workflow-send-to-review](./skills/mpt-ext-workflow-send-to-review/SKILL.md): Workflow for validating changes, creating or updating the PR, and moving Jira into Code Review
+- [mpt-ext-workflow-send-to-review](./skills/mpt-ext-workflow-send-to-review/SKILL.md): Workflow for updating documentation, validating changes, creating or updating the PR, and moving Jira into Code Review
 - [mpt-ext-workflow-address-review-feedback](./skills/mpt-ext-workflow-address-review-feedback/SKILL.md): Workflow for processing review comments, validating the resulting changes, and updating the review branch
 - [mpt-ext-workflow-complete-after-merge](./skills/mpt-ext-workflow-complete-after-merge/SKILL.md): Workflow for confirming merge completion and moving Jira into its correct post-merge status
 - [mpt-ext-workflow-skill-authoring](./skills/mpt-ext-workflow-skill-authoring/SKILL.md): Skill authoring workflow for creating or updating reusable shared skills
+- [mpt-ext-workflow-update-documentation](./skills/mpt-ext-workflow-update-documentation/SKILL.md): Workflow for updating documentation for a change set, self-checking against the guideline, and staging the docs
 
 ## Agent Expectations
 
