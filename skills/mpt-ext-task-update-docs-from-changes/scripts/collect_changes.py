@@ -57,8 +57,8 @@ MAPPING_RULES = [
     ),
     (
         "docs/contributing.md",
-        "build/CI/workflow change",
-        ["Makefile", "make/*", "*.mk", ".github/workflows/*", ".pre-commit-config.yaml"],
+        "build/dev-tooling change",
+        ["Makefile", "make/*", "*.mk", ".pre-commit-config.yaml"],
     ),
     (
         "docs/external-integrations.md",
