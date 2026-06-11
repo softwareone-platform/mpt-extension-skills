@@ -58,6 +58,42 @@ CONDITIONAL_DOCS = {
 # path glob, because there is no single file path that marks an integration.
 EXTENSION_DOC = "docs/external-integrations.md"
 
+# Directory names whose immediate children are treated as integration modules.
+# `swo` is the platform convention for grouping per-service clients
+# (e.g. swo/<service>/), alongside the generic clients/ and integrations/.
+INTEGRATION_PARENT_DIRS = {"clients", "integrations", "swo"}
+
+# Tokens that are infrastructure or cross-cutting code, not external
+# integrations, and should not be reported as uncovered candidates.
+INTEGRATION_TOKEN_IGNORE = {
+    "base",
+    "base_client",
+    "async",
+    "http",
+    "common",
+    "utils",
+    "models",
+    "errors",
+    "exceptions",
+    "constants",
+    "conftest",
+}
+
+# Directory names that hold vendored or generated code, never first-party
+# integration modules. Any path under one of these is skipped.
+VENDORED_DIRS = {
+    ".venv",
+    "venv",
+    ".tox",
+    "site-packages",
+    "node_modules",
+    "build",
+    "dist",
+    ".eggs",
+    ".git",
+    "__pycache__",
+}
+
 
 def repo_has(root: Path, pattern: str) -> bool:
     if pattern.endswith("/"):
@@ -91,6 +127,63 @@ def is_extension(root: Path) -> bool:
     return False
 
 
+def integration_candidates(root: Path) -> list[str]:
+    """Heuristic list of likely external-integration modules in the repository.
+
+    Two signals: files named ``*_client.py`` (the token before ``_client``), and
+    modules/packages that sit directly under an integration parent directory
+    (``clients/``, ``integrations/``, or the platform ``swo/`` grouping). Test
+    code is excluded. These are candidates, not a definitive list; the skill
+    confirms which represent real external systems.
+    """
+    names: set[str] = set()
+    for path in root.rglob("*.py"):
+        parts = path.relative_to(root).parts
+        if (
+            any(part in VENDORED_DIRS or part.startswith(".") for part in parts)
+            or "tests" in parts
+            or path.name.startswith("test_")
+        ):
+            continue
+        if path.name.endswith("_client.py"):
+            token = path.name[: -len("_client.py")]
+            if token and token not in INTEGRATION_TOKEN_IGNORE:
+                names.add(token)
+        for i in range(len(parts) - 1):
+            if parts[i] in INTEGRATION_PARENT_DIRS:
+                child = parts[i + 1]
+                token = child[:-3] if child.endswith(".py") else child
+                if token and not token.startswith("__") and token not in INTEGRATION_TOKEN_IGNORE:
+                    names.add(token)
+    return sorted(names)
+
+
+def external_integration_coverage(root: Path) -> dict | None:
+    """Compare integration candidates against the external-integrations index.
+
+    Returns None when the index does not exist yet (it is already recommended
+    for authoring in that case). Otherwise reports candidate modules whose name
+    is mentioned neither in the index nor as a ``docs/external/<name>.md`` page.
+    """
+    index = root / EXTENSION_DOC
+    if not index.is_file():
+        return None
+    text = index.read_text(encoding="utf-8", errors="ignore").lower()
+    external_dir = root / "docs" / "external"
+    covered_pages = (
+        {p.stem.lower() for p in external_dir.glob("*.md")}
+        if external_dir.is_dir()
+        else set()
+    )
+    candidates = integration_candidates(root)
+    uncovered = [
+        name
+        for name in candidates
+        if name.lower() not in text and name.lower() not in covered_pages
+    ]
+    return {"candidates": candidates, "uncovered": uncovered}
+
+
 def audit(root: Path) -> dict:
     present_required = [d for d in REQUIRED_DOCS if (root / d).is_file()]
     missing_required = [d for d in REQUIRED_DOCS if not (root / d).is_file()]
@@ -115,12 +208,20 @@ def audit(root: Path) -> dict:
         if (root / top).is_file():
             existing_docs.append(top)
 
-    return {
+    result = {
         "repo_root": str(root),
         "required": {"present": present_required, "missing": missing_required},
         "conditional_recommended": sorted(recommended),
         "existing_docs": sorted(set(existing_docs)),
     }
+
+    # Extensions: flag integration modules with no entry in the existing index.
+    if is_extension(root):
+        coverage = external_integration_coverage(root)
+        if coverage is not None:
+            result["external_integrations"] = coverage
+
+    return result
 
 
 def main() -> None:
