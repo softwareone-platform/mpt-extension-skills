@@ -41,11 +41,10 @@ REQUIRED_DOCS = [
 CONDITIONAL_DOCS = {
     "docs/local-development.md": ["compose*.y*ml", "Dockerfile", "*/Dockerfile"],
     "docs/deployment.md": [
-        "Dockerfile",
-        "*/Dockerfile",
-        "compose*.y*ml",
         "helm/**",
         "k8s/**",
+        "compose*prod*.yml",
+        "compose*prod*.yaml",
     ],
     "docs/migrations.md": ["**/migrations/", "migrations/"],
     "docs/e2e.md": ["**/e2e/", "e2e/", "**/tests/e2e/"],
