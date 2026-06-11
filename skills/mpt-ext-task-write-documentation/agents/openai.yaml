@@ -1,0 +1,4 @@
+interface:
+  display_name: "Write Documentation"
+  short_description: "Author or refresh a repo's required docs set"
+  default_prompt: "Author or refresh the repository documentation set: build repository context, read standards/documentation.md, run the bundled audit_docs.py to find missing required and recommended conditional docs, then author and refresh docs/README/AGENTS per the guideline from the repository's real code. Do not commit or open a PR."
