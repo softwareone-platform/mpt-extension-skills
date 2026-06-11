@@ -61,6 +61,7 @@ reviews:
       instructions: |
         Review backend changes against `AGENTS.md`, `docs/architecture.md`, `docs/contributing.md`, and `docs/testing.md`.
         Use relevant linked shared standards and operational guidance when those local documents reference them.
+        If the change adds or alters behaviour, components, configuration, or commands, verify the corresponding documentation (`docs/*`, `README.md`, `AGENTS.md`) is updated per `standards/documentation.md`.
     - path: "backend/tests/**"
       instructions: |
         Review backend test changes against `docs/testing.md` and the linked repository's `standards/unittests.md`.
@@ -103,6 +104,19 @@ reviews:
           - Prefer one commit unless multiple commits are intentionally separated.
           - Branch history is linear and does not contain merge commits.
           Fail when a requirement does not comply.
+      - name: "Documentation Up To Date"
+        mode: "warning"
+        instructions: |
+          When this PR changes code or behaviour, verify the relevant documentation was updated in the same PR, following standards/documentation.md. Map changes to documents:
+          - new or changed modules, components, or boundaries -> docs/architecture.md
+          - new or changed make targets or developer workflow -> docs/contributing.md
+          - new or changed environment variables, configuration, or deployment manifests -> docs/deployment.md
+          - new or changed external integration -> docs/external-integrations.md
+          - migration changes -> docs/migrations.md
+          - changed test strategy or scope -> docs/testing.md
+          - user-facing or public behaviour and commands -> README.md or docs/usage.md
+          - new top-level structure or agent navigation changes -> AGENTS.md
+          Pass when the matching documentation was updated, or when the change genuinely has no documentation impact (for example refactors, test-only, CI-only, or dependency-bump changes). Warn when a code or behaviour change that plausibly affects documented behaviour has no corresponding documentation update.
   tools:
     ast-grep:
       rule_dirs: []
