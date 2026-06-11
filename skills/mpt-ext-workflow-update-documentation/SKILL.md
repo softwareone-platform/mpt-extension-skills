@@ -43,6 +43,7 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 
 3. Self-check the result.
 - Re-run the change collection from `mpt-ext-task-update-docs-from-changes` and compare its `affected_docs` and `missing_doc_updates` against what was actually edited.
+- Review `stale_doc_references`: any existing document that still references a path removed or renamed in this change set is likely stale; fix or remove the reference.
 - If a genuinely affected document is still not updated, return to step 2 for that document.
 - Run at most 3 update-and-recheck iterations before stopping and reporting the remaining gaps.
 

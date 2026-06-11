@@ -17,9 +17,11 @@ Output is JSON on stdout.
 
 import argparse
 import json
+import re
 import subprocess
 import sys
 from fnmatch import fnmatch
+from pathlib import Path
 
 MIN_PYTHON = (3, 12)
 
@@ -30,10 +32,13 @@ def require_python_version() -> None:
         raise SystemExit(1)
 
 
-# Ordered, most-specific-first. Each rule maps glob patterns (matched against the
-# changed path) to a target document and a short reason. The first matching rule
-# wins for a given path. Mirrors the intent of the shared CodeRabbit gate.
-MAPPING_RULES = [
+# --- Change->document mapping ------------------------------------------------
+#
+# Path-only rules: the changed path alone maps it to a document. Ordered,
+# most-specific-first; the first matching rule wins for a given path.
+# Keep aligned with the shared CodeRabbit gate ("Documentation Up To Date" in
+# coderabbit-shared.yaml), which restates this mapping in prose for review.
+PATH_RULES = [
     ("docs/migrations.md", "migration change", ["*/migrations/*", "migrations/*"]),
     (
         "docs/testing.md",
@@ -60,17 +65,35 @@ MAPPING_RULES = [
         "build/dev-tooling change",
         ["Makefile", "make/*", "*.mk", ".pre-commit-config.yaml"],
     ),
+    # A new dependency can introduce a new integration; a lockfile refresh
+    # (uv.lock) is churn, so it is deliberately excluded to avoid false positives.
     (
         "docs/external-integrations.md",
         "dependency/integration change",
-        ["pyproject.toml", "*/pyproject.toml", "uv.lock", "*/uv.lock"],
-    ),
-    (
-        "docs/architecture.md",
-        "source code change",
-        ["*.py", "frontend/*", "src/*", "backend/*"],
+        ["pyproject.toml", "*/pyproject.toml"],
     ),
 ]
+
+# Architecture is mapped separately. A modified line inside an existing module
+# is rarely an architecture change, but adding or removing a module, or touching
+# a structural entry point, is. Mapping every modified *.py to architecture.md
+# floods missing_doc_updates and trains reviewers to ignore it, so architecture
+# requires a structural signal: a structural path, or an added/deleted code
+# module. Plain modifications fall through to unmapped_code for a manual call.
+ARCH_DOC = "docs/architecture.md"
+ARCH_STRUCTURAL_PATTERNS = [
+    "app.py",
+    "*/app.py",
+    "router.py",
+    "*/router.py",
+    "routing/*",
+    "*/routing/*",
+    "routers/*",
+    "*/routers/*",
+    "__init__.py",
+    "*/__init__.py",
+]
+ARCH_CODE_PATTERNS = ["*.py", "*.ts", "*.tsx", "*.js", "*.jsx"]
 
 # Documents that always warrant a review decision, because the changes that
 # affect them (public behaviour, repository structure, agent navigation) are not
@@ -112,24 +135,75 @@ def git_diff_name_status(source: str, base: str) -> list[str]:
 
 
 def parse_changes(lines: list[str]) -> list[dict]:
-    """Parse `git diff --name-status` lines into {status, path} records.
+    """Parse `git diff --name-status` lines into {status, path, old_path} records.
 
-    Renames/copies (R###/C###) carry the old and new path; the new path is used.
+    Renames/copies (R###/C###) carry the old and new path; the new path is used
+    as `path` and the source path is kept as `old_path` so removed-path
+    references can be detected.
     """
     changes = []
     for line in lines:
         parts = line.split("\t")
-        status = parts[0]
-        path = parts[-1]  # new path for renames/copies, the path otherwise
-        changes.append({"status": status[:1], "path": path})
+        status = parts[0][:1]
+        if status in {"R", "C"} and len(parts) >= 3:
+            old_path, path = parts[1], parts[2]
+        else:
+            old_path, path = None, parts[-1]
+        changes.append({"status": status, "path": path, "old_path": old_path})
     return changes
 
 
-def classify(path: str) -> tuple[str, str] | None:
-    for doc, reason, patterns in MAPPING_RULES:
+def classify(change: dict) -> tuple[str, str] | None:
+    path = change["path"]
+    for doc, reason, patterns in PATH_RULES:
         if any(fnmatch(path, pattern) for pattern in patterns):
             return doc, reason
+    if any(fnmatch(path, pattern) for pattern in ARCH_STRUCTURAL_PATTERNS):
+        return ARCH_DOC, "structural source change"
+    if change["status"] in {"A", "D"} and any(
+        fnmatch(path, pattern) for pattern in ARCH_CODE_PATTERNS
+    ):
+        verb = "module added" if change["status"] == "A" else "module removed"
+        return ARCH_DOC, f"source {verb}"
     return None
+
+
+def existing_docs_on_disk() -> list[str]:
+    """Repository documents present on disk (docs/**/*.md plus README/AGENTS)."""
+    out: list[str] = []
+    docs_dir = Path("docs")
+    if docs_dir.is_dir():
+        out += [str(p) for p in docs_dir.glob("**/*.md")]
+    for top in ("README.md", "AGENTS.md"):
+        if Path(top).is_file():
+            out.append(top)
+    return sorted(set(out))
+
+
+def find_stale_doc_references(removed_paths: list[str]) -> list[dict]:
+    """Existing docs that still reference a path removed in this change set.
+
+    A removed module or asset whose name still appears in the docs is a likely
+    stale reference. Matches the full relative path or the bare filename as a
+    whole token; the skill confirms each before editing.
+    """
+    if not removed_paths:
+        return []
+    results: list[dict] = []
+    for doc in existing_docs_on_disk():
+        try:
+            text = Path(doc).read_text(encoding="utf-8", errors="ignore")
+        except OSError:
+            continue
+        for removed in removed_paths:
+            base = removed.rsplit("/", 1)[-1]
+            hit = removed in text or (
+                bool(base)
+                and re.search(rf"(?<![\w./]){re.escape(base)}(?![\w])", text) is not None
+            )
+            if hit:
+                results.append({"doc": doc, "removed_path": removed})
+    return results
 
 
 def build_report(source: str, base: str) -> dict:
@@ -141,7 +215,7 @@ def build_report(source: str, base: str) -> dict:
     affected: dict[str, list[dict]] = {}
     unmapped: list[str] = []
     for change in code_changes:
-        match = classify(change["path"])
+        match = classify(change)
         if match is None:
             unmapped.append(change["path"])
             continue
@@ -149,6 +223,11 @@ def build_report(source: str, base: str) -> dict:
         affected.setdefault(doc, []).append({"path": change["path"], "reason": reason})
 
     changed_doc_paths = {c["path"] for c in doc_changes}
+
+    removed_paths = sorted(
+        {c["path"] for c in code_changes if c["status"] == "D"}
+        | {c["old_path"] for c in code_changes if c["status"] == "R" and c["old_path"]}
+    )
 
     return {
         "source": source,
@@ -160,6 +239,8 @@ def build_report(source: str, base: str) -> dict:
         "missing_doc_updates": sorted(set(affected) - changed_doc_paths),
         "always_review": ALWAYS_REVIEW,
         "unmapped_code": sorted(unmapped),
+        "removed_paths": removed_paths,
+        "stale_doc_references": find_stale_doc_references(removed_paths),
     }
 
 

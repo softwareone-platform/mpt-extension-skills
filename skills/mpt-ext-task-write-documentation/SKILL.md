@@ -51,6 +51,7 @@ python3 "${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skill
 - Use `required.missing` for the documents that must be authored.
 - Use `conditional_recommended` for documents the repository signals it should have.
 - Use `existing_docs` and `required.present` for documents to review and refresh.
+- When present (extensions with an existing `docs/external-integrations.md`), use `external_integrations.uncovered` as candidate integration modules that the index does not yet mention; confirm which are real external systems and cover them.
 
 4. Author the missing required documents.
 - Create each missing required document following the responsibilities and structure in `standards/documentation.md`.

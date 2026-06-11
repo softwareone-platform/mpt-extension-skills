@@ -58,7 +58,8 @@ python3 "${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skill
 - Use `affected_docs` to know which documents each changed path most likely affects.
 - Use `missing_doc_updates` to see which affected docs were not yet touched in this change set.
 - Treat `always_review` (`README.md`, `AGENTS.md`) as documents that need a judgement call, because behaviour and structure changes affecting them are not detectable from paths.
-- Treat `unmapped_code` as changes with no default mapping; decide their documentation impact manually.
+- Treat `unmapped_code` as changes with no default mapping; decide their documentation impact manually. Modified (not added or deleted) source files map to `docs/architecture.md` only through a structural signal, so ordinary edits land here for a manual call rather than flooding `missing_doc_updates`.
+- Treat `stale_doc_references` as likely-stale references: each entry is an existing document that still mentions a path removed or renamed in this change set; confirm and fix or remove the reference.
 
 4. Update the affected documents.
 - For each affected document, read the current document and the actual change content, then edit only what the change affects.
