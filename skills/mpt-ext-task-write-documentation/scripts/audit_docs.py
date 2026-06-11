@@ -55,12 +55,10 @@ CONDITIONAL_DOCS = {
 
 def repo_has(root: Path, pattern: str) -> bool:
     if pattern.endswith("/"):
-        # Directory signal: match any directory whose path ends with the pattern.
+        # Directory signal: match the full relative directory path, not just the
+        # basename, so "**/tests/e2e/" does not match an unrelated "foo/e2e".
         target = pattern.rstrip("/")
-        return any(
-            p.is_dir() and (p.name == Path(target).name)
-            for p in root.glob("**/" + Path(target).name)
-        )
+        return any(p.is_dir() for p in root.glob(target))
     return any(root.glob(pattern))
 
 

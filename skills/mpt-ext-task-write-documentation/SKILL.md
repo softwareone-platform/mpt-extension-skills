@@ -35,7 +35,8 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 1. Build repository context first.
 - If not already done for the current task, read the target repository `AGENTS.md`.
 - Read repository-specific docs when they exist, because they may extend or override shared guidance.
-- Read shared docs only when the repository explicitly points to them. Resolve those shared docs from `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current` when available; otherwise read them from the `main` branch of the shared GitHub repository.
+- Read shared docs required by this skill (see Shared References) regardless of repository pointers; read additional shared docs only when the repository explicitly points to them.
+- Resolve shared docs from `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current` when available; otherwise read them from the `main` branch of the shared GitHub repository.
 
 2. Read the documentation guideline.
 - Read `standards/documentation.md` for the required set, conditional documents, document responsibilities, and authoring rules. Treat it as the source of truth.
