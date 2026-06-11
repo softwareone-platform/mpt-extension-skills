@@ -51,7 +51,7 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 
 2. Bring documentation up to date for the change.
 - Use `mpt-ext-workflow-update-documentation` against the uncommitted change set to update and stage the documentation affected by the current work, so docs are validated and committed together with the change.
-- Skip only when the change has no documentation impact; the underlying skill no-ops when nothing is affected.
+- The underlying workflow no-ops when the change has no documentation impact, so this step is safe to always run.
 
 3. Run repository validation.
 - Use `mpt-ext-task-run-repository-checks` to execute the repository-required local validation flow for the current change scope.
