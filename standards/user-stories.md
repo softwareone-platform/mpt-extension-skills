@@ -47,7 +47,7 @@ Do not interleave the two phases. Do not embed subtasks as text inside the story
 
 - Use `Back` and `Front` types. A single story may mix both; backend and frontend work in one story is normal and is not a reason to split.
 - Do **not** create a standalone subtask for writing tests. Code is always committed together with its tests, so testing is part of each implementation subtask.
-- Do **not** add a `Design, research and investigate` subtask by default. The TDR already is the design/investigation artifact. Add design work only when the user explicitly asks for design beyond the TDR.
+- Do **not** add a `Design, investigate and research` subtask by default. The TDR already is the design/investigation artifact. Add design work only when the user explicitly asks for design beyond the TDR.
 - Subtasks inherit `Team` and `Sprint` from the parent story. Do not set `Team` on a subtask (Jira rejects it).
 - **Never assign a `Sprint` directly to a subtask.** Sprint is set on the user story only; subtasks follow their parent automatically.
 
