@@ -1,0 +1,4 @@
+interface:
+  display_name: "Decompose TDR"
+  short_description: "Break a TDR/epic into estimated stories and subtasks"
+  default_prompt: "Break a TDR or epic into a backlog: first agree vertical-slice user stories, then create estimated Back/Front subtasks. Inherit Team/components/fixVersions, set components per item, link blocking dependencies, add a backport story when needed, and place stories in the sprint. Follow standards/user-stories.md and use the Jira workitem ops skill."
