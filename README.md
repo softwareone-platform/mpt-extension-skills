@@ -25,6 +25,7 @@ Current skills:
 - [mpt-ext-task-move-jira-to-qa](./skills/mpt-ext-task-move-jira-to-qa/SKILL.md): Move a Jira issue into its correct post-merge status after reviewed work is merged
 - [mpt-ext-task-write-documentation](./skills/mpt-ext-task-write-documentation/SKILL.md): Author or refresh a repository's required documentation set following the documentation guideline
 - [mpt-ext-task-update-docs-from-changes](./skills/mpt-ext-task-update-docs-from-changes/SKILL.md): Update repository documentation from a code change set (unstaged, uncommitted, last commit, or branch diff)
+- [mpt-ext-task-create-initial-epic](./skills/mpt-ext-task-create-initial-epic/SKILL.md): Create the initial epic plus a 3d "Design, investigate and research" user story at kickoff
 - [mpt-ext-workflow-start-work](./skills/mpt-ext-workflow-start-work/SKILL.md): Coordinate branch creation and Jira start-of-work setup
 - [mpt-ext-workflow-dashboard-failure-triage](./skills/mpt-ext-workflow-dashboard-failure-triage/SKILL.md): Batch triage App Insights dashboard failures into MPT Jira bugs
 - [mpt-ext-workflow-fix-dependabot-prs](./skills/mpt-ext-workflow-fix-dependabot-prs/SKILL.md): Coordinate Dependabot PR discovery, policy fixes, validation, scoped check fixes, amend, and push
@@ -34,6 +35,7 @@ Current skills:
 - [mpt-ext-workflow-complete-after-merge](./skills/mpt-ext-workflow-complete-after-merge/SKILL.md): Coordinate merge confirmation and the final Jira post-merge handoff
 - [mpt-ext-workflow-skill-authoring](./skills/mpt-ext-workflow-skill-authoring/SKILL.md): Shared workflow skill for creating and updating reusable skills
 - [mpt-ext-workflow-update-documentation](./skills/mpt-ext-workflow-update-documentation/SKILL.md): Coordinate updating documentation for a change set: update affected docs, self-check, and stage
+- [mpt-ext-workflow-decompose-tdr](./skills/mpt-ext-workflow-decompose-tdr/SKILL.md): Break a TDR or epic into agreed user stories and then estimated Back/Front subtasks
 
 For first-time installation from GitHub Releases, see [docs/installation.md](./docs/installation.md).
 For installed CLI commands, updates, local debug installs, and release lifecycle usage, see [docs/usage.md](./docs/usage.md).
@@ -75,6 +77,7 @@ Current documents in `standards/`:
 - [python-coding.md](./standards/python-coding.md): shared Python coding conventions, including typing, docstrings, linting, and naming expectations
 - [skills.md](./standards/skills.md): shared rules and best practices for writing reusable skills
 - [unittests.md](./standards/unittests.md): Python unit testing guidelines, including test structure, parametrization, determinism, and mocking rules
+- [user-stories.md](./standards/user-stories.md): work breakdown standard for turning an epic or TDR into demoable, estimated user stories and Back/Front subtasks
 
 These standards are intended to be linked from repository-level documentation rather than copied into each repository.
 

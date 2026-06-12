@@ -80,6 +80,7 @@ Treat `knowledge/` as reusable guidance. Repository-specific commands and except
 - [python-coding.md](./standards/python-coding.md): Python coding conventions
 - [skills.md](./standards/skills.md): shared rules and best practices for writing reusable skills
 - [unittests.md](./standards/unittests.md): Python unit testing guidelines
+- [user-stories.md](./standards/user-stories.md): work breakdown standard for turning an epic or TDR into demoable, estimated user stories and Back/Front subtasks
 
 ## Current Knowledge
 
@@ -117,6 +118,7 @@ Treat `knowledge/` as reusable guidance. Repository-specific commands and except
 - [mpt-ext-task-move-jira-to-qa](./skills/mpt-ext-task-move-jira-to-qa/SKILL.md): Task for transitioning a merged Jira issue into its correct post-merge status
 - [mpt-ext-task-write-documentation](./skills/mpt-ext-task-write-documentation/SKILL.md): Task for authoring or refreshing a repository's required documentation set per the documentation guideline
 - [mpt-ext-task-update-docs-from-changes](./skills/mpt-ext-task-update-docs-from-changes/SKILL.md): Task for updating documentation from a code change set (unstaged, uncommitted, last commit, or branch diff)
+- [mpt-ext-task-create-initial-epic](./skills/mpt-ext-task-create-initial-epic/SKILL.md): Task for creating the initial epic plus a 3d "Design, investigate and research" user story
 - [mpt-ext-workflow-start-work](./skills/mpt-ext-workflow-start-work/SKILL.md): Workflow for coordinating branch creation and Jira start-state setup
 - [mpt-ext-workflow-dashboard-failure-triage](./skills/mpt-ext-workflow-dashboard-failure-triage/SKILL.md): Workflow for batch triaging App Insights dashboard failures into MPT Jira decisions
 - [mpt-ext-workflow-fix-dependabot-prs](./skills/mpt-ext-workflow-fix-dependabot-prs/SKILL.md): Workflow for coordinating Dependabot PR discovery, policy fixes, validation, scoped check fixes, amend, and push
@@ -126,6 +128,7 @@ Treat `knowledge/` as reusable guidance. Repository-specific commands and except
 - [mpt-ext-workflow-complete-after-merge](./skills/mpt-ext-workflow-complete-after-merge/SKILL.md): Workflow for confirming merge completion and moving Jira into its correct post-merge status
 - [mpt-ext-workflow-skill-authoring](./skills/mpt-ext-workflow-skill-authoring/SKILL.md): Skill authoring workflow for creating or updating reusable shared skills
 - [mpt-ext-workflow-update-documentation](./skills/mpt-ext-workflow-update-documentation/SKILL.md): Workflow for updating documentation for a change set, self-checking against the guideline, and staging the docs
+- [mpt-ext-workflow-decompose-tdr](./skills/mpt-ext-workflow-decompose-tdr/SKILL.md): Workflow for breaking a TDR or epic into agreed user stories and estimated Back/Front subtasks
 
 ## Agent Expectations
 

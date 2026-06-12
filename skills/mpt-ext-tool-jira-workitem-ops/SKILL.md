@@ -7,7 +7,14 @@ description: Read, create, edit, comment, assign, search, link, and transition J
 
 ## Purpose
 
-Operate Jira work items with `acli jira` safely and consistently.
+Operate Jira work items with `acli jira`, or with an available MCP Jira integration, safely and consistently.
+
+## Interface Selection
+
+- `acli jira` is the baseline interface and is always assumed available.
+- `acli jira` is the primary interface. When an MCP Jira integration is available, use it as an equivalent fallback for the same operations — not as a mere convenience choice; the `acli` behavior remains the reference contract.
+- The rules in this skill are interface-independent: read before write, inherit parent context, apply assignee safety, set required fields, and add AI attribution regardless of interface.
+- The `acli` commands in this skill are the reference. When using MCP, map each to the equivalent MCP call and the same field names (for example `components`, `fixVersions`, parent, and the Sprint field). Some MCP edit calls accept custom fields that `acli` edit does not; use whichever interface can set the field you need.
 
 ## Use When
 

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Create Initial Epic"
+  short_description: "Create epic + 3d Design/investigate/research story"
+  default_prompt: "Create the initial epic plus one \"Design, investigate and research\" user story at 3d. Require a BDR link or description in the epic, inherit Team/components/fixVersions, do not set Keywords, and create no delivery stories or subtasks. Use the Jira workitem ops skill."
