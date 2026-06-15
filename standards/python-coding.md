@@ -49,7 +49,7 @@ extension/
     vendor.py
 ```
 
-12. Fix linter and type-checker findings by correcting the code, not by silencing the check. Inline suppressions (`# noqa`, `# noqa: <rule>`, `# type: ignore`, ruff per-file ignores) are a last resort: use them only for a specific rule, on the narrowest possible scope, and with a short comment explaining why the suppression is justified. Do not silence whole files or broad rule sets just to make checks pass.
+12. Fix linter and type-checker findings by correcting the code, not by silencing the check.
 
 BAD
 ```python
@@ -58,6 +58,19 @@ result = compute(data)  # noqa
 
 GOOD
 ```python
-# noqa: E501 — vendor signature URL must stay on a single line
+result = compute(data)
+```
+
+13. Inline suppressions (`# noqa`, `# noqa: <rule>`, `# type: ignore`, ruff per-file ignores) are a last resort. When a suppression is genuinely unavoidable, use it only for a specific rule, on the narrowest possible scope, place it on the same line as the code it suppresses, and add a short comment explaining why it is justified. Do not silence whole files or broad rule sets just to make checks pass.
+
+BAD
+```python
+# the suppression sits on its own line, so it does not apply to the code below
+# noqa: E501
 VENDOR_SIGNATURE_URL = "https://vendor.example.com/very/long/callback/path?with=many&query=params"
+```
+
+GOOD
+```python
+VENDOR_SIGNATURE_URL = "https://vendor.example.com/very/long/callback/path?with=many&query=params"  # noqa: E501 — vendor signature URL must stay on a single line
 ```
