@@ -25,3 +25,39 @@ Describe the general conventions for Python code.
  - `flake8-aaa` for validating the AAA pattern in tests
 9. Follow PEP 8 style and naming conventions unless repository tooling explicitly overrides them.
 10. Prefer simple, explicit code over clever or overly compact implementations.
+11. Organize modules into cohesive packages by responsibility. Group related modules into a package with a clear purpose instead of leaving flat modules at the top level or accumulating unrelated helpers in a generic `utils`/`helpers` dump.
+
+BAD
+```text
+extension/
+  utils.py     # unrelated helpers piled together
+  helpers.py
+  stuff.py
+  client.py
+  vendor.py
+```
+
+GOOD
+```text
+extension/
+  flows/
+    steps/
+    fulfillment.py
+    validation.py
+  client/
+    mpt.py
+    vendor.py
+```
+
+12. Fix linter and type-checker findings by correcting the code, not by silencing the check. Inline suppressions (`# noqa`, `# noqa: <rule>`, `# type: ignore`, ruff per-file ignores) are a last resort: use them only for a specific rule, on the narrowest possible scope, and with a short comment explaining why the suppression is justified. Do not silence whole files or broad rule sets just to make checks pass.
+
+BAD
+```python
+result = compute(data)  # noqa
+```
+
+GOOD
+```python
+# noqa: E501 — vendor signature URL must stay on a single line
+VENDOR_SIGNATURE_URL = "https://vendor.example.com/very/long/callback/path?with=many&query=params"
+```

@@ -68,6 +68,7 @@ Avoid using this directory for:
 
 Current documents in `standards/`:
 
+- [cli.md](./standards/cli.md): shared rules for implementing CLI commands with `typer` or Django management commands and keeping them runnable inside Docker
 - [commit-messages.md](./standards/commit-messages.md): shared commit message format with tag, Jira ID, short summary, and descriptive commit body guidance
 - [documentation.md](./standards/documentation.md): shared repository documentation structure and authoring rules for human readers and AI agents
 - [extensions-best-practices.md](./standards/extensions-best-practices.md): extension architecture and design guidance for isolation, deployability, local development, and reusability
