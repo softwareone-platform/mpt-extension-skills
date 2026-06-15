@@ -13,24 +13,47 @@ Applies to:
 Does not apply to:
  - integration tests
  - end-to-end tests
- 
+
 ## Purpose
 Define general rules for unit test code in Python repositories.
 
 ## General Rules
 1. Use `pytest` for unit tests.
-2. Write tests as functions, not classes.
-3. Do *NOT* use type annotations (PEP 484)
+2. Write tests as functions, not classes. Do not group tests inside a `class`, even to share setup. Share setup with fixtures and modules instead.
+
+BAD
+```python
+class TestValidatePayload:
+    def test_returns_error_for_invalid_payload(self):
+        payload = {"name": ""}
+
+        result = validate_payload(payload)
+
+        assert result.is_valid is False
+```
+
+GOOD
+```python
+def test_returns_error_for_invalid_payload():
+    payload = {"name": ""}
+
+    result = validate_payload(payload)
+
+    assert result.is_valid is False
+```
+
+3. Do *NOT* use type annotations (PEP 484).
 4. Name test files and test functions with the `test_` prefix.
-5. Do *NOT* write docstrings
+5. Do *NOT* write docstrings.
 6. Follow AAA (Arrange, Act, Assert). See the [flake8-aaa documentation](https://flake8-aaa.readthedocs.io/en/stable/index.html).
+
 BAD
 ```python
 def test_returns_error_for_invalid_payload():
     payload = {"name": ""}
-    
+
     validate = validate_payload(payload)
-    
+
     assert validate.is_valid is False
 ```
 
@@ -38,9 +61,9 @@ GOOD
 ```python
 def test_returns_error_for_invalid_payload():
     payload = {"name": ""}
-    
+
     result = validate_payload(payload)
-    
+
     assert result.is_valid is False
 ```
 
@@ -72,7 +95,7 @@ BAD
 @pytest.mark.parametrize("payload", [1, 2])
 def test_validation_payload(payload):
     result = validate_payload(payload)
-    
+
     if payload == 1:
         assert result.is_valid
     elif payload == 2:
@@ -93,8 +116,9 @@ def test_validation_payload(payload, is_valid_expected):
 
     assert result.is_valid == is_valid_expected
 ```
-7. Use `@pytest.mark.parametrize` when testing multiple permutations of the same behavior.
-8. Keep the test directory structure aligned with the source code structure.
+
+8. Use `@pytest.mark.parametrize` when testing multiple permutations of the same behavior.
+9. Keep the test directory structure aligned with the source code structure, and group related test modules into packages that mirror the source packages. Do not collect unrelated test modules in one flat directory.
 
 BAD
 ```text
@@ -119,11 +143,14 @@ mpt-extension-<name>/
           |-- fulfillment.py # example of separated logic; split further if needed
           |-- validation.py
 tests/
-  |-- flows/ # folders have the same name as in the source code
+  |-- flows/ # packages mirror the source packages
+      |-- steps/
+          |-- test_create_order.py
       |-- test_fulfillment.py  # same module name with test_ prefix
       |-- test_validation.py
 ```
-9.Prefer a single logical assertion per test. If multiple assertions validate one result object, keep them tightly related and easy to read.
+
+10. Prefer a single logical assertion per test. If multiple assertions validate one result object, keep them tightly related and easy to read.
 
 BAD
 ```python
@@ -153,16 +180,17 @@ def test_example():
     # or
     assert result == {"property_1": "property_1", "property_2": "property_2"}
 ```
-10. Test branches as close as possible to the function where the branch exists.
+
+11. Test branches as close as possible to the function where the branch exists.
 ```python
 
 def inner_function_to_test(a):
     return a == 2
-    
+
 
 def outer_function_to_test(b):
     return inner_function_to_test(b + 1)
-    
+
 # BAD tests example
 @pytest.mark.parametrize(
     "input_value, is_valid",
@@ -189,7 +217,7 @@ def test_inner_function(input_value, is_valid):
     result = inner_function_to_test(input_value)
 
     assert result is is_valid
-    
+
 # Also add a focused test for the outer function behavior.
 def test_outer_function():
     result = outer_function_to_test(1)
@@ -197,7 +225,7 @@ def test_outer_function():
     assert result is True
 ```
 
-11. Do not test private or protected functions or methods directly. Cover them through public behavior instead.
+12. Do not test private or protected functions or methods directly. Cover them through public behavior instead.
 
 BAD
 ```python
@@ -207,7 +235,7 @@ def test_private_function():
     assert _private_function() is True
 ```
 
-12. Unit tests must be deterministic. They must not depend on current time, randomness, or external state.
+13. Unit tests must be deterministic. They must not depend on current time, randomness, or external state.
 
 BAD
 ```python
@@ -221,8 +249,74 @@ result = get_timestamp(fixed_time)
 assert result == expected_value
 ```
 
-13. Target unit test coverage above 95% unless a repository documents an explicit exception.
-14. Every bugfix MUST have test to reproduce it or changes in existing tests
+14. Target unit test coverage above 95% unless a repository documents an explicit exception.
+15. Every bugfix MUST have a test to reproduce it, or changes in existing tests.
+
+## Fixtures And conftest
+
+1. Prefer fixtures over repeated arrange code. When the same setup or value object appears in more than one test, extract it into a fixture instead of copy-pasting it.
+2. Put shared fixtures in `conftest.py` at the narrowest scope that covers the tests that use them (per-package `conftest.py` is preferred over a single root `conftest.py` for fixtures used by one package only).
+3. Do not let `conftest.py` grow into a single large grab-bag. When it accumulates many unrelated fixtures, split the fixtures into a dedicated package of focused modules and register them from `conftest.py` with `pytest_plugins`.
+
+GOOD
+```text
+tests/
+  conftest.py            # registers the fixtures package, no large fixture body
+  fixtures/              # the "conftest package": fixtures grouped by topic
+      __init__.py
+      orders.py
+      http.py
+      vendor.py
+```
+
+```python
+# tests/conftest.py
+pytest_plugins = [
+    "tests.fixtures.orders",
+    "tests.fixtures.http",
+    "tests.fixtures.vendor",
+]
+```
+
+```python
+# tests/fixtures/orders.py
+import pytest
+
+
+@pytest.fixture
+def order():
+    return {"id": "ORD-0001", "status": "processing"}
+```
+
+4. Keep fixture dependency chains shallow. A fixture must depend on **at most 3 levels** of other fixtures. If a chain grows deeper, flatten it by building the value directly or by combining intermediate fixtures.
+
+BAD
+```python
+# 4 levels deep: settings -> client -> session -> authed_session -> order_api
+@pytest.fixture
+def client(settings): ...
+
+@pytest.fixture
+def session(client): ...
+
+@pytest.fixture
+def authed_session(session): ...
+
+@pytest.fixture
+def order_api(authed_session): ...
+```
+
+GOOD
+```python
+# at most 3 levels: settings -> client -> order_api
+@pytest.fixture
+def client(settings): ...
+
+@pytest.fixture
+def order_api(client):
+    # build the authenticated session inline instead of chaining extra fixtures
+    ...
+```
 
 ## Mocking Rules
 1. Do not use `unittest.mock` directly.
@@ -237,3 +331,24 @@ def mock_mpt_update_asset(mocker):
     return mocker.patch("mpt_extension_sdk.mpt_http.mpt.update_asset", autospec=True)
 ```
 5. Unit tests must not call real APIs, databases, or any other external systems.
+6. To control time, use `freezegun` (`freeze_time`) instead of patching `datetime`, `datetime.now`, or `time.time`. Freeze the clock to a fixed instant so the test stays deterministic (see General Rule 13).
+
+BAD
+```python
+def test_marks_order_expired(mocker):
+    mocker.patch("extension.orders.datetime", autospec=True)
+
+    ...
+```
+
+GOOD
+```python
+from freezegun import freeze_time
+
+
+@freeze_time("2026-01-01T00:00:00Z")
+def test_marks_order_expired():
+    result = is_expired(order)
+
+    assert result is True
+```

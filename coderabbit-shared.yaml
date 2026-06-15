@@ -45,6 +45,8 @@ reviews:
       instructions: |
         Follow the linting rules defined in `backend/pyproject.toml` under `[tool.ruff]` and `[tool.flake8]`.
         For formatting, use Ruff instead of Black. Do not suggest Black formatting changes.
+        Review code against the linked repository's `standards/python-coding.md`.
+        Verify modules are organized into cohesive packages instead of flat or grab-bag `utils`/`helpers` modules, and flag inline linter or type-checker ignores (`# noqa`, `# type: ignore`) that are not a narrow, justified last resort.
     - path: "docs/**"
       instructions: |
         Review documentation changes against `docs/documentation.md` and the linked repository's `standards/documentation.md`.
@@ -66,6 +68,7 @@ reviews:
       instructions: |
         Review backend test changes against `docs/testing.md` and the linked repository's `standards/unittests.md`.
         Verify that repository-specific test behavior and shared unit-test rules are followed.
+        Verify tests are written as functions (not classes), are grouped into packages mirroring the source, share setup through fixtures (splitting a large conftest into a fixtures package registered via `pytest_plugins`), keep fixture dependency depth at 3 or fewer levels, and use `freezegun` instead of patching `datetime`.
   abort_on_close: true
   disable_cache: false
   auto_review:
@@ -115,6 +118,7 @@ reviews:
           - migration changes -> docs/migrations.md
           - changed test strategy or scope -> docs/testing.md
           - user-facing or public behaviour and commands -> README.md or docs/usage.md
+          - new or changed CLI commands -> README.md or docs/usage.md, following standards/cli.md
           - new top-level structure or agent navigation changes -> AGENTS.md
           Pass when the matching documentation was updated, or when the change genuinely has no documentation impact (for example refactors, test-only, CI-only, or dependency-bump changes). Warn when a code or behaviour change that plausibly affects documented behaviour has no corresponding documentation update.
   tools:
