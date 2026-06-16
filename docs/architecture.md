@@ -15,6 +15,10 @@ docs/                   documentation specific to this repository
 scripts/                install/upgrade CLI and the token-budget checker
 make/                   repository make targets
 tests/                  shell tests for the CLI
+.claude-plugin/         Claude Code plugin manifest and marketplace catalog
+.codex-plugin/          Codex plugin manifest
+.cursor/rules/          Cursor rule adapter (instruction-tier)
+.github/workflows/      release-prepare (stamp + PR) and release (tag + publish)
 coderabbit-shared.yaml  shared CodeRabbit config inherited by consuming repos
 Makefile                entry point that includes make/*.mk
 ```
@@ -69,6 +73,17 @@ under that installed root, falling back to the `main` branch of this repository
 when the installed root is unavailable. Installation and upgrade flows are
 documented in [docs/installation.md](installation.md) and
 [docs/usage.md](usage.md).
+
+The same `skills/` are also published as a plugin for runtimes with a plugin
+marketplace. `.claude-plugin/plugin.json` and `.codex-plugin/plugin.json` are the
+Claude and Codex plugin manifests; `.claude-plugin/marketplace.json` is the
+marketplace catalog whose plugin `source` is pinned to the release tag.
+`.cursor/rules/mpt-extension-skills.mdc` is the Cursor adapter (instruction-tier,
+no marketplace). Releases are two-step: the **Prepare release** workflow stamps
+the manifest versions and opens a `release/<version>` pull request; merging it
+triggers the **Release** workflow, which tags the version, builds the package
+assets, and publishes the GitHub release. The manifest version, the marketplace
+version, and the git tag therefore always match.
 
 ## Related documentation
 

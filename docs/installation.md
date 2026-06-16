@@ -55,6 +55,34 @@ By default this command is linked into:
 
 For lifecycle commands after installation, see [usage.md](./usage.md).
 
+## Plugin Installation
+
+Runtimes that support a plugin marketplace can install the skills as a versioned
+plugin instead of using the shell installer. Each release pins the plugin source
+to its git tag for reproducible installs.
+
+Claude Code:
+
+```text
+/plugin marketplace add softwareone-platform/mpt-extension-skills
+/plugin install mpt-extension-skills@mpt-extension-skills
+```
+
+Codex:
+
+```bash
+codex plugin marketplace add softwareone-platform/mpt-extension-skills
+```
+
+Then open `/plugins`, select the marketplace, and install `mpt-extension-skills`.
+
+Cursor has no versioned plugin marketplace. Copy the rule adapter at
+[../.cursor/rules/mpt-extension-skills.mdc](../.cursor/rules/mpt-extension-skills.mdc)
+into the consuming repository's `.cursor/rules/` directory.
+
+The shell installer and the plugin are two delivery paths for the same skills;
+use whichever the runtime supports.
+
 ## Related Documents
 
 - [usage.md](./usage.md)
