@@ -318,6 +318,41 @@ def order_api(client):
     ...
 ```
 
+## Test Data And Factories
+
+1. Build test objects with factory fixtures, not with ad-hoc private helper methods scattered across test modules. A factory fixture returns a function that builds the object, so each test creates exactly the variant it needs while construction stays in one place.
+
+BAD
+```python
+# private helper duplicated across test modules
+def _make_order(id, name):
+    return {"id": id, "name": name}
+
+
+def test_order_name():
+    order = _make_order("ORD-0001", "First order")
+
+    ...
+```
+
+GOOD
+```python
+@pytest.fixture
+def order_factory():
+    def _build(id, name):
+        return {"id": id, "name": name}
+
+    return _build
+
+
+def test_order_name(order_factory):
+    order = order_factory("ORD-0001", "First order")
+
+    ...
+```
+
+2. Place shared factory fixtures in the `conftest`/fixtures package so they can be reused across modules, following the fixtures rules above.
+
 ## Mocking Rules
 1. Do not use `unittest.mock` directly.
 2. Use the `mocker` fixture only when mocking is unavoidable.
