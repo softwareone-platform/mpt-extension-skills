@@ -1,0 +1,93 @@
+name: Prepare release
+run-name: Prepare release v${{ inputs.version }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Release version without v prefix, for example 1.2.3
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          ref: main
+
+      - name: Validate version
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          case "${VERSION}" in
+            v*)
+              echo "Version input must not start with v" >&2
+              exit 1
+              ;;
+            *[!0-9.]*|'')
+              echo "Version must contain only digits and dots" >&2
+              exit 1
+              ;;
+          esac
+
+      - name: Stamp plugin manifests
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          # Claude and Codex plugin manifests carry the plugin version.
+          for f in .claude-plugin/plugin.json .codex-plugin/plugin.json; do
+            tmp="$(mktemp)"
+            jq --arg v "${VERSION}" '.version = $v' "$f" > "$tmp"
+            mv "$tmp" "$f"
+          done
+          # The marketplace declares the version twice and pins the plugin source
+          # to the release tag so installs are reproducible.
+          tmp="$(mktemp)"
+          jq --arg v "${VERSION}" \
+            '.metadata.version = $v
+             | .plugins[0].version = $v
+             | .plugins[0].source.ref = $v' \
+            .claude-plugin/marketplace.json > "${tmp}"
+          mv "${tmp}" .claude-plugin/marketplace.json
+          # The Cursor rule is instruction-tier; stamp its version marker.
+          sed -i -E "s/(mpt-extension-skills version: ).*( -->)/\1${VERSION}\2/" \
+            .cursor/rules/mpt-extension-skills.mdc
+
+      - name: Open release pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          branch="release/${VERSION}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "${branch}"
+          git add .claude-plugin .codex-plugin .cursor
+          if git diff --cached --quiet; then
+            echo "No manifest changes for ${VERSION}; nothing to prepare."
+            exit 0
+          fi
+          git commit -m "chore: stamp plugin manifests to v${VERSION}"
+          git push --force -u origin "${branch}"
+          if gh pr view "${branch}" >/dev/null 2>&1; then
+            echo "Pull request for ${branch} already exists; branch updated."
+            exit 0
+          fi
+          body="$(printf '%s\n' \
+            "Automated release preparation for v${VERSION}." \
+            "" \
+            "Stamps the Claude, Codex, and Cursor manifests to \`${VERSION}\` and pins the marketplace plugin source to tag \`${VERSION}\`." \
+            "" \
+            "Merging this pull request triggers the **Release** workflow, which tags \`${VERSION}\`, builds the package assets, and publishes the GitHub release.")"
+          gh pr create \
+            --base main \
+            --head "${branch}" \
+            --title "Release v${VERSION}" \
+            --body "${body}"

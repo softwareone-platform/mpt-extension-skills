@@ -1,7 +1,10 @@
 name: Release
-run-name: Release v${{ inputs.version }}
 
 on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       version:
@@ -14,18 +17,34 @@ permissions:
 
 jobs:
   release:
+    # Publish when a release/* preparation PR merges, or on a manual re-run.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.pull_request.merged == true &&
+       startsWith(github.event.pull_request.head.ref, 'release/'))
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
 
-      - name: Validate version
+      - name: Resolve version
+        id: version
         env:
-          VERSION: ${{ inputs.version }}
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_VERSION: ${{ inputs.version }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
         run: |
+          if [ "${EVENT_NAME}" = "workflow_dispatch" ]; then
+            VERSION="${INPUT_VERSION}"
+          else
+            VERSION="${HEAD_REF#release/}"
+          fi
           case "${VERSION}" in
             v*)
-              echo "Version input must not start with v" >&2
+              echo "Version must not start with v" >&2
               exit 1
               ;;
             *[!0-9.]*|'')
@@ -33,16 +52,18 @@ jobs:
               exit 1
               ;;
           esac
+          echo "version=${VERSION}" >> "${GITHUB_OUTPUT}"
 
       - name: Build release assets
         env:
-          VERSION: ${{ inputs.version }}
+          VERSION: ${{ steps.version.outputs.version }}
         run: |
+          release_sha="$(git rev-parse HEAD)"
           mkdir -p dist/package
           cp -R scripts skills standards knowledge docs README.md LICENSE dist/package/
           printf '{"name":"mpt-extension-skills","version":"%s","source_repo":"softwareone-platform/mpt-extension-skills","source_commit":"%s","source_type":"release"}\n' \
             "${VERSION}" \
-            "${GITHUB_SHA}" \
+            "${release_sha}" \
             > dist/package/manifest.json
           tar -C dist/package -czf "dist/mpt-extension-skills-${VERSION}.tar.gz" .
           sed "s/__MPT_SKILLS_RELEASE_VERSION__/${VERSION}/g" scripts/mpt-extensions-skills-install.sh > dist/mpt-extensions-skills-install.sh
@@ -51,32 +72,33 @@ jobs:
 
       - name: Create annotated tag
         env:
-          VERSION: ${{ inputs.version }}
+          VERSION: ${{ steps.version.outputs.version }}
         run: |
+          release_sha="$(git rev-parse HEAD)"
           existing_tag_commit="$(git ls-remote --tags origin "refs/tags/${VERSION}^{}" | awk '{print $1}')"
           if [ -z "${existing_tag_commit}" ]; then
             existing_tag_commit="$(git ls-remote --tags origin "refs/tags/${VERSION}" | awk '{print $1}')"
           fi
 
           if [ -n "${existing_tag_commit}" ]; then
-            if [ "${existing_tag_commit}" = "${GITHUB_SHA}" ]; then
-              echo "Tag ${VERSION} already exists for ${GITHUB_SHA}; skipping tag creation"
+            if [ "${existing_tag_commit}" = "${release_sha}" ]; then
+              echo "Tag ${VERSION} already exists for ${release_sha}; skipping tag creation"
               exit 0
             fi
 
-            echo "Tag ${VERSION} already exists for ${existing_tag_commit}, expected ${GITHUB_SHA}" >&2
+            echo "Tag ${VERSION} already exists for ${existing_tag_commit}, expected ${release_sha}" >&2
             exit 1
           fi
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git tag -a "${VERSION}" -m "v${VERSION}" "${GITHUB_SHA}"
+          git tag -a "${VERSION}" -m "v${VERSION}" "${release_sha}"
           git push origin "refs/tags/${VERSION}"
 
       - name: Create GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
-          VERSION: ${{ inputs.version }}
+          VERSION: ${{ steps.version.outputs.version }}
         run: |
           if gh release view "${VERSION}" >/dev/null 2>&1; then
             echo "Release ${VERSION} already exists; uploading assets"

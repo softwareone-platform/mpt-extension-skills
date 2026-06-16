@@ -1,0 +1,38 @@
+---
+description: SoftwareOne MPT extension SDLC skills and engineering standards
+alwaysApply: true
+---
+<!-- mpt-extension-skills version: 0.0.0 -->
+
+# MPT Extension SDLC
+
+This repository follows the SoftwareOne MPT extension SDLC. Cursor has no
+versioned plugin marketplace, so this rule is the Cursor adapter: an always-on
+pointer to the same skills and standards that the Claude and Codex plugins load.
+
+## Where the source of truth lives
+
+- `skills/` — reusable agent skills, one directory per skill, each with a
+  `SKILL.md`. Skills are classified as `tool`, `task`, or `workflow`.
+- `standards/` — normative engineering rules (commit messages, pull requests,
+  Python coding, testing, documentation, dependencies). Follow these; do not
+  restate or contradict them.
+- `knowledge/` — reusable how-to guidance (build and checks, make targets,
+  dependency management, migrations, backports).
+
+When a consuming repository does not vendor these directories, read them from the
+installed skills root (`~/.mpt-extension-skills/current`) or from the `main`
+branch of `softwareone-platform/mpt-extension-skills`.
+
+## Always-on conventions
+
+- Commit messages: tag, Jira ID in the body, short imperative subject; follow
+  `standards/commit-messages.md`.
+- Pull requests: one commit per PR, Jira ID in the title, reviewable scope;
+  follow `standards/pull-requests.md`.
+- Validation: run the repository's required checks and tests before committing or
+  opening a PR; see `knowledge/build-and-checks.md`.
+- Jira lifecycle: move work to Done only after the reviewed PR is merged.
+
+For any concrete SDLC step (start work, commit, open PR, handle review comments,
+complete after merge), follow the matching `skills/mpt-ext-*/SKILL.md`.

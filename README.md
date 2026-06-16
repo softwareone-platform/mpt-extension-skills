@@ -40,6 +40,37 @@ Current skills:
 For first-time installation from GitHub Releases, see [docs/installation.md](./docs/installation.md).
 For installed CLI commands, updates, local debug installs, and release lifecycle usage, see [docs/usage.md](./docs/usage.md).
 
+## Install as a plugin
+
+The same skills are published as a versioned plugin for runtimes that support a
+plugin marketplace. Each release pins the plugin source to its git tag, so
+installs are reproducible.
+
+Claude Code:
+
+```text
+/plugin marketplace add softwareone-platform/mpt-extension-skills
+/plugin install mpt-extension-skills@mpt-extension-skills
+```
+
+Codex:
+
+```bash
+codex plugin marketplace add softwareone-platform/mpt-extension-skills
+codex
+```
+
+Then open `/plugins`, select the marketplace, and install `mpt-extension-skills`.
+
+Cursor has no versioned plugin marketplace; copy the always-on rule adapter at
+[.cursor/rules/mpt-extension-skills.mdc](./.cursor/rules/mpt-extension-skills.mdc)
+into the consuming repository's `.cursor/rules/`.
+
+The plugin manifests live at
+[.claude-plugin/](./.claude-plugin/), [.codex-plugin/](./.codex-plugin/), and
+[.cursor/rules/](./.cursor/rules/); the [release workflow](./.github/workflows/release.yml)
+stamps their version on every release.
+
 ## Shared Standards
 
 The [standards/](./standards/) directory contains shared standards and engineering policies that can be referenced from multiple repositories.
