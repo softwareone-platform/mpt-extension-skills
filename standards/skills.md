@@ -81,6 +81,7 @@ Use paths under that root such as `standards/skills.md`, `standards/documentatio
 25. State destructive or high-risk actions explicitly. Do not hide them inside vague steps.
 26. Keep examples short, concrete, and directly relevant to the skill.
 27. Add supporting files only when they materially improve reuse, correctness, or maintainability.
+28. Only a `workflow` skill may have a companion slash command. `tool` and `task` skills are building blocks invoked by workflows and must not get their own command. See `Companion Commands`.
 
 ## Required Structure
 
@@ -144,6 +145,18 @@ Like the `SKILL.md` `description`, these fields are a token surface for the Code
 `make token-budget` reports these alongside the `SKILL.md` surfaces, and `make token-budget-check` fails when a field is over budget.
 
 `SKILL.md` remains the main behavior document, but `agents/openai.yaml` is a required adapter for cross-runtime compatibility.
+
+## Companion Commands
+
+A `workflow` skill may ship a companion slash command so the end-to-end process has a guaranteed, named entry point in addition to model-driven skill selection. The command is optional: a workflow skill is complete without one.
+
+Rules:
+
+- Only `workflow` skills get a companion command. `tool` and `task` skills are building blocks and must not get their own command.
+- The command lives in the repository `commands/` directory as a single `commands/mpt-<short-purpose>.md` file (Markdown with YAML frontmatter). The `<short-purpose>` should match the workflow skill it wraps.
+- The command must be a thin wrapper: state the trigger, pass any arguments, and delegate to the matching `mpt-ext-workflow-*` skill. Do not restate the skill's steps or add behavior the skill does not define.
+- Keep the command frontmatter minimal: a `description` (selector text) and, when the command takes input, `argument-hint` and `arguments`.
+- Commands are auto-discovered from the plugin root; no `plugin.json` entry is needed. They are a Claude Code surface, are exposed as skills in Codex, and do not exist in Cursor.
 
 ## SKILL.md Requirements
 

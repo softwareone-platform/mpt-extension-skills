@@ -12,6 +12,7 @@ GITHUB_API_BASE_URL="${MPT_SKILLS_GITHUB_API_BASE_URL:-https://api.github.com/re
 INSTALL_ROOT="${MPT_EXTENSION_SKILLS_HOME:-${HOME}/.mpt-extension-skills}"
 CODEX_SKILLS_DIR="${CODEX_SKILLS_DIR:-${HOME}/.codex/skills}"
 CLAUDE_SKILLS_DIR="${CLAUDE_SKILLS_DIR:-${HOME}/.claude/skills}"
+CLAUDE_COMMANDS_DIR="${CLAUDE_COMMANDS_DIR:-${HOME}/.claude/commands}"
 COMMAND_BIN_DIR="${MPT_SKILLS_BIN_DIR:-${HOME}/.local/bin}"
 
 log_info() {
@@ -78,6 +79,8 @@ Environment overrides:
                              Default: \$HOME/.codex/skills
   CLAUDE_SKILLS_DIR          Claude skills directory to wire during activation
                              Default: \$HOME/.claude/skills
+  CLAUDE_COMMANDS_DIR        Claude commands directory to wire during activation
+                             Default: \$HOME/.claude/commands
   MPT_SKILLS_BIN_DIR         Directory where the user-facing mpt-extensions-skills command is linked
                              Default: \$HOME/.local/bin
 
@@ -288,6 +291,48 @@ refresh_runtime_links() {
   log_done "${runtime_name} wiring complete (${linked} skills linked)"
 }
 
+remove_managed_command_links() {
+  local commands_dir="$1"
+  local link target
+  while IFS= read -r -d '' link; do
+    target="$(readlink "${link}" || true)"
+    case "${target}" in
+      "${INSTALL_ROOT}/current/commands/"*) rm -f "${link}" ;;
+    esac
+  done < <(
+    find "${commands_dir}" -maxdepth 1 -mindepth 1 -type l \
+      -name 'mpt-*.md' -print0
+  )
+}
+
+refresh_runtime_commands() {
+  local runtime_name="$1"
+  local commands_dir="$2"
+
+  if [[ ! -d "${INSTALL_ROOT}/current/commands" ]]; then
+    return
+  fi
+
+  log_info "Preparing ${runtime_name} commands directory at ${commands_dir}"
+  mkdir -p "${commands_dir}"
+
+  log_info "Removing existing managed command links from ${runtime_name}"
+  remove_managed_command_links "${commands_dir}"
+
+  local linked=0
+  local command_file
+  while IFS= read -r -d '' command_file; do
+    ln -sfn "${command_file}" "${commands_dir}/$(basename "${command_file}")"
+    linked=$((linked + 1))
+    log_info "Linked $(basename "${command_file}") into ${runtime_name}"
+  done < <(
+    find "${INSTALL_ROOT}/current/commands" -maxdepth 1 -mindepth 1 -type f \
+      -name 'mpt-*.md' -print0
+  )
+
+  log_done "${runtime_name} command wiring complete (${linked} commands linked)"
+}
+
 remove_runtime_links() {
   local runtime_name="$1"
   local runtime_dir="$2"
@@ -303,6 +348,19 @@ remove_runtime_links() {
   log_done "${runtime_name} links removed"
 }
 
+remove_runtime_commands() {
+  local runtime_name="$1"
+  local commands_dir="$2"
+
+  if [[ ! -d "${commands_dir}" ]]; then
+    return
+  fi
+
+  log_info "Removing existing managed command links from ${runtime_name}"
+  remove_managed_command_links "${commands_dir}"
+  log_done "${runtime_name} command links removed"
+}
+
 activate_selected_runtimes() {
   if [[ "${TARGET_CODEX}" -eq 1 ]]; then
     refresh_runtime_links "Codex" "${CODEX_SKILLS_DIR}"
@@ -310,6 +368,7 @@ activate_selected_runtimes() {
 
   if [[ "${TARGET_CLAUDE}" -eq 1 ]]; then
     refresh_runtime_links "Claude" "${CLAUDE_SKILLS_DIR}"
+    refresh_runtime_commands "Claude" "${CLAUDE_COMMANDS_DIR}"
   fi
 
   if [[ "${TARGET_CODEX}" -eq 0 && "${TARGET_CLAUDE}" -eq 0 ]]; then
@@ -325,6 +384,7 @@ deactivate_selected_runtimes() {
 
   if [[ "${TARGET_CLAUDE}" -eq 1 ]]; then
     remove_runtime_links "Claude" "${CLAUDE_SKILLS_DIR}"
+    remove_runtime_commands "Claude" "${CLAUDE_COMMANDS_DIR}"
   fi
 
   if [[ "${TARGET_CODEX}" -eq 0 && "${TARGET_CLAUDE}" -eq 0 ]]; then
@@ -391,6 +451,16 @@ copy_package_files() {
 
   log_info "Copying docs/"
   cp -R "${source_dir}/docs" "${version_dir}/docs"
+
+  if [[ -d "${source_dir}/commands" ]]; then
+    log_info "Copying commands/"
+    cp -R "${source_dir}/commands" "${version_dir}/commands"
+  fi
+
+  if [[ -d "${source_dir}/hooks" ]]; then
+    log_info "Copying hooks/"
+    cp -R "${source_dir}/hooks" "${version_dir}/hooks"
+  fi
 }
 
 activate_version() {

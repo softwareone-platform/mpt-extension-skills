@@ -71,6 +71,32 @@ The plugin manifests live at
 [.cursor/rules/](./.cursor/rules/); the [release workflow](./.github/workflows/release.yml)
 stamps their version on every release.
 
+## Commands and hooks
+
+The plugin also ships slash commands and a session hook, both auto-discovered
+from the plugin root (no manifest entries required).
+
+Slash commands in [commands/](./commands/) are thin wrappers over the workflow
+skills, for a guaranteed, named entry point into each SDLC step:
+
+- `/mpt-start-work <KEY> <type>` — create the work branch and move the issue into active development
+- `/mpt-send-to-review` — update docs, validate, open/update the PR, move Jira to Code Review
+- `/mpt-address-review` — handle PR review feedback
+- `/mpt-complete-after-merge` — post-merge Jira handoff
+- `/mpt-decompose-tdr <KEY>` — break an epic/TDR into stories and subtasks
+- `/mpt-fix-dependabot` — process Dependabot PRs
+- `/mpt-hotfix-backport <KEY>` — hotfix/backport to the active release branch
+- `/mpt-skill-authoring [purpose]` — create or update a reusable shared skill
+
+The [hooks/](./hooks/) directory holds a `SessionStart` hook that injects a
+compact standards reminder and the command list at the start of each session.
+Hooks are executable, so the runtime asks you to trust them once on install (in
+Codex, via `/hooks`). The shell installer does not register hooks; use the
+plugin to get them.
+
+In Claude, commands appear in the `/` menu. In Codex they behave as skills
+(invoke with `@`). Cursor has no commands or hooks — only the rule adapter.
+
 ## Shared Standards
 
 The [standards/](./standards/) directory contains shared standards and engineering policies that can be referenced from multiple repositories.
