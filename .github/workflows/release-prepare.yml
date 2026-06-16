@@ -47,15 +47,18 @@ jobs:
             jq --arg v "${VERSION}" '.version = $v' "$f" > "$tmp"
             mv "$tmp" "$f"
           done
-          # The marketplace declares the version twice and pins the plugin source
-          # to the release tag so installs are reproducible.
-          tmp="$(mktemp)"
-          jq --arg v "${VERSION}" \
-            '.metadata.version = $v
-             | .plugins[0].version = $v
-             | .plugins[0].source.ref = $v' \
-            .claude-plugin/marketplace.json > "${tmp}"
-          mv "${tmp}" .claude-plugin/marketplace.json
+          # Each marketplace declares the version twice and pins the plugin source
+          # to the release tag so installs are reproducible. Claude reads
+          # .claude-plugin/marketplace.json; Codex reads .agents/plugins/marketplace.json.
+          for mp in .claude-plugin/marketplace.json .agents/plugins/marketplace.json; do
+            tmp="$(mktemp)"
+            jq --arg v "${VERSION}" \
+              '.metadata.version = $v
+               | .plugins[0].version = $v
+               | .plugins[0].source.ref = $v' \
+              "${mp}" > "${tmp}"
+            mv "${tmp}" "${mp}"
+          done
           # The Cursor rule is instruction-tier; stamp its version marker.
           sed -i -E "s/(mpt-extension-skills version: ).*( -->)/\1${VERSION}\2/" \
             .cursor/rules/mpt-extension-skills.mdc
@@ -69,7 +72,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b "${branch}"
-          git add .claude-plugin .codex-plugin .cursor
+          git add .claude-plugin .codex-plugin .agents .cursor
           if git diff --cached --quiet; then
             echo "No manifest changes for ${VERSION}; nothing to prepare."
             exit 0

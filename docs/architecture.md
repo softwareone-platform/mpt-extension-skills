@@ -19,6 +19,7 @@ make/                   repository make targets
 tests/                  shell tests for the CLI
 .claude-plugin/         Claude Code plugin manifest and marketplace catalog
 .codex-plugin/          Codex plugin manifest
+.agents/plugins/        Codex marketplace catalog (tag-pinned source)
 .cursor/rules/          Cursor rule adapter (instruction-tier)
 .github/workflows/      release-prepare (stamp + PR) and release (tag + publish)
 coderabbit-shared.yaml  shared CodeRabbit config inherited by consuming repos
@@ -78,8 +79,9 @@ documented in [docs/installation.md](installation.md) and
 
 The same `skills/` are also published as a plugin for runtimes with a plugin
 marketplace. `.claude-plugin/plugin.json` and `.codex-plugin/plugin.json` are the
-Claude and Codex plugin manifests; `.claude-plugin/marketplace.json` is the
-marketplace catalog whose plugin `source` is pinned to the release tag.
+Claude and Codex plugin manifests. Each runtime has its own marketplace catalog
+whose plugin `source` is pinned to the release tag: `.claude-plugin/marketplace.json`
+for Claude and `.agents/plugins/marketplace.json` for Codex.
 `.cursor/rules/mpt-extension-skills.mdc` is the Cursor adapter (instruction-tier,
 no marketplace). The plugin also ships `commands/` (slash commands over the
 workflow skills) and `hooks/` (a `SessionStart` context hook), both

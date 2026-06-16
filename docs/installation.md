@@ -76,6 +76,9 @@ codex plugin marketplace add softwareone-platform/mpt-extension-skills
 
 Then open `/plugins`, select the marketplace, and install `mpt-extension-skills`.
 
+Codex reads `.agents/plugins/marketplace.json`, whose plugin `source` is pinned
+to the release tag, so the install is reproducible rather than tracking `main`.
+
 Cursor has no versioned plugin marketplace. Copy the rule adapter at
 [../.cursor/rules/mpt-extension-skills.mdc](../.cursor/rules/mpt-extension-skills.mdc)
 into the consuming repository's `.cursor/rules/` directory.
