@@ -67,7 +67,8 @@ Cursor has no versioned plugin marketplace; copy the always-on rule adapter at
 into the consuming repository's `.cursor/rules/`.
 
 The plugin manifests live at
-[.claude-plugin/](./.claude-plugin/), [.codex-plugin/](./.codex-plugin/), and
+[.claude-plugin/](./.claude-plugin/), [.codex-plugin/](./.codex-plugin/),
+[.agents/plugins/](./.agents/plugins/) (the Codex marketplace catalog), and
 [.cursor/rules/](./.cursor/rules/); the [release workflow](./.github/workflows/release.yml)
 stamps their version on every release.
 
