@@ -9,6 +9,8 @@ repository docs, and the supporting CLI and configuration.
 
 ```text
 skills/                 reusable agent skills (one directory per skill)
+commands/               slash commands wrapping the workflow skills
+hooks/                  plugin hooks (hooks.json + SessionStart context script)
 standards/              shared engineering standards (normative)
 knowledge/              reusable operational how-to (non-normative)
 docs/                   documentation specific to this repository
@@ -79,7 +81,10 @@ marketplace. `.claude-plugin/plugin.json` and `.codex-plugin/plugin.json` are th
 Claude and Codex plugin manifests; `.claude-plugin/marketplace.json` is the
 marketplace catalog whose plugin `source` is pinned to the release tag.
 `.cursor/rules/mpt-extension-skills.mdc` is the Cursor adapter (instruction-tier,
-no marketplace). Releases are two-step: the **Prepare release** workflow stamps
+no marketplace). The plugin also ships `commands/` (slash commands over the
+workflow skills) and `hooks/` (a `SessionStart` context hook), both
+auto-discovered from the plugin root; the shell installer additionally wires
+`commands/` into the Claude commands directory, but not hooks. Releases are two-step: the **Prepare release** workflow stamps
 the manifest versions and opens a `release/<version>` pull request; merging it
 triggers the **Release** workflow, which tags the version, builds the package
 assets, and publishes the GitHub release. The manifest version, the marketplace

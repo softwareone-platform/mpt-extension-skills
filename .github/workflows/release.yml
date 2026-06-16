@@ -60,7 +60,7 @@ jobs:
         run: |
           release_sha="$(git rev-parse HEAD)"
           mkdir -p dist/package
-          cp -R scripts skills standards knowledge docs README.md LICENSE dist/package/
+          cp -R scripts skills commands hooks standards knowledge docs README.md LICENSE dist/package/
           printf '{"name":"mpt-extension-skills","version":"%s","source_repo":"softwareone-platform/mpt-extension-skills","source_commit":"%s","source_type":"release"}\n' \
             "${VERSION}" \
             "${release_sha}" \

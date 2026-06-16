@@ -83,6 +83,17 @@ into the consuming repository's `.cursor/rules/` directory.
 The shell installer and the plugin are two delivery paths for the same skills;
 use whichever the runtime supports.
 
+## Commands and Hooks
+
+The plugin path also installs the slash commands in `commands/` and the
+`SessionStart` hook in `hooks/`, both auto-discovered from the plugin root. Hooks
+are executable and require a one-time trust step (in Codex, via `/hooks`).
+
+The shell installer wires the slash commands into the Claude commands directory
+(default `~/.claude/commands`, override with `CLAUDE_COMMANDS_DIR`) alongside the
+skills, and `deactivate` removes them. The shell installer does not register
+hooks; install the plugin to get the `SessionStart` hook.
+
 ## Related Documents
 
 - [usage.md](./usage.md)
