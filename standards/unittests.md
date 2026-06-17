@@ -42,7 +42,27 @@ def test_returns_error_for_invalid_payload():
     assert result.is_valid is False
 ```
 
-3. Do *NOT* use type annotations (PEP 484).
+3. Do *NOT* use type annotations (PEP 484). This includes test function parameters and `@pytest.mark.parametrize` arguments. Annotating arguments adds no value in tests, and a boolean parameter annotation also triggers `ruff` `FBT` findings.
+
+BAD
+```python
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [(1, True), (2, False)],
+)
+def test_is_valid(value: int, expected: bool) -> None:  # FBT001 on `expected`
+    assert is_valid(value) is expected
+```
+
+GOOD
+```python
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [(1, True), (2, False)],
+)
+def test_is_valid(value, expected):
+    assert is_valid(value) is expected
+```
 4. Name test files and test functions with the `test_` prefix.
 5. Do *NOT* write docstrings.
 6. Follow AAA (Arrange, Act, Assert). See the [flake8-aaa documentation](https://flake8-aaa.readthedocs.io/en/stable/index.html).
@@ -352,21 +372,28 @@ def test_order_name(order_factory):
 ```
 
 2. Place shared factory fixtures in the `conftest`/fixtures package so they can be reused across modules, following the fixtures rules above.
+3. A factory fixture intentionally returns a nested builder function. The repository test lint configuration must permit nested functions in test code so the pattern does not fight the linter (for example, ignore `WPS430` for `tests/` paths). This is a sanctioned exception to the general "fix the code, do not silence the linter" rule because the nested builder is required by rule 1.
 
 ## Mocking Rules
 1. Do not use `unittest.mock` directly.
 2. Use the `mocker` fixture only when mocking is unavoidable.
-3. Prefer fixtures and real value objects over mocks whenever possible.
-4. Always use `autospec=True` when patching.
+3. Prefer fixtures and real value objects over mocks whenever possible. Build the real domain or context object (for example the SDK `OrderContext`) instead of an ad-hoc `SimpleNamespace` or bare `Mock`; mock only the parts that genuinely cannot be real (such as an outbound API client).
+4. Always use `autospec=True` when patching, and build injected mock objects with `create_autospec(...)` so their attributes and call signatures match the real type. A spec-less `Mock`/`AsyncMock` accepts any attribute and any call, hiding wrong method names or signatures.
 
 GOOD
 ```python
 @pytest.fixture
 def mock_mpt_update_asset(mocker):
     return mocker.patch("mpt_extension_sdk.mpt_http.mpt.update_asset", autospec=True)
+
+
+@pytest.fixture
+def order_service(mocker):
+    # injected mock: spec it against the real type
+    return mocker.create_autospec(OrderService, instance=True)
 ```
 5. Unit tests must not call real APIs, databases, or any other external systems.
-6. To control time, use `freezegun` (`freeze_time`) instead of patching `datetime`, `datetime.now`, or `time.time`. Freeze the clock to a fixed instant so the test stays deterministic (see General Rule 13).
+6. To control time, use `freezegun` (`freeze_time`) instead of patching `datetime`, `datetime.now`, or `time.time`. Freeze the clock to a fixed instant so the test stays deterministic (see General Rule 13). Freeze only when the code under test reads the clock itself; when the test can pass the instant explicitly (for example a `today=` or `now=` argument), pass it instead of freezing.
 
 BAD
 ```python
