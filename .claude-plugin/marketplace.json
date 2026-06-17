@@ -7,7 +7,7 @@
   },
   "metadata": {
     "description": "SoftwareOne MPT extension SDLC skills, standards, and workflows.",
-    "version": "1.10.0"
+    "version": "1.10.1"
   },
   "plugins": [
     {
@@ -15,10 +15,10 @@
       "source": {
         "source": "url",
         "url": "https://github.com/softwareone-platform/mpt-extension-skills.git",
-        "ref": "1.10.0"
+        "ref": "1.10.1"
       },
       "description": "SDLC skills for MPT extensions: Jira, branching, commits, pull requests, reviews, documentation, and releases.",
-      "version": "1.10.0",
+      "version": "1.10.1",
       "strict": true
     }
   ]
