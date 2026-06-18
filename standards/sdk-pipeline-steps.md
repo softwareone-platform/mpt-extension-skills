@@ -100,14 +100,19 @@ async def pre(self, ctx: OrderContext) -> None:
    required settings as a `Protocol`, and have the extension's `ExtensionSettings`
    inherit it so the contract is explicit and type-checked. Pass behavioral
    parameters (counts, templates, thresholds) as constructor arguments and
-   validate them, failing fast on invalid input.
+   validate them, failing fast on invalid input. Prefer expressing the
+   constraint in the parameter type (for example a `pydantic` constrained type
+   with `@validate_call`) over an imperative check, so the invariant lives in
+   the type definition rather than in the step body.
 
 GOOD
 ```python
+from pydantic import NonNegativeInt, validate_call
+
+
 class SetDueDate(BaseStep):
-    def __init__(self, *, days: int) -> None:
-        if days < 0:
-            raise ValueError("days must be non-negative")
+    @validate_call
+    def __init__(self, *, days: NonNegativeInt) -> None:
         self._days = days
 ```
 
