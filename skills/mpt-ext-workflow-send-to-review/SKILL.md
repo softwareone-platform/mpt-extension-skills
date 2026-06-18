@@ -45,24 +45,24 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 ## Workflow
 
 1. Build repository context first.
-- If not already done for the current task, read the target repository `AGENTS.md`.
+- Read the target repository `AGENTS.md` once per session. If you already loaded it earlier in this session and still have its full contents, reuse them instead of re-reading; if the context was summarized or you are unsure it is complete, read it again. Do not pre-load shared docs in this step; read them lazily only when the repository points to them.
 - Read repository-specific docs when they exist, because they may extend or override shared guidance.
 - Read shared docs only when the repository explicitly points to them. Resolve those shared docs from `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current` when available; otherwise read them from the `main` branch of the shared GitHub repository.
 
 2. Bring documentation up to date for the change.
-- Use `mpt-ext-workflow-update-documentation` against the uncommitted change set to update and stage the documentation affected by the current work, so docs are validated and committed together with the change.
-- The underlying workflow no-ops when the change has no documentation impact, so this step is safe to always run.
+- Use `mpt-ext-task-update-docs-from-changes` against the uncommitted change set to map the change to affected documents and edit them, then stage only the updated documentation files so docs are validated and committed together with the change.
+- The task no-ops when the change has no documentation impact, so this step is safe to always run.
+- Call the task directly here; do not enter a separate documentation workflow, to avoid nested workflow loading and repeated context rebuilds.
 
 3. Run repository validation.
 - Use `mpt-ext-task-run-repository-checks` to execute the repository-required local validation flow for the current change scope.
-- If repository checks or tests fail, use `mpt-ext-task-fix-repository-check-failures` to work through the blockers step by step and rerun the required validation.
-- Run at most 5 validation-fix iterations before stopping.
-- Stop and redirect back to implementation when validation still fails or the work is not yet ready to publish.
+- If repository checks or tests fail, hand the failing output to `mpt-ext-task-fix-repository-check-failures` once; that task owns the bounded fix-and-rerun loop. Do not re-loop it from here.
+- Act on its returned outcome: continue only on `fixed`; on any other outcome stop and report the blocker, redirecting back to implementation when the work is not yet ready to publish.
 
 4. Create the commit.
 - Use `mpt-ext-task-commit-changes` to stage the intended files and create a repository-compliant commit.
-- If the commit is blocked by automatic `pre-commit` hook failures or hook-generated file rewrites, use `mpt-ext-task-fix-pre-commit-failures` before retrying the commit.
-- Run at most 5 pre-commit fix-and-retry iterations before stopping.
+- If the commit is blocked by automatic `pre-commit` hook failures or hook-generated file rewrites, hand control to `mpt-ext-task-fix-pre-commit-failures` once; that task owns the bounded fix-and-retry loop. Do not re-loop it from here.
+- Act on its returned outcome: continue only on `committed`; on any other outcome stop and report the blocker.
 
 5. Publish the branch for review.
 - Push the committed branch before creating or updating the PR so review state is based on the published branch instead of unpublished local history.
@@ -85,9 +85,9 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 
 - Never duplicate the lower-level instructions already owned by the task skills used in this workflow.
 - Never skip repository-required validation before commit and PR creation.
-- Never publish a change that affects documented behaviour without updating documentation first; delegate the update to `mpt-ext-workflow-update-documentation`.
+- Never publish a change that affects documented behaviour without updating documentation first; delegate the update to `mpt-ext-task-update-docs-from-changes`.
 - Never retry failing validation or `pre-commit` loops blindly without routing through the relevant failure-handling task.
-- Never run more than 5 validation-fix iterations or 5 pre-commit fix-and-retry iterations before stopping with a blocker.
+- Never wrap a fix task that already owns its bounded loop in a second retry loop; invoke it once, consume its classified outcome, and stop on anything other than success.
 - Never rely on unpublished local commits when opening or updating the review PR; publish the branch first.
 - Never move Jira to `Code Review` without a review-ready PR.
 - Never continue into review-comment or post-merge handling inside this workflow.

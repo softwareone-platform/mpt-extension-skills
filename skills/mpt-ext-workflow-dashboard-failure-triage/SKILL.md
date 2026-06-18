@@ -57,7 +57,7 @@ Paths below are relative to the installed package root `${MPT_EXTENSION_SKILLS_H
 ## Workflow
 
 1. Build repository and tool context first.
-- If not already done for the current task, read the target repository `AGENTS.md`.
+- Read the target repository `AGENTS.md` once per session. If you already loaded it earlier in this session and still have its full contents, reuse them instead of re-reading; if the context was summarized or you are unsure it is complete, read it again. Do not pre-load shared docs in this step; read them lazily only when the repository points to them.
 - Read `mpt-ext-tool-jira-workitem-ops/SKILL.md` before Jira writes.
 - Read `mpt-ext-task-apply-dashboard-jira-decision/SKILL.md` before applying approved review decisions.
 - Verify `acli jira` auth before Jira writes.
