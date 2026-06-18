@@ -16,7 +16,7 @@ Describe the general conventions for Python code.
 1. Use type annotations (PEP 484), except in the `tests/` folder unless a repository explicitly requires them there.
 2. All public functions, methods, and classes must include [Google-style docstrings](https://google.github.io/styleguide/pyguide.html).
 3. Do not add explanatory comments for obvious code. Use comments only when they provide context that is hard to express in code or docstrings.
-4. `__init__.py` files must not include module-level docstrings; this rule `#4` does not override rule `#2` for public functions, methods, and classes defined there.
+4. `__init__.py` files must not include module-level docstrings. More generally, avoid redundant module-level docstrings: do not add one that only restates the module name or path — if a module seems to need a docstring to explain "what it contains", that usually signals a naming problem. This rule `#4` does not override rule `#2`: public functions, methods, and classes still require docstrings.
 5. Function and variable names must be explicit and intention-revealing.
 6. `pyproject.toml` is the source of truth for code quality rules. Generated code must not violate any configured rules.
 7. `ruff` is the primary linter for general Python style and best practices.
