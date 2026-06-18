@@ -372,12 +372,22 @@ def test_order_name(order_factory):
 ```
 
 2. Place shared factory fixtures in the `conftest`/fixtures package so they can be reused across modules, following the fixtures rules above.
-3. A factory fixture intentionally returns a nested builder function. The repository test lint configuration must permit nested functions in test code so the pattern does not fight the linter (for example, ignore `WPS430` for `tests/` paths). This is a sanctioned exception to the general "fix the code, do not silence the linter" rule because the nested builder is required by rule 1.
+3. A factory fixture returns a nested builder function. Name that inner function `factory` (or `decorator`/`wrapper`) — these are in wemake's `NESTED_FUNCTIONS_WHITELIST`, so the pattern does not trip `WPS430` and needs no per-file suppression. Do not silence `WPS430` for tests; rename the builder instead.
+
+GOOD
+```python
+@pytest.fixture
+def order_factory():
+    def factory(order_id, name):
+        return {"id": order_id, "name": name}
+
+    return factory
+```
 
 ## Mocking Rules
 1. Do not use `unittest.mock` directly.
 2. Use the `mocker` fixture only when mocking is unavoidable.
-3. Prefer fixtures and real value objects over mocks whenever possible. Build the real domain or context object (for example the SDK `OrderContext`) instead of an ad-hoc `SimpleNamespace` or bare `Mock`; mock only the parts that genuinely cannot be real (such as an outbound API client).
+3. Prefer fixtures and real value objects over mocks whenever possible. Build the real domain or context object (for example the SDK `OrderContext`) and mock only the parts that genuinely cannot be real (such as an outbound API client). Do **not** stand in a fake object with `types.SimpleNamespace` or a bare attribute holder for a typed domain/context object: it silently accepts any attribute and hides drift from the real type. Use the real object, or `create_autospec` when only a mock will do.
 4. Always use `autospec=True` when patching, and build injected mock objects with `create_autospec(...)` so their attributes and call signatures match the real type. A spec-less `Mock`/`AsyncMock` accepts any attribute and any call, hiding wrong method names or signatures.
 
 GOOD

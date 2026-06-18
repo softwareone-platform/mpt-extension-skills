@@ -46,3 +46,13 @@ dependencies = [
   "django==4.2.2",
 ]
 ```
+
+5. Reusable libraries (distributions other projects depend on) are an exception to rules 3 and 4: declare a bounded compatible range up to the next major instead of pinning a single minor, so consumers are not forced onto one minor. Applications and extensions keep the patch-level pin from rule 3.
+
+GOOD (library)
+```toml
+[project]
+dependencies = [
+  "mpt-extension-sdk>=6.3,<7",
+]
+```

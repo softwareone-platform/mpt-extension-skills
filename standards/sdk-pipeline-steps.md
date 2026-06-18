@@ -78,13 +78,27 @@ async def process(self, ctx: OrderContext) -> None:
    `StopStepError` for a distinguishable business outcome so hooks and error
    handlers can react with `isinstance`.
 
-6. Steps must be idempotent and retry-safe. Event-driven flows re-run steps, so
+6. Put "is there work to do?" guards in `pre()` and raise `SkipStepError`, rather
+   than an early `return` in `process()`. The pipeline dispatches `on_step_skipped`
+   (which logs the reason), and `process()` stays focused on the actual work.
+
+GOOD
+```python
+@override
+async def pre(self, ctx: OrderContext) -> None:
+    if get_due_date(ctx.order.parameters, _param(ctx)) is None:
+        raise SkipStepError("due date is not set")
+```
+
+7. Steps must be idempotent and retry-safe. Event-driven flows re-run steps, so
    a step must be safe to execute again. Apply set-once semantics for stable
    values and keep no hidden in-memory state across runs.
 
-7. Read configuration from the context; take behavior from the constructor.
+8. Read configuration from the context; take behavior from the constructor.
    Read environment-driven configuration from `ctx.ext_settings` (typed with a
-   `Protocol`), not from hardcoded constants or `os.getenv`. Pass behavioral
+   `Protocol`), not from hardcoded constants or `os.getenv`. Expose the step's
+   required settings as a `Protocol`, and have the extension's `ExtensionSettings`
+   inherit it so the contract is explicit and type-checked. Pass behavioral
    parameters (counts, templates, thresholds) as constructor arguments and
    validate them, failing fast on invalid input.
 
@@ -97,15 +111,15 @@ class SetDueDate(BaseStep):
         self._days = days
 ```
 
-8. Keep shared and library steps free of product-specific business logic. A
+9. Keep shared and library steps free of product-specific business logic. A
    reusable step takes its product specifics (parameter ids, thresholds) from
    settings or an injected protocol; vendor and business rules stay in the
    extension.
 
-9. Implement `process()`, and `pre()` / `post()` only when needed; decorate
-   overrides with `@override`. Step lifecycle methods are `async`.
+10. Implement `process()`, and `pre()` / `post()` only when needed; decorate
+    overrides with `@override`. Step lifecycle methods are `async`.
 
-10. Test steps against a real `OrderContext` with an autospec'd
+11. Test steps against a real `OrderContext` with an autospec'd
     `mpt_api_service`. Assert the declared `ctx.order_state.action` and the
     raised step error, not a direct client call. See
     [unittests.md](./unittests.md).
