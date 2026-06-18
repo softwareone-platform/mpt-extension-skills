@@ -96,17 +96,6 @@ reviews:
     issue_assessment:
       mode: warning
     custom_checks:
-      - name: "PR And Commit Formatting"
-        mode: "error"
-        instructions: |
-          Validate these requirements derived from the shared PR and commit standards:
-          - The PR title uses `<JIRA-ID> <short summary>`.
-          - The PR description explains what changed.
-          - Each commit title follows Conventional Commits.
-          - Each commit has a body explaining what changed and why.
-          - Prefer one commit unless multiple commits are intentionally separated.
-          - Branch history is linear and does not contain merge commits.
-          Fail when a requirement does not comply.
       - name: "Documentation Up To Date"
         mode: "warning"
         instructions: |

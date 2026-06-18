@@ -45,6 +45,18 @@ git pull --rebase origin main
 11. The complete pull request description, including the AI-generated warning line from rule 8 when it applies, must be present in the initial pull request creation request. Do not open a pull request with an empty or placeholder description and then add the required description or warning line in a later edit.
 12. When the final description cannot be set at creation time, open the pull request as a draft, set the complete description while it is still a draft, and only then mark it ready for review.
 
+## Enforcement
+
+These PR-formatting rules are enforced automatically by **Danger**, via the shared
+`softwareone-platform/one-danger` GitHub Action wired into each repository's pull-request
+workflow. The action checks the Jira key in the title, the change size, the single-commit
+preference, linear history (no merge commits), the `[HF]`/`[BACKPORT]` markers, and the
+release→main linkage.
+
+CodeRabbit does not run a PR-formatting pre-merge check; it focuses on code and documentation
+review. This split keeps formatting enforcement deterministic and avoids the false positives a
+language-model check can produce.
+
 ## Description Must Be Complete At Creation
 
 Automated reviewers such as CodeRabbit start their first review on the `pull request opened` event and read the description as it exists at that moment. If the pull request is opened with an empty or placeholder body and the required content — including the `🤖 AI-generated PR — Please review carefully.` warning line — is added in a later edit, the first automated review and the pre-merge description checks run against the stale description and can report false-positive failures.
