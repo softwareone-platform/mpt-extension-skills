@@ -85,21 +85,6 @@ reviews:
       mode: off
     issue_assessment:
       mode: warning
-    custom_checks:
-      - name: "PR And Commit Formatting"
-        mode: "error"
-        instructions: |
-          Validate PR and commit formatting against `standards/pull-requests.md` and `standards/commit-messages.md`.
-          Use those documents as the source of truth and verify all applicable requirements except Rule 8 from `standards/pull-requests.md`.
-          Treat `[HF] MPT-1234 <summary>` and `[BACKPORT] MPT-1234 <summary>` as valid PR title formats for pull requests opened against release branches.
-          Verify:
-          - PR title
-          - PR description
-          - commit titles
-          - commit descriptions
-          - commit count and history structure
-          - linear history expectations
-          Fail the check when any of those requirements do not comply.
   tools:
     ast-grep:
       rule_dirs: []
