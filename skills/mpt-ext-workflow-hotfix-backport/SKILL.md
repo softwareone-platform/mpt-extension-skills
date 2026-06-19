@@ -59,7 +59,7 @@ Use these shared documents and skills as the source of truth instead of restatin
 ## Workflow
 
 1. Build repository context first.
-- If not already done for the current task, read the target repository `AGENTS.md`.
+- Read the target repository `AGENTS.md` once per session. If you already loaded it earlier in this session and still have its full contents, reuse them instead of re-reading; if the context was summarized or you are unsure it is complete, read it again. Do not pre-load shared docs in this step; read them lazily only when the repository points to them.
 - Read repository-specific docs when they exist, because they may extend or override shared guidance.
 - Read shared docs using the resolution rule from Shared References.
 
@@ -118,12 +118,9 @@ python3 "${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skill
 
 9. Validate the release branch result.
 - Use `mpt-ext-task-run-repository-checks` to run the repository-required validation flow.
-- If checks fail, run a bounded fix loop for at most 5 iterations.
-- In each iteration, use `mpt-ext-task-fix-repository-check-failures` only for failures caused by the hotfix or backport.
-- After each fix attempt, rerun the narrowest safe failing validation command first, then rerun the repository-required validation flow before publishing.
-- Stop when validation passes.
-- Stop without pushing or opening the release PR when validation still fails after 5 fix iterations.
-- Stop without pushing or opening the release PR when remaining failures are unrelated, environment-related, or require a product decision.
+- If checks fail, hand the failing output to `mpt-ext-task-fix-repository-check-failures` once; that task owns the bounded fix-and-rerun loop. Do not re-loop it from here.
+- Constrain the fix scope to failures caused by the hotfix or backport.
+- Act on its returned outcome: continue to publishing only on `fixed`; on any other outcome — including failures that are unrelated, environment-related, or that require a product decision — stop without pushing or opening the release PR and record the blocker.
 
 10. Publish the release pull request.
 - Publish only after the repository-required validation flow passes.
@@ -161,7 +158,7 @@ python3 "${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skill
 - Never silently choose a release branch when active release branch resolution is ambiguous.
 - Never skip repository-required validation before opening or updating the release PR.
 - Never push or open the release PR while validation is failing.
-- Never run more than 5 validation-fix iterations before stopping with a blocker.
+- Never wrap a fix task that already owns its bounded loop in a second retry loop; invoke it once, consume its classified outcome, and stop on anything other than success.
 - Never use this workflow to change shared hotfix, backport, or release-branch policy.
 - Prefer narrower task or tool skills when the user only asked for one step of the workflow.
 

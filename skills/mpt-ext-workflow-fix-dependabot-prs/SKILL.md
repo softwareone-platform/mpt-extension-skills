@@ -48,7 +48,7 @@ Use these shared documents as the source of truth instead of restating their pol
 ## Workflow
 
 1. Build repository context first.
-- If not already done for the current task, read the target repository `AGENTS.md`.
+- Read the target repository `AGENTS.md` once per session. If you already loaded it earlier in this session and still have its full contents, reuse them instead of re-reading; if the context was summarized or you are unsure it is complete, read it again. Do not pre-load shared docs in this step; read them lazily only when the repository points to them.
 - Read repository-specific docs when they exist, because they may extend or override shared guidance.
 - Read shared docs only when the repository explicitly points to them, using the resolution rule from Shared References.
 
@@ -102,12 +102,9 @@ git pull --rebase origin <base-branch>
 - Preserve command output with the command that produced it.
 
 7. Fix actionable validation failures.
-- If validation fails, invoke `mpt-ext-task-fix-repository-check-failures` with the failing command output.
-- Run at most 5 validation-fix iterations per Dependabot PR.
-- Fix only failures that are clearly caused by the Dependabot dependency change, dependency lock refresh, pre-commit pin sync, or validation fallout from those files.
-- After each fix, rerun the narrowest safe validation command, then rerun the repository-required check flow before publishing.
-- Stop without committing or pushing when validation still fails after 5 fix iterations.
-- Stop without committing or pushing when the remaining failure is environment-related, unrelated to the Dependabot change, or requires a product or design decision.
+- If validation fails, hand the failing output to `mpt-ext-task-fix-repository-check-failures` once; that task owns the bounded fix-and-rerun loop. Do not re-loop it from here.
+- Constrain the fix scope to failures clearly caused by the Dependabot dependency change, dependency lock refresh, pre-commit pin sync, or validation fallout from those files.
+- Act on its returned outcome: continue to publishing only on `fixed`; on any other outcome — including failures that are environment-related, unrelated to the Dependabot change, or that need a product or design decision — stop without committing or pushing and record the blocker.
 
 8. Amend and push to the same Dependabot branch.
 - Stage only files from the recorded changed-file list produced by the policy-fix and validation-fix steps.
@@ -141,7 +138,7 @@ git push --force-with-lease origin <head-branch>
 - Never keep Dependabot `opentelemetry`-family version bumps in the PR.
 - Never update `.pre-commit-config.yaml` opportunistically for unrelated tools.
 - Never continue to amend or push after failed validation unless the failure has been fixed and the required validation flow passes.
-- Never run more than 5 validation-fix iterations for one Dependabot PR before stopping with a blocker.
+- Never wrap a fix task that already owns its bounded loop in a second retry loop; invoke it once per Dependabot PR, consume its classified outcome, and stop on anything other than success.
 - Never use validation auto-fix as permission to make unrelated product-code changes in a Dependabot PR.
 - Never run repository-required validation steps in parallel when the shared validation workflow requires a sequence.
 

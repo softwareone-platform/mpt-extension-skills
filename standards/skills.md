@@ -52,13 +52,14 @@ Examples:
 14. A `tool` skill must not orchestrate other skills.
 15. A `task` skill may rely on tools, but it should not turn into a broad workflow.
 16. A `workflow` skill may reference or rely on task-level actions, but it should not hide unrelated side effects or branch into multiple unrelated processes.
-17. Avoid deep or ambiguous composition between skills. Keep the execution model easy to understand from reading the skill.
+17. Avoid deep or ambiguous composition between skills. Keep the execution model easy to understand from reading the skill. A `workflow` skill must not invoke another `workflow` skill in its steps; coordinate `task` and `tool` skills directly instead, so a single run never loads more than one workflow level and never rebuilds repository context repeatedly.
+17b. A bounded fix-and-retry loop must have a single owner. The `task` that performs the fixes owns the loop and its iteration cap; a `workflow` invokes such a task once and acts on its returned outcome, and must never wrap it in a second retry loop. Iteration caps must be observable (each attempt numbered, e.g. `Iteration N/5`) and must stop early on non-convergence (the same failure signature recurs, or a fix reintroduces a previously-passing check). A loop-owning task must return a single classified outcome (such as `fixed` / `needs-user-input` / `environment-blocker` / `non-converging` / `iteration-limit-reached`) so the caller can decide without re-running the loop.
 18. Do not duplicate shared standards or shared operational guidance inside a skill. Link to the relevant document in `standards/` or `knowledge/` instead.
 19. Skills that operate on a target repository must make repository context the first workflow step:
 
 ```text
 1. Build repository context first.
-- If not already done for the current task, read the target repository `AGENTS.md`.
+- Read the target repository `AGENTS.md` once per session. If you already loaded it earlier in this session and still have its full contents, reuse them instead of re-reading; if the context was summarized or you are unsure it is complete, read it again. Do not pre-load shared docs in this step; read them lazily only when the repository points to them.
 - Read repository-specific docs when they exist, because they may extend or override shared guidance.
 - Read shared docs using the resolution rule from Shared References.
 ```

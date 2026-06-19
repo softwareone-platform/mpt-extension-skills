@@ -46,7 +46,7 @@ Read these shared documents before making substantial skill changes, using the r
 ## Workflow
 
 1. Build repository context first.
-- If not already done for the current task, read the target repository `AGENTS.md`.
+- Read the target repository `AGENTS.md` once per session. If you already loaded it earlier in this session and still have its full contents, reuse them instead of re-reading; if the context was summarized or you are unsure it is complete, read it again. Do not pre-load shared docs in this step; read them lazily only when the repository points to them.
 - Read repository-specific docs when they exist, because they may extend or override shared guidance.
 - Read shared docs using the resolution rule from Shared References.
 

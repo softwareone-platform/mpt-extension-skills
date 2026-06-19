@@ -33,7 +33,7 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 ## Workflow
 
 1. Build repository context first.
-- If not already done for the current task, read the target repository `AGENTS.md`.
+- Read the target repository `AGENTS.md` once per session. If you already loaded it earlier in this session and still have its full contents, reuse them instead of re-reading; if the context was summarized or you are unsure it is complete, read it again. Do not pre-load shared docs in this step; read them lazily only when the repository points to them.
 - Read repository-specific docs when they exist, because they may extend or override shared guidance.
 - Read shared docs required by this skill (see Shared References) regardless of repository pointers; read additional shared docs only when the repository explicitly points to them.
 - Resolve shared docs from `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current` when available; otherwise read them from the `main` branch of the shared GitHub repository.
@@ -42,7 +42,7 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 - Use `mpt-ext-task-update-docs-from-changes` with the requested change source to map the change set to affected documents and edit them.
 
 3. Self-check the result.
-- Re-run the change collection from `mpt-ext-task-update-docs-from-changes` and compare its `affected_docs` and `missing_doc_updates` against what was actually edited.
+- Re-run only the bundled change-collection script directly (`skills/mpt-ext-task-update-docs-from-changes/scripts/collect_changes.py`); do not re-invoke the task skill, to avoid reloading it and rebuilding context. Compare its `affected_docs` and `missing_doc_updates` against what was actually edited.
 - Review `stale_doc_references`: any existing document that still references a path removed or renamed in this change set is likely stale; fix or remove the reference.
 - If a genuinely affected document is still not updated, return to step 2 for that document.
 - Run at most 3 update-and-recheck iterations before stopping and reporting the remaining gaps.

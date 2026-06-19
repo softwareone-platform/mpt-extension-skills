@@ -45,7 +45,7 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 ## Workflow
 
 1. Build repository context first.
-- If not already done for the current task, read the target repository `AGENTS.md`.
+- Read the target repository `AGENTS.md` once per session. If you already loaded it earlier in this session and still have its full contents, reuse them instead of re-reading; if the context was summarized or you are unsure it is complete, read it again. Do not pre-load shared docs in this step; read them lazily only when the repository points to them.
 - Read repository-specific docs when they exist, because they may extend or override shared guidance.
 - Read shared docs only when the repository explicitly points to them. Resolve those shared docs from `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current` when available; otherwise read them from the `main` branch of the shared GitHub repository.
 
@@ -55,14 +55,13 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 
 3. Run repository validation for the applied fixes.
 - Use `mpt-ext-task-run-repository-checks` to execute the repository-required local validation flow for the changed scope.
-- If repository checks or tests fail, use `mpt-ext-task-fix-repository-check-failures` to work through the blockers step by step and rerun the required validation.
-- Run at most 5 validation-fix iterations before stopping.
-- Stop when validation still fails or the updated branch is not ready to send back for review.
+- If repository checks or tests fail, hand the failing output to `mpt-ext-task-fix-repository-check-failures` once; that task owns the bounded fix-and-rerun loop. Do not re-loop it from here.
+- Act on its returned outcome: continue only on `fixed`; on any other outcome stop and report the blocker when the updated branch is not ready to send back for review.
 
 4. Update the commit history for the branch.
 - Use `mpt-ext-task-commit-changes` to stage the intended files and amend or create the repository-compliant commit for this review iteration.
-- If the commit is blocked by automatic `pre-commit` hook failures or hook-generated file rewrites, use `mpt-ext-task-fix-pre-commit-failures` before retrying the commit.
-- Run at most 5 pre-commit fix-and-retry iterations before stopping.
+- If the commit is blocked by automatic `pre-commit` hook failures or hook-generated file rewrites, hand control to `mpt-ext-task-fix-pre-commit-failures` once; that task owns the bounded fix-and-retry loop. Do not re-loop it from here.
+- Act on its returned outcome: continue only on `committed`; on any other outcome stop and report the blocker.
 
 5. Update the pull request branch.
 - Push the updated branch so the existing PR reflects the latest review fixes.
@@ -78,7 +77,7 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 
 - Never start from already resolved or already answered review threads unless the user explicitly asks to revisit them.
 - Never skip repository-required validation after code changes made for review feedback.
-- Never run more than 5 validation-fix iterations or 5 pre-commit fix-and-retry iterations before stopping with a blocker.
+- Never wrap a fix task that already owns its bounded loop in a second retry loop; invoke it once, consume its classified outcome, and stop on anything other than success.
 - Never create a duplicate pull request when updating the existing review branch.
 - Never move Jira to `Code Review` or `QA` inside this workflow.
 - Never assume every review comment must be fixed; use explanation or pushback when that is the correct outcome.
