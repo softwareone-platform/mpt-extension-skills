@@ -37,40 +37,32 @@ Current skills:
 - [mpt-ext-workflow-update-documentation](./skills/mpt-ext-workflow-update-documentation/SKILL.md): Coordinate updating documentation for a change set: update affected docs, self-check, and stage
 - [mpt-ext-workflow-decompose-tdr](./skills/mpt-ext-workflow-decompose-tdr/SKILL.md): Break a TDR or epic into agreed user stories and then estimated Back/Front subtasks
 
-For first-time installation from GitHub Releases, see [docs/installation.md](./docs/installation.md).
-For installed CLI commands, updates, local debug installs, and release lifecycle usage, see [docs/usage.md](./docs/usage.md).
+## How to install
 
-## Install as a plugin
+The skills ship through several delivery paths; pick whichever your runtime
+supports. Full instructions, prerequisites, and runtime flags live in
+[docs/installation.md](./docs/installation.md).
 
-The same skills are published as a versioned plugin for runtimes that support a
-plugin marketplace. Each release pins the plugin source to its git tag, so
-installs are reproducible.
+- **Via CLI (shell installer)** — install from GitHub Releases with the release
+  installer script: see [Install via CLI](./docs/installation.md#install-via-cli).
+- **As a Claude Code plugin** — add the marketplace and install the versioned
+  plugin: see [Claude Code plugin](./docs/installation.md#claude-code-plugin).
+- **As a Codex plugin** — add the Codex marketplace and install: see
+  [Codex plugin](./docs/installation.md#codex-plugin).
+- **As a Cursor rule** — install the always-on rule adapter into a project with
+  `install --cursor[=<dir>]` (or copy it by hand): see
+  [Cursor rule adapter](./docs/installation.md#cursor-rule-adapter).
 
-Claude Code:
-
-```text
-/plugin marketplace add softwareone-platform/mpt-extension-skills
-/plugin install mpt-extension-skills@mpt-extension-skills
-```
-
-Codex:
-
-```bash
-codex plugin marketplace add softwareone-platform/mpt-extension-skills
-codex
-```
-
-Then open `/plugins`, select the marketplace, and install `mpt-extension-skills`.
-
-Cursor has no versioned plugin marketplace; copy the always-on rule adapter at
-[.cursor/rules/mpt-extension-skills.mdc](./.cursor/rules/mpt-extension-skills.mdc)
-into the consuming repository's `.cursor/rules/`.
-
-The plugin manifests live at
+The same skills are published as a versioned plugin for runtimes with a
+marketplace; each release pins the plugin source to its git tag, so installs are
+reproducible. The plugin manifests live at
 [.claude-plugin/](./.claude-plugin/), [.codex-plugin/](./.codex-plugin/),
 [.agents/plugins/](./.agents/plugins/) (the Codex marketplace catalog), and
 [.cursor/rules/](./.cursor/rules/); the [release workflow](./.github/workflows/release.yml)
 stamps their version on every release.
+
+For installed CLI commands, updates, local debug installs, and release lifecycle
+usage, see [docs/usage.md](./docs/usage.md).
 
 ## Commands and hooks
 

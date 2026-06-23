@@ -14,6 +14,9 @@ CODEX_SKILLS_DIR="${CODEX_SKILLS_DIR:-${HOME}/.codex/skills}"
 CLAUDE_SKILLS_DIR="${CLAUDE_SKILLS_DIR:-${HOME}/.claude/skills}"
 CLAUDE_COMMANDS_DIR="${CLAUDE_COMMANDS_DIR:-${HOME}/.claude/commands}"
 COMMAND_BIN_DIR="${MPT_SKILLS_BIN_DIR:-${HOME}/.local/bin}"
+CURSOR_PROJECT_DIR="${CURSOR_PROJECT_DIR:-$(pwd)}"
+CURSOR_ADAPTER_RELPATH=".cursor/rules/mpt-extension-skills.mdc"
+CURSOR_ADAPTER_FILENAME="mpt-extension-skills.mdc"
 
 log_info() {
   printf '[INFO] %s\n' "$*"
@@ -47,11 +50,11 @@ current_version_block() {
 usage() {
   cat <<EOF
 Usage:
-  ${COMMAND_NAME} install --version <version> [--codex | --claude | --all]
-  ${COMMAND_NAME} install --path <local-repo> [--codex | --claude | --all]
-  ${COMMAND_NAME} activate <version> [--codex | --claude | --all]
-  ${COMMAND_NAME} deactivate [--codex | --claude | --all]
-  ${COMMAND_NAME} upgrade [--version <version>] [--codex | --claude | --all]
+  ${COMMAND_NAME} install --version <version> [--codex | --claude | --all] [--cursor[=<dir>]]
+  ${COMMAND_NAME} install --path <local-repo> [--codex | --claude | --all] [--cursor[=<dir>]]
+  ${COMMAND_NAME} activate <version> [--codex | --claude | --all] [--cursor[=<dir>]]
+  ${COMMAND_NAME} deactivate [--codex | --claude | --all] [--cursor[=<dir>]]
+  ${COMMAND_NAME} upgrade [--version <version>] [--codex | --claude | --all] [--cursor[=<dir>]]
   ${COMMAND_NAME} remove --all
   ${COMMAND_NAME} list
   ${COMMAND_NAME} --help
@@ -67,10 +70,13 @@ Commands:
   --help                      Show this help
 
 Runtime targeting:
-  No runtime flag  Auto-detect installed runtimes and wire only those
+  No runtime flag  Auto-detect installed Codex/Claude runtimes and wire only those
   --codex         Wire only Codex
   --claude        Wire only Claude
   --all           Wire both Codex and Claude
+  --cursor[=<dir>]  Copy the Cursor rule adapter into <dir>/.cursor/rules
+                    (default: current directory). Explicit only: never
+                    auto-detected and not included by --all.
 
 Environment overrides:
   MPT_EXTENSION_SKILLS_HOME  Install root for versioned package contents
@@ -83,6 +89,9 @@ Environment overrides:
                              Default: \$HOME/.claude/commands
   MPT_SKILLS_BIN_DIR         Directory where the user-facing mpt-extensions-skills command is linked
                              Default: \$HOME/.local/bin
+  CURSOR_PROJECT_DIR         Project directory whose .cursor/rules receives the
+                             Cursor adapter when --cursor is given without a value
+                             Default: current directory
 
 $(current_version_block)
 EOF
@@ -177,7 +186,10 @@ install_cli_command() {
 parse_runtime_selection() {
   TARGET_CODEX=0
   TARGET_CLAUDE=0
+  TARGET_CURSOR=0
+  CURSOR_TARGET_DIR="${CURSOR_PROJECT_DIR}"
   RUNTIME_MODE="auto"
+  local cursor_explicit=0
 
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -194,6 +206,20 @@ parse_runtime_selection() {
         TARGET_CLAUDE=1
         RUNTIME_MODE="explicit"
         ;;
+      --cursor)
+        TARGET_CURSOR=1
+        cursor_explicit=1
+        ;;
+      --cursor=*)
+        TARGET_CURSOR=1
+        cursor_explicit=1
+        CURSOR_TARGET_DIR="${1#--cursor=}"
+        if [[ -z "${CURSOR_TARGET_DIR}" ]]; then
+          echo "Missing directory value for --cursor=" >&2
+          usage
+          exit 1
+        fi
+        ;;
       *)
         echo "Unknown option: $1" >&2
         usage
@@ -202,6 +228,13 @@ parse_runtime_selection() {
     esac
     shift
   done
+
+  # Cursor is project-scoped and never auto-detected: only Codex/Claude take
+  # part in auto-detection. A bare --cursor must not trigger Codex/Claude
+  # auto-wiring, so treat a cursor-only invocation as an explicit selection.
+  if [[ "${RUNTIME_MODE}" == "auto" && "${cursor_explicit}" -eq 1 ]]; then
+    RUNTIME_MODE="explicit"
+  fi
 
   if [[ "${RUNTIME_MODE}" == "auto" ]]; then
     if runtime_is_available "${CODEX_SKILLS_DIR}"; then
@@ -232,7 +265,7 @@ parse_upgrade_selection() {
         UPGRADE_VERSION="$2"
         shift 2
         ;;
-      --codex|--claude|--all)
+      --codex|--claude|--all|--cursor|--cursor=*)
         runtime_args+=("$1")
         shift
         ;;
@@ -252,15 +285,29 @@ parse_upgrade_selection() {
 }
 
 log_runtime_selection() {
-  if [[ "${TARGET_CODEX}" -eq 1 && "${TARGET_CLAUDE}" -eq 1 ]]; then
-    log_info "Target runtimes: Codex and Claude"
-  elif [[ "${TARGET_CODEX}" -eq 1 ]]; then
-    log_info "Target runtime: Codex"
-  elif [[ "${TARGET_CLAUDE}" -eq 1 ]]; then
-    log_info "Target runtime: Claude"
-  else
-    log_warn "No runtime selected or detected. The package will be installed without wiring Codex or Claude links."
+  local targets=()
+  [[ "${TARGET_CODEX}" -eq 1 ]] && targets+=("Codex")
+  [[ "${TARGET_CLAUDE}" -eq 1 ]] && targets+=("Claude")
+  [[ "${TARGET_CURSOR:-0}" -eq 1 ]] && targets+=("Cursor")
+
+  local count="${#targets[@]}"
+  if [[ "${count}" -eq 0 ]]; then
+    log_warn "No runtime selected or detected. The package will be installed without wiring Codex, Claude, or Cursor links."
+    return
   fi
+
+  if [[ "${count}" -eq 1 ]]; then
+    log_info "Target runtime: ${targets[0]}"
+    return
+  fi
+
+  # Join as "A and B" for two targets, "A, B and C" for three.
+  local last="${targets[count - 1]}"
+  local head_list=("${targets[@]:0:count - 1}")
+  local joined
+  joined="$(printf '%s, ' "${head_list[@]}")"
+  joined="${joined%, }"
+  log_info "Target runtimes: ${joined} and ${last}"
 }
 
 refresh_runtime_links() {
@@ -333,6 +380,35 @@ refresh_runtime_commands() {
   log_done "${runtime_name} command wiring complete (${linked} commands linked)"
 }
 
+install_cursor_adapter() {
+  local project_dir="$1"
+  local adapter_src="${INSTALL_ROOT}/current/${CURSOR_ADAPTER_RELPATH}"
+
+  if [[ ! -f "${adapter_src}" ]]; then
+    log_warn "Cursor rule adapter not found at ${adapter_src}; skipping Cursor wiring"
+    return
+  fi
+
+  local dest_dir="${project_dir}/.cursor/rules"
+  log_info "Installing Cursor rule adapter into ${dest_dir}"
+  mkdir -p "${dest_dir}"
+  cp "${adapter_src}" "${dest_dir}/${CURSOR_ADAPTER_FILENAME}"
+  log_done "Cursor rule adapter installed at ${dest_dir}/${CURSOR_ADAPTER_FILENAME}"
+}
+
+remove_cursor_adapter() {
+  local project_dir="$1"
+  local dest="${project_dir}/.cursor/rules/${CURSOR_ADAPTER_FILENAME}"
+
+  if [[ -f "${dest}" ]]; then
+    log_info "Removing Cursor rule adapter ${dest}"
+    rm -f "${dest}"
+    log_done "Cursor rule adapter removed"
+  else
+    log_info "Skipping Cursor: no managed adapter at ${dest}"
+  fi
+}
+
 remove_runtime_links() {
   local runtime_name="$1"
   local runtime_dir="$2"
@@ -371,9 +447,13 @@ activate_selected_runtimes() {
     refresh_runtime_commands "Claude" "${CLAUDE_COMMANDS_DIR}"
   fi
 
-  if [[ "${TARGET_CODEX}" -eq 0 && "${TARGET_CLAUDE}" -eq 0 ]]; then
+  if [[ "${TARGET_CURSOR:-0}" -eq 1 ]]; then
+    install_cursor_adapter "${CURSOR_TARGET_DIR}"
+  fi
+
+  if [[ "${TARGET_CODEX}" -eq 0 && "${TARGET_CLAUDE}" -eq 0 && "${TARGET_CURSOR:-0}" -eq 0 ]]; then
     log_warn "Skipped runtime wiring because no compatible runtime directories were detected."
-    log_warn "Use --codex, --claude, or --all to force runtime wiring."
+    log_warn "Use --codex, --claude, --all, or --cursor to force runtime wiring."
   fi
 }
 
@@ -387,15 +467,23 @@ deactivate_selected_runtimes() {
     remove_runtime_commands "Claude" "${CLAUDE_COMMANDS_DIR}"
   fi
 
-  if [[ "${TARGET_CODEX}" -eq 0 && "${TARGET_CLAUDE}" -eq 0 ]]; then
+  if [[ "${TARGET_CURSOR:-0}" -eq 1 ]]; then
+    remove_cursor_adapter "${CURSOR_TARGET_DIR}"
+  fi
+
+  if [[ "${TARGET_CODEX}" -eq 0 && "${TARGET_CLAUDE}" -eq 0 && "${TARGET_CURSOR:-0}" -eq 0 ]]; then
     log_warn "Skipped runtime deactivation because no compatible runtime directories were detected."
-    log_warn "Use --codex, --claude, or --all to force runtime deactivation."
+    log_warn "Use --codex, --claude, --all, or --cursor to force runtime deactivation."
   fi
 }
 
 remove_all() {
   TARGET_CODEX=0
   TARGET_CLAUDE=0
+  # Cursor adapters live inside individual project trees, so remove --all (which
+  # operates on the shared install root) never touches them. Use
+  # "deactivate --cursor[=<dir>]" to remove a project's adapter.
+  TARGET_CURSOR=0
 
   if runtime_is_available "${CODEX_SKILLS_DIR}"; then
     TARGET_CODEX=1
@@ -460,6 +548,12 @@ copy_package_files() {
   if [[ -d "${source_dir}/hooks" ]]; then
     log_info "Copying hooks/"
     cp -R "${source_dir}/hooks" "${version_dir}/hooks"
+  fi
+
+  if [[ -f "${source_dir}/${CURSOR_ADAPTER_RELPATH}" ]]; then
+    log_info "Copying ${CURSOR_ADAPTER_RELPATH}"
+    mkdir -p "${version_dir}/.cursor/rules"
+    cp "${source_dir}/${CURSOR_ADAPTER_RELPATH}" "${version_dir}/${CURSOR_ADAPTER_RELPATH}"
   fi
 }
 

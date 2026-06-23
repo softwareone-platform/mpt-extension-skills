@@ -83,8 +83,10 @@ Claude and Codex plugin manifests. Each runtime has its own marketplace catalog
 whose plugin `source` is pinned to the release tag: `.claude-plugin/marketplace.json`
 for Claude and `.agents/plugins/marketplace.json` for Codex.
 `.cursor/rules/mpt-extension-skills.mdc` is the Cursor adapter (instruction-tier,
-no marketplace). The plugin also ships `commands/` (slash commands over the
-workflow skills) and `hooks/` (a `SessionStart` context hook), both
+no marketplace); the shell installer can place it per project with
+`install --cursor[=<dir>]`, since Cursor rules are project-scoped rather than a
+global runtime directory. The plugin also ships `commands/` (slash commands over
+the workflow skills) and `hooks/` (a `SessionStart` context hook), both
 auto-discovered from the plugin root; the shell installer additionally wires
 `commands/` into the Claude commands directory, but not hooks. Releases are two-step: the **Prepare release** workflow stamps
 the manifest versions and opens a `release/<version>` pull request; merging it
