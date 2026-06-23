@@ -33,6 +33,7 @@ Use explicit runtime flags when needed:
 mpt-extensions-skills install --version 1.0.0 --codex
 mpt-extensions-skills install --version 1.0.0 --claude
 mpt-extensions-skills install --version 1.0.0 --all
+mpt-extensions-skills install --version 1.0.0 --cursor=/path/to/repo
 ```
 
 Supported runtime flags:
@@ -40,6 +41,11 @@ Supported runtime flags:
 - `--codex`
 - `--claude`
 - `--all`
+- `--cursor[=<dir>]` — copy the Cursor rule adapter into `<dir>/.cursor/rules`
+  (default: current directory). Explicit only: never auto-detected and not
+  included by `--all`; combine it with `--codex`/`--claude` as needed, and
+  remove a project's adapter with `deactivate --cursor=<dir>`. The directory can
+  also be set with the `CURSOR_PROJECT_DIR` environment variable.
 
 ## Environment Variables
 
@@ -49,6 +55,7 @@ The CLI supports these environment variable overrides:
 - `CODEX_SKILLS_DIR`: Codex skills directory that receives managed shared skill links during activation. Default: `~/.codex/skills`
 - `CLAUDE_SKILLS_DIR`: Claude skills directory that receives managed shared skill links during activation. Default: `~/.claude/skills`
 - `MPT_SKILLS_BIN_DIR`: directory where the user-facing `mpt-extensions-skills` command is linked. Default: `~/.local/bin`
+- `CURSOR_PROJECT_DIR`: project directory whose `.cursor/rules` receives the Cursor adapter when `--cursor` is given without a value. Default: current directory
 
 ## Install A Specific Release
 
@@ -155,8 +162,10 @@ Use:
 mpt-extensions-skills deactivate
 ```
 
-`deactivate` removes only managed skill links from selected runtime directories.
-It does not delete installed versions from `~/.mpt-extension-skills`.
+`deactivate` removes only managed skill links from selected runtime directories
+(and, with `--cursor`, the rule adapter from the target project's
+`.cursor/rules`). It does not delete installed versions from
+`~/.mpt-extension-skills`.
 
 Examples with explicit runtime selection:
 
@@ -164,6 +173,7 @@ Examples with explicit runtime selection:
 mpt-extensions-skills deactivate --codex
 mpt-extensions-skills deactivate --claude
 mpt-extensions-skills deactivate --all
+mpt-extensions-skills deactivate --cursor=/path/to/repo
 ```
 
 ## Remove Everything
@@ -179,6 +189,9 @@ This command:
 - removes managed skill links from detected Codex and Claude runtime directories
 - removes the user command link from `~/.local/bin` or `MPT_SKILLS_BIN_DIR`
 - removes the package install root such as `~/.mpt-extension-skills`
+
+Cursor adapters live inside individual project trees, so `remove --all` does not
+touch them. Remove a project's adapter with `deactivate --cursor=<dir>`.
 
 ## Release Workflow
 

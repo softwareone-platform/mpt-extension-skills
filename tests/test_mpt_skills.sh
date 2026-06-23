@@ -91,6 +91,9 @@ create_release_asset() {
     "${REPO_ROOT}/knowledge" \
     "${REPO_ROOT}/docs" \
     "${package_dir}/package/"
+  mkdir -p "${package_dir}/package/.cursor/rules"
+  cp "${REPO_ROOT}/.cursor/rules/mpt-extension-skills.mdc" \
+    "${package_dir}/package/.cursor/rules/"
   cat > "${package_dir}/package/manifest.json" <<EOF
 {
   "name": "mpt-extension-skills",
@@ -138,6 +141,8 @@ test_help_without_install() {
   assert_contains "${output}" 'Usage:'
   assert_contains "${output}" 'install --version <version>'
   assert_contains "${output}" 'install --path <local-repo>'
+  assert_contains "${output}" '--cursor[=<dir>]'
+  assert_contains "${output}" 'CURSOR_PROJECT_DIR'
   if [[ "${output}" == *'install <version>'* ]]; then
     fail 'Deprecated install <version> form must not be shown in help'
   fi
@@ -574,6 +579,84 @@ test_installed_command_is_invokable_as_mpt_extensions_skills() {
   pass "${FUNCNAME[0]}"
 }
 
+test_install_cursor_only() {
+  local tmp_root
+  tmp_root="$(mktemp -d)"
+
+  local project_dir="${tmp_root}/project"
+  mkdir -p "${project_dir}"
+  mkdir -p "${tmp_root}/codex" "${tmp_root}/claude"
+
+  local output
+  output="$(install_release_for_test "${tmp_root}" 1.0.0 "--cursor=${project_dir}")"
+
+  assert_contains "${output}" 'Target runtime: Cursor'
+  assert_contains "${output}" 'Cursor rule adapter installed'
+  assert_exists "${project_dir}/.cursor/rules/mpt-extension-skills.mdc"
+  assert_exists "${tmp_root}/store/versions/1.0.0/.cursor/rules/mpt-extension-skills.mdc"
+  # Cursor is explicit-only: a bare --cursor must not trigger Codex/Claude wiring
+  # even though their directories exist.
+  assert_not_exists "${tmp_root}/codex/skills/mpt-ext-workflow-start-work"
+  assert_not_exists "${tmp_root}/claude/skills/mpt-ext-workflow-start-work"
+  pass "${FUNCNAME[0]}"
+}
+
+test_install_cursor_bare_uses_default_dir() {
+  local tmp_root
+  tmp_root="$(mktemp -d)"
+
+  local project_dir="${tmp_root}/project"
+  mkdir -p "${project_dir}"
+
+  # A bare --cursor (no value) resolves the project directory from
+  # CURSOR_PROJECT_DIR; run_with_release_env uses plain env, so the exported
+  # value passes through to the script.
+  local output
+  export CURSOR_PROJECT_DIR="${project_dir}"
+  output="$(install_release_for_test "${tmp_root}" 1.0.0 --cursor)"
+  unset CURSOR_PROJECT_DIR
+
+  assert_contains "${output}" 'Target runtime: Cursor'
+  assert_exists "${project_dir}/.cursor/rules/mpt-extension-skills.mdc"
+  pass "${FUNCNAME[0]}"
+}
+
+test_install_codex_and_cursor() {
+  local tmp_root
+  tmp_root="$(mktemp -d)"
+
+  local project_dir="${tmp_root}/project"
+  mkdir -p "${project_dir}" "${tmp_root}/codex"
+
+  local output
+  output="$(install_release_for_test "${tmp_root}" 1.0.0 --codex "--cursor=${project_dir}")"
+
+  assert_contains "${output}" 'Target runtimes: Codex and Cursor'
+  assert_symlink_target "${tmp_root}/codex/skills/mpt-ext-workflow-start-work" "${tmp_root}/store/current/skills/mpt-ext-workflow-start-work"
+  assert_exists "${project_dir}/.cursor/rules/mpt-extension-skills.mdc"
+  pass "${FUNCNAME[0]}"
+}
+
+test_deactivate_cursor_removes_adapter_only() {
+  local tmp_root
+  tmp_root="$(mktemp -d)"
+
+  local project_dir="${tmp_root}/project"
+  mkdir -p "${project_dir}"
+
+  install_release_for_test "${tmp_root}" 1.0.0 "--cursor=${project_dir}" >/dev/null
+  assert_exists "${project_dir}/.cursor/rules/mpt-extension-skills.mdc"
+
+  local output
+  output="$(run_with_env "${tmp_root}" deactivate "--cursor=${project_dir}")"
+
+  assert_contains "${output}" 'Cursor rule adapter removed'
+  assert_not_exists "${project_dir}/.cursor/rules/mpt-extension-skills.mdc"
+  # Deactivation removes the project adapter but leaves the installed package.
+  assert_exists "${tmp_root}/store/current/.cursor/rules/mpt-extension-skills.mdc"
+  pass "${FUNCNAME[0]}"
+}
+
 main() {
   chmod +x "${SCRIPT_PATH}"
 
@@ -586,6 +669,14 @@ main() {
   test_list_marks_active_version
   TESTS_RUN=$((TESTS_RUN + 1))
   test_install_codex_only
+  TESTS_RUN=$((TESTS_RUN + 1))
+  test_install_cursor_only
+  TESTS_RUN=$((TESTS_RUN + 1))
+  test_install_cursor_bare_uses_default_dir
+  TESTS_RUN=$((TESTS_RUN + 1))
+  test_install_codex_and_cursor
+  TESTS_RUN=$((TESTS_RUN + 1))
+  test_deactivate_cursor_removes_adapter_only
   TESTS_RUN=$((TESTS_RUN + 1))
   test_install_from_release_asset
   TESTS_RUN=$((TESTS_RUN + 1))
