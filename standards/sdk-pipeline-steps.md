@@ -98,7 +98,13 @@ async def pre(self, ctx: OrderContext) -> None:
    Read environment-driven configuration from `ctx.ext_settings` (typed with a
    `Protocol`), not from hardcoded constants or `os.getenv`. Expose the step's
    required settings as a `Protocol`, and have the extension's `ExtensionSettings`
-   inherit it so the contract is explicit and type-checked. Pass behavioral
+   inherit it so the contract is explicit and type-checked. Read those settings
+   directly from `ctx.ext_settings`; do not introduce a parallel settings
+   attribute or a mapping/property indirection on the context. This settings
+   contract — read `ext_settings`, expose a `Protocol`, inherit it on
+   `ExtensionSettings` — applies equally to non-step library components that read
+   settings (for example a context mixin that builds something from settings).
+   Pass behavioral
    parameters (counts, templates, thresholds) as constructor arguments and
    validate them, failing fast on invalid input. Prefer expressing the
    constraint in the parameter type (for example a `pydantic` constrained type

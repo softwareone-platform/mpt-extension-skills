@@ -387,7 +387,7 @@ def order_factory():
 ## Mocking Rules
 1. Do not use `unittest.mock` directly.
 2. Use the `mocker` fixture only when mocking is unavoidable.
-3. Prefer fixtures and real value objects over mocks whenever possible. Build the real domain or context object (for example the SDK `OrderContext`) and mock only the parts that genuinely cannot be real (such as an outbound API client). Do **not** stand in a fake object with `types.SimpleNamespace` or a bare attribute holder for a typed domain/context object: it silently accepts any attribute and hides drift from the real type. Use the real object, or `create_autospec` when only a mock will do.
+3. Prefer fixtures and real value objects over mocks whenever possible. Build the real domain or context object (for example the SDK `OrderContext`) and mock only the parts that genuinely cannot be real (such as an outbound API client). Do **not** stand in a fake object with `types.SimpleNamespace` or a bare attribute holder for a typed domain/context object: it silently accepts any attribute and hides drift from the real type. Use the real object, or `create_autospec` when only a mock will do. The same applies to test-only doubles: do not stand in an empty stub class (`class _Stub: ...` or `pass`) — wemake rejects an empty class body (`WPS604`/`WPS420`). For an `isinstance`/lookup test prefer a real or built-in object (`object()`, `5`, `"x"`); when a distinct type is genuinely needed, give the double a real member instead of an empty body.
 4. Always use `autospec=True` when patching, and build injected mock objects with `create_autospec(...)` so their attributes and call signatures match the real type. A spec-less `Mock`/`AsyncMock` accepts any attribute and any call, hiding wrong method names or signatures.
 
 GOOD
@@ -423,4 +423,30 @@ def test_marks_order_expired():
     result = is_expired(order)
 
     assert result is True
+```
+7. Mock outbound HTTP at the transport, not by patching client functions. For `httpx`-based code use `respx` to register routes and assert on the captured request, instead of patching `httpx` functions (for example `mocker.patch("httpx.post")`), which is brittle and bypasses request building. The `respx_mock` fixture intercepts requests in the test; the registered route records the real request.
+
+BAD
+```python
+def test_posts_card(mocker, notifier):
+    post = mocker.patch("httpx.post")  # brittle; asserts on mock args, not a real request
+
+    notifier.send_error("Title", "Body")  # act
+
+    assert post.call_args.kwargs["json"]
+```
+
+GOOD
+```python
+import httpx
+
+
+def test_posts_card(respx_mock, notifier):
+    route = respx_mock.post("https://example.com/webhook").mock(
+        return_value=httpx.Response(200),
+    )
+
+    notifier.send_error("Title", "Body")  # act
+
+    assert route.calls.last.request.content  # assert on the real captured request
 ```
