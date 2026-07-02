@@ -37,3 +37,7 @@ Define shared design and architecture practices for building maintainable, deplo
 - Prefer dependency injection or adapter-based design for additional external dependencies.
 - Keep local development setup lightweight and predictable.
 - Design steps so they can be reused across multiple extensions with configuration instead of copy-paste.
+
+## Related Documents
+
+- [extensions-ui-best-practices.md](./extensions-ui-best-practices.md)
