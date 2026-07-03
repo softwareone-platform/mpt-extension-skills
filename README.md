@@ -122,6 +122,7 @@ Current documents in `standards/`:
 - [commit-messages.md](./standards/commit-messages.md): shared commit message format with tag, Jira ID, short summary, and descriptive commit body guidance
 - [documentation.md](./standards/documentation.md): shared repository documentation structure and authoring rules for human readers and AI agents
 - [extensions-best-practices.md](./standards/extensions-best-practices.md): extension architecture and design guidance for isolation, deployability, local development, and reusability
+- [extensions-ui-best-practices.md](./standards/extensions-ui-best-practices.md): frontend (UI) authoring rules for extension modules — structure, naming, SDK and design-system usage, data fetching, plug declaration, styling, testing, and iframe compatibility shims
 - [makefiles.md](./standards/makefiles.md): shared `Makefile` structure and expectations for organizing common development commands
 - [packages-and-dependencies.md](./standards/packages-and-dependencies.md): shared dependency management rules for Python repositories, including `uv`, lock files, and version pinning strategy
 - [pull-requests.md](./standards/pull-requests.md): shared pull request rules for titles, commit structure, reviewability, testing, and release branch workflows
