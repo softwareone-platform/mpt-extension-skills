@@ -9,8 +9,9 @@ Applies to:
  - frontend (browser) UI shipped inside MPT extensions
 
 ## Purpose
-Define how extension UI is structured, built, and tested so that screens rendered inside the
-MPT Marketplace platform shell are consistent, on-brand, type-safe, and maintainable.
+Define how extension UI must be structured and built so that screens rendered inside the
+MPT Marketplace platform shell are consistent, on-brand, type-safe, and maintainable. UI testing
+rules live in a separate standard (see Related Documents).
 
 ## Definitions
 
@@ -29,15 +30,15 @@ MPT Marketplace platform shell are consistent, on-brand, type-safe, and maintain
 
 ### Project structure
 
-1. Place every UI surface under `src/modules/<name>/` with an `index.tsx` entry point. The build
+1. Every UI surface must live under `src/modules/<name>/` with an `index.tsx` entry point. The build
    auto-discovers one entry point per module directory, so the directory name defines the bundle.
-2. Put code shared across modules under `src/modules/shared/` (domain model, hooks, domain
-   constants) and generic, domain-agnostic helpers under `src/modules/utils/` (coercion, storage,
-   pure predicates).
-3. Colocate a component's `.tsx`, its `.scss`, and its `.test.tsx` in the same folder. Follow the
-   file and folder naming conventions below.
-4. Keep entry points thin: mount React and import global styles only. All logic lives in `App.tsx`
-   and below.
+2. Code shared across modules must live under `src/modules/shared/` (domain model, hooks, domain
+   constants); generic, domain-agnostic helpers must live under `src/modules/utils/` (coercion,
+   storage, pure predicates).
+3. A component's `.tsx`, its `.scss`, and its `.test.tsx` must be colocated in the same folder,
+   following the file and folder naming conventions below.
+4. Entry points must stay thin: they must only mount React and import global styles; all logic must
+   live in `App.tsx` and below.
 
 GOOD (`src/modules/agreement/index.tsx`)
 ```tsx
@@ -55,11 +56,10 @@ setup((element: Element) => {
 
 ### Naming conventions
 
-5. Name files and folders by their role, using the conventions in the table below. Match the case
-   exactly — the build, imports, and test discovery all depend on it. The rule in one line:
-   **folders and all non-component `.ts` files are `kebab-case`, except hook files under
-   `shared/hooks/`, which are `camelCase` named after the hook (e.g. `useAdobeCustomer.ts`);
-   component files are `PascalCase`.**
+5. Files and folders must be named by role per the table below, matching case exactly (the build,
+   imports, and test discovery all depend on it): folders and all non-component `.ts` files are
+   `kebab-case`, except hook files under `shared/hooks/`, which are `camelCase` named after the hook
+   (e.g. `useAdobeCustomer.ts`); component files are `PascalCase`.
 
 | Kind | Convention | Examples |
 | --- | --- | --- |
@@ -74,24 +74,22 @@ setup((element: Element) => {
 | Component / view styles | `.scss` named after the component it styles | `DetailsSection.scss` |
 | Global styles | a single `style.scss` at the `src/` root, imported by each entry point | `src/style.scss` |
 
-6. Use `kebab-case` for component folders. Components are reusable, shared building blocks rather
-   than module-specific code, so they follow the same `kebab-case` folder convention as the modules
-   and utils around them; the `PascalCase` component files inside still name the React component.
-   The reference project currently mixes in some `PascalCase` folders (feature sub-views and wizard
-   steps, e.g. `ThreeYearCommitment/`, `DetailsStep/`) — treat those as legacy, use `kebab-case` for
-   new work, and migrate opportunistically.
+6. Component folders must use `kebab-case` (like the modules and utils around them); the `PascalCase`
+   files inside name the React component. New component folders must not use `PascalCase`; existing
+   `PascalCase` folders (e.g. `ThreeYearCommitment/`, `DetailsStep/`) may be renamed to `kebab-case`
+   when a component in them is already being changed.
 
 ### Use the SDK and design system — do not hand-roll
 
-7. Render UI with design-system components (`Button`, `Select`, `Input`, `InlineNotification`,
-   `MediumText`/`RegularText`, etc.). Do not build bespoke equivalents of components the design
-   system already provides.
-8. Talk to the platform only through the SDK: `http` for backend calls, `useMPTContext` for the
-   page context, `useMPTModal` for opening/closing actions. Do not read platform globals or call
-   `fetch` directly.
-9. When you must deviate from a design-system component (because it assumes a full-page platform
-   shell, for example), reuse design-system tokens/icons to match the look **and** document why in a
-   comment at the deviation site.
+7. UI must be rendered with design-system components (`Button`, `Select`, `Input`,
+   `InlineNotification`, `MediumText`/`RegularText`, etc.). Bespoke equivalents of components the
+   design system already provides must not be built.
+8. Code must talk to the platform only through the SDK: `http` for backend calls, `useMPTContext` for
+   the page context, `useMPTModal` for opening/closing actions. Code must not read platform globals or
+   call `fetch` directly.
+9. A component may deviate from a design-system component only when that component assumes a full-page
+   platform shell; such a deviation must reuse design-system tokens/icons to match the look and must
+   document the reason in a comment at the deviation site.
 
 GOOD (deviation is justified and explained at the call site)
 ```tsx
@@ -105,11 +103,12 @@ GOOD (deviation is justified and explained at the call site)
 
 ### Styling
 
-10. Style with colocated SCSS that `@use`s the design tokens; reference spacing, color, and brand
-   values through tokens (`var(--spacing-3)`, `var(--brand-primary)`, `$var-gray-2`). Do not
-   hardcode hex colors or arbitrary pixel spacing.
-11. Use a consistent block/element class convention (`extension__sidebar`, `details-section__label`).
-   Keep class names scoped to the component; do not rely on cascading from unrelated modules.
+10. Styles must be colocated SCSS that `@use`s the design tokens, and must reference spacing, color,
+   and brand values through tokens (`var(--spacing-3)`, `var(--brand-primary)`, `$var-gray-2`). Hex
+   colors and arbitrary pixel spacing must not be hardcoded.
+11. Class names must follow a consistent block/element convention (`extension__sidebar`,
+   `details-section__label`) and must be scoped to the component; styles must not rely on cascading
+   from unrelated modules.
 
 GOOD
 ```scss
@@ -137,17 +136,16 @@ BAD
 
 ### Data fetching and async state
 
-12. Wrap every backend call in a custom hook under `shared/hooks/` that returns an explicit state
-    object. Model status as a discriminated union — `'idle' | 'loading' | 'success' | 'error'` —
-    rather than loose booleans.
-13. Always `encodeURIComponent` path segments built from IDs before composing a request URL.
-14. Normalize errors: in a `catch`, narrow with `err instanceof Error ? err.message : '<fallback>'`
-    so the UI always has a displayable message and never surfaces a raw thrown value.
-15. Render each async state explicitly — show a loading notification while `loading` and the error
-    message while `error`. Do not leave the user with a blank screen.
-16. Get effect dependency arrays right so data is not re-fetched or re-computed needlessly. Reach for
-    `useMemo`/`useCallback` only for a measured problem, not by default — these modules are small and
-    React's defaults are fine.
+12. Every backend call must be wrapped in a custom hook under `shared/hooks/` that returns an explicit
+    state object; status must be modelled as a discriminated union — `'idle' | 'loading' | 'success' |
+    'error'` — not loose booleans.
+13. Path segments built from IDs must be `encodeURIComponent`-encoded before composing a request URL.
+14. Errors must be normalized: in a `catch`, narrow with `err instanceof Error ? err.message :
+    '<fallback>'` so the UI always has a displayable message and never surfaces a raw thrown value.
+15. Each async state must be rendered explicitly — a loading notification while `loading` and the error
+    message while `error`; the user must not be left with a blank screen.
+16. Effect dependency arrays must be correct so data is not re-fetched or re-computed needlessly.
+    `useMemo`/`useCallback` should be used only for a measured performance problem, not by default.
 
 GOOD (`shared/hooks/useAdobeCustomer.ts`, abridged)
 ```ts
@@ -173,21 +171,18 @@ export function useAdobeCustomer(agreementId: string) {
 
 ### Domain model and pure helpers
 
-17. Place a domain model by its scope:
-    - A model used by more than one module goes in `shared/model.ts` — the single home for
-      cross-module types. Do not scatter shared models across other files.
-    - A model specific to one module lives in a `model.ts` in that module's own folder and must not
-      be imported by another module. If a sibling needs it, that is the signal it is actually shared
-      — promote it to `shared/model.ts` rather than importing across modules (see the
-      no-sibling-import rule).
-    - Let `model.ts` grow as the shared surface grows; group it with section comments, and split it
-      only when the size genuinely hurts.
-18. Read domain types through small, pure helper functions (`resolveAgreementId`,
-    `findThreeYearBenefit`, `readParameter`), colocated with the types they operate on. Keep these
-    free of React and side effects so they are trivially testable.
-19. Treat backend payloads as untrusted shapes: type optional fields as optional, navigate with
-    optional chaining and nullish coalescing, and render a consistent placeholder (an em dash, `—`)
-    for absent values.
+17. A domain model must be placed by scope. A model used by more than one module must live in
+    `shared/model.ts` (the single home for cross-module types). A model specific to one module must
+    live in a `model.ts` in that module's own folder and must not be imported by another module; if a
+    sibling needs it, it must be promoted to `shared/model.ts` (see the no-sibling-import rule).
+    `model.ts` may grow with the shared surface, grouped with section comments, and should be split
+    only when its size genuinely hurts.
+18. Domain types must be read through small, pure helper functions (`resolveAgreementId`,
+    `findThreeYearBenefit`, `readParameter`), colocated with the types they operate on; these helpers
+    must be free of React and side effects so they are trivially testable.
+19. Backend payloads must be treated as untrusted shapes: optional fields must be typed as optional,
+    navigated with optional chaining and nullish coalescing, and absent values must render a
+    consistent placeholder (an em dash, `—`).
 
 GOOD (a pure resolver reads an untrusted context defensively)
 ```ts
@@ -198,11 +193,11 @@ export function resolveAgreementId(context?: AgreementContext): string {
 
 ### Authorization and feature gating
 
-20. Express "may this user perform this action" as pure predicates (see `utils/security.ts`) keyed
-    on account type, product, and segment. Gate both the entry point (whether the button renders) and
-    the action module itself (return `null` early when the predicate fails).
-21. Treat UI gating as UX, not security — the backend remains the authority. Never grant an action
-    purely because the control was visible.
+20. "May this user perform this action" must be expressed as pure predicates (see `utils/security.ts`)
+    keyed on account type, product, and segment; both the entry point (whether the button renders) and
+    the action module itself (an early `return null`) must be gated.
+21. UI gating must be treated as UX, not security — the backend remains the authority; an action must
+    not be granted purely because the control was visible.
 
 GOOD (action re-checks the same predicate it was gated on)
 ```tsx
@@ -212,23 +207,23 @@ if (!canRequest) return null;
 
 ### TypeScript and quality gates
 
-22. Keep `strict` TypeScript on; do not introduce `any`. Parameterize `useMPTContext<…>()` with the
-    exact shape you read instead of casting away types.
-23. Confine string→number/null conversions to shared coercion helpers (`toIntOrNull`,
-    `toNumberOrNull`) rather than scattering ad-hoc `Number(...)`/`parseInt` calls.
-24. Code must pass `npm run check` (type-check plus `eslint --max-warnings=0`) before review. Zero
+22. `strict` TypeScript must stay on and `any` must not be introduced; `useMPTContext<…>()` must be
+    parameterized with the exact shape read instead of casting away types.
+23. String→number/null conversions must be confined to shared coercion helpers (`toIntOrNull`,
+    `toNumberOrNull`) rather than scattered ad-hoc `Number(...)`/`parseInt` calls.
+24. Code must pass `npm run check` (type-check plus `eslint --max-warnings=0`) before review; zero
     warnings is the bar, not zero errors.
 
 ### Component design
 
-25. Split presentational components (small, prop-driven, no data fetching — e.g. `DetailsSection`)
-    from container views that wire hooks and compose them (e.g. `ThreeYearCommitment`). Push fetching
-    and gating up; keep leaf components pure.
-26. Expose a `data-testid` (or stable text) on components that tests assert against, rather than
-    reaching for brittle structural selectors.
-27. Components must not import from sibling or cousin components — only along the parent-child tree.
-    Shared objects, classes, types, or helpers belong in `shared/` or `utils/`, where any component
-    may import them. Importing from a shared module is not a lateral import; the ban is on
+25. Presentational components (small, prop-driven, no data fetching — e.g. `DetailsSection`) must be
+    split from container views that wire hooks and compose them (e.g. `ThreeYearCommitment`); fetching
+    and gating must be pushed up and leaf components kept pure.
+26. Components that tests assert against should expose a `data-testid` (or stable text) rather than
+    forcing tests to reach for brittle structural selectors.
+27. A component must not import from sibling or cousin components — only along the parent-child tree.
+    Shared objects, classes, types, or helpers must live in `shared/` or `utils/`, where any component
+    may import them; importing from a shared module is not a lateral import — the ban is on
     sibling-to-sibling imports specifically.
 
 BAD (a component reaches sideways into a sibling)
@@ -249,43 +244,22 @@ import { formatOffer } from '../../utils/offer';
 import { formatOffer } from '../../utils/offer';
 ```
 
-### Testing
-
-28. Every component, hook, and helper ships with a colocated `*.test.{ts,tsx}` (Jest + Testing
-    Library + jsdom). Test observable behavior — rendered text, the placeholder for missing data,
-    the request URL called — not implementation details.
-29. Mock the SDK at the module boundary (`jest.mock('@mpt-extension/sdk', …, { virtual: true })`)
-    and drive hooks with `renderHook` + `waitFor`. Assert both the success and the failure path.
-
-GOOD (`shared/hooks/useSettings.test.ts`, abridged)
-```ts
-jest.mock('@mpt-extension/sdk', () => ({ http: { get: jest.fn() } }), { virtual: true });
-const mockGet = jest.mocked(http.get);
-
-it('returns undefined when the request fails', async () => {
-  mockGet.mockRejectedValue(new Error('Settings unavailable'));
-  const { result } = renderHook(() => useSettings());
-  await waitFor(() => expect(mockGet).toHaveBeenCalled());
-  expect(result.current).toBeUndefined();
-});
-```
-
 ### Robustness
 
-30. Defend against hostile or restricted browser environments where platform APIs may throw — for
-    example install a `localStorage`/`sessionStorage` fallback that degrades to in-memory storage
-    rather than letting the module crash on load (see `utils/safe-storage.ts`).
+28. Modules must defend against restricted browser environments where platform APIs may throw — for
+    example they must install a `localStorage`/`sessionStorage` fallback that degrades to in-memory
+    storage rather than letting the module crash on load (see `utils/safe-storage.ts`).
 
 ### Modal data flow
 
-31. A plug opens an action with `useMPTModal().open(name, { context, onClose })` — passing the page
-    `context` in and receiving the action's result through `onClose`. The action returns its result
-    by calling `useMPTModal().close(result)`, or `close()` with no argument to cancel. The plug
-    applies the result to its own state. An action must not mutate the plug directly or communicate
-    through global/shared state.
-32. Treat the `close(result)` payload as the action's contract: type it, keep it minimal (the
-    updated entity, not UI state), and have the plug guard the cancel case, where `onClose` receives
-    `undefined`.
+29. A plug must open an action with `useMPTModal().open(name, { context, onClose })`, passing the page
+    `context` in and receiving the action's result through `onClose`. The action must return its result
+    by calling `useMPTModal().close(result)`, or `close()` with no argument to cancel. The plug applies
+    the result to its own state; an action must not mutate the plug directly or communicate through
+    global/shared state.
+30. The `close(result)` payload must be treated as the action's contract: it must be typed and kept
+    minimal (the updated entity, not UI state), and the plug must guard the cancel case, where
+    `onClose` receives `undefined`.
 
 GOOD (plug opens the action and applies the returned entity)
 ```tsx
@@ -305,10 +279,10 @@ close();                     // cancel
 
 ### Accessibility
 
-33. Use semantic elements and label the non-obvious ones: real `<button>`/`<nav>`/`<header>`/
-    `<aside>` over clickable `<div>`s, an `aria-label` on landmarks and icon-only controls, and
-    `aria-hidden` on decorative SVGs. Rely on the design system's own accessible components rather
-    than re-implementing their behavior.
+31. Semantic elements must be used and the non-obvious ones labelled: real
+    `<button>`/`<nav>`/`<header>`/`<aside>` over clickable `<div>`s, an `aria-label` on landmarks and
+    icon-only controls, and `aria-hidden` on decorative SVGs. The design system's own accessible
+    components should be reused rather than re-implemented.
 
 GOOD
 ```tsx
@@ -319,20 +293,20 @@ GOOD
 
 ### State management
 
-34. Keep state local — `useState` in components, and custom hooks for shared or async state. Do not
-    add a global store (Redux, Zustand) or a broad app-wide React context; each module is small and
-    mounted independently, so local state plus hooks is sufficient. Lift state only to the nearest
-    common ancestor when two children genuinely share it.
+32. State must be kept local — `useState` in components, and custom hooks for shared or async state. A
+    global store (Redux, Zustand) or a broad app-wide React context must not be added; each module is
+    small and mounted independently, so local state plus hooks is sufficient. State should be lifted
+    only to the nearest common ancestor when two children genuinely share it.
 
 ### Routing
 
-35. When a module has more than one view, route with `BrowserRouter`. The SDK synchronises the
-    module's route with the platform URL — the platform page path is suffixed with `/-/` followed by
-    the extension's internal path — so browser navigation and deep links work. Use `react-router` as
-    usual: declare routes and read `useParams`/`useNavigate`. When redirecting to a default view on
-    mount, pass `{ replace: true }` so you don't leave a dead history entry that traps the back
-    button; drive active-link styling with `NavLink`, and end the route list with a catch-all
-    redirect to the default view.
+33. A module with more than one view must route with `BrowserRouter`. The SDK synchronises the module's
+    route with the platform URL — the platform page path is suffixed with `/-/` followed by the
+    extension's internal path — so browser navigation and deep links work. Use `react-router` as usual:
+    declare routes and read `useParams`/`useNavigate`. A redirect to a default view on mount must pass
+    `{ replace: true }` so it does not leave a dead history entry that traps the back button; active
+    links should use `NavLink`, and the route list should end with a catch-all redirect to the default
+    view.
 
 GOOD
 ```tsx
@@ -347,10 +321,10 @@ GOOD
 
 ### Forms and validation
 
-36. Express each validation as a pure function that returns an error message string or `null`, and
-    compose them with `??` so the first failure wins. Keep this logic out of the component body (so
-    it is unit-testable) and set the resulting message into local error state; do not `throw` for
-    validation.
+34. Each validation must be a pure function that returns an error message string or `null`, composed
+    with `??` so the first failure wins. This logic must stay out of the component body (so it is
+    unit-testable) and must set the resulting message into local error state; validation must not
+    `throw`.
 
 GOOD
 ```ts
@@ -366,9 +340,9 @@ if (validationError) {
 
 ### Constants
 
-37. Extract magic numbers and configuration literals into a `constants.ts` rather than inlining
-    them — `shared/constants.ts` for cross-module values, a module-local `constants.ts` otherwise.
-    Name them in `SCREAMING_SNAKE_CASE`.
+35. Magic numbers and configuration literals must be extracted into a `constants.ts` rather than
+    inlined — `shared/constants.ts` for cross-module values, a module-local `constants.ts` otherwise —
+    and must be named in `SCREAMING_SNAKE_CASE`.
 
 GOOD
 ```ts
@@ -379,11 +353,11 @@ export const SCREEN_WIDTH_FACTOR = 0.9;
 
 ### Error boundaries
 
-38. Wrap each module's root in a React error boundary so an uncaught render error shows a contained
-    fallback message instead of a blank surface inside the platform page. Put the boundary in the
-    entry point around `<App />`, keep the fallback simple (a design-system notification), and report
-    the error where the extension collects diagnostics. Share one boundary component across modules
-    rather than reimplementing it per entry point.
+36. Each module's root must be wrapped in a React error boundary so an uncaught render error shows a
+    contained fallback message instead of a blank surface inside the platform page. The boundary must
+    be placed in the entry point around `<App />`, the fallback should stay simple (a design-system
+    notification) and report the error where the extension collects diagnostics, and one boundary
+    component should be shared across modules rather than reimplemented per entry point.
 
 GOOD (entry point mounts the app inside a shared boundary)
 ```tsx
@@ -398,23 +372,24 @@ setup((element: Element) => {
 
 ### Plug declaration
 
-39. Declare every plug in the backend registration. For SDK-based extensions the Python `PlugRouter`
-    is the single source of truth for which plugs exist: organise registration per entity (one router
-    per entity — orders, subscriptions, agreements, and so on), keep no orphan bundle without a
-    registration and no registration without a bundle, and ensure each plug's `href` resolves to the
-    built module bundle, or the platform cannot load the iframe.
+37. Every plug must be declared in the backend registration. For SDK-based extensions the Python
+    `PlugRouter` is the single source of truth for which plugs exist: registration should be organised
+    per entity (one router per entity — orders, subscriptions, agreements, and so on); there must be no
+    orphan bundle without a registration and no registration without a bundle; and each plug's `href`
+    must resolve to the built module bundle, or the platform cannot load the iframe.
 
 ### iframe compatibility shims
 
-40. Extensions run in an isolated cross-origin iframe, so the design system's assumptions about a host
-    environment do not all hold. Bridge the gap with a small, shared set of shims and document them in
-    one place: global base typography and `box-sizing`, wizard step sizing that relies on inherited
+38. Extensions run in an isolated cross-origin iframe, so the design system's assumptions about a host
+    environment do not all hold. The gap must be bridged with a small, shared set of shims, documented
+    in one place: global base typography and `box-sizing`, wizard step sizing that relies on inherited
     line-height, modal layout (header/content/actions) for plugs rendered inside platform modals, and
-    the in-memory `localStorage`/`sessionStorage` fallback (rule 30). These are expected to move into
+    the in-memory `localStorage`/`sessionStorage` fallback (rule 28). These are expected to move into
     the UI SDK over time.
 
 ## Related Documents
 
+- [extensions-ui-testing-best-practices.md](./extensions-ui-testing-best-practices.md) — UI testing rules (Jest + Testing Library)
 - [extensions-best-practices.md](./extensions-best-practices.md)
 - [unittests.md](./unittests.md)
 - [packages-and-dependencies.md](./packages-and-dependencies.md)
