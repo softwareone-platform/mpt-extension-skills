@@ -18,6 +18,8 @@ MPT Marketplace platform shell are consistent, on-brand, type-safe, and maintain
   entry point. Each module is bundled into a separate output and mounted independently by the platform.
 - A `plug` is a module rendered inline within a platform page (for example the agreement view).
 - An `action` is a module opened as a modal from a plug (for example `request-commitment-action`).
+- A `socket` is a named mount point in the platform UI where a plug is rendered; a plug targets a
+  socket, while an action is opened by id.
 - The `SDK` refers to `@mpt-extension/sdk` (framework-agnostic: `setup`, `http`) and
   `@mpt-extension/sdk-react` (React bindings: `useMPTContext`, `useMPTModal`).
 - The `design system` refers to `@softwareone-platform/sdk-react-ui-v0` — the shared component
@@ -324,19 +326,23 @@ GOOD
 
 ### Routing
 
-35. When a module has more than one view, route with `MemoryRouter` — not `BrowserRouter`. The
-    module renders inside the platform's own page and does not own the browser URL, so navigation
-    must stay in memory. Drive active-link styling with `NavLink`, and end the route list with a
-    catch-all redirect to the default view.
+35. When a module has more than one view, route with `BrowserRouter`. The SDK synchronises the
+    module's route with the platform URL — the platform page path is suffixed with `/-/` followed by
+    the extension's internal path — so browser navigation and deep links work. Use `react-router` as
+    usual: declare routes and read `useParams`/`useNavigate`. When redirecting to a default view on
+    mount, pass `{ replace: true }` so you don't leave a dead history entry that traps the back
+    button; drive active-link styling with `NavLink`, and end the route list with a catch-all
+    redirect to the default view.
 
 GOOD
 ```tsx
-<MemoryRouter initialEntries={[DEFAULT_PATH]}>
+<BrowserRouter>
   <Routes>
-    <Route path="/3-year-commitment" element={<ThreeYearCommitment />} />
+    <Route path="/:tab" element={<View />} />
+    <Route path="/" element={<View />} />
     <Route path="*" element={<Navigate to={DEFAULT_PATH} replace />} />
   </Routes>
-</MemoryRouter>
+</BrowserRouter>
 ```
 
 ### Forms and validation
@@ -389,6 +395,26 @@ setup((element: Element) => {
   );
 });
 ```
+
+### Plug declaration
+
+39. Declare every plug in the backend registration. For SDK-based extensions the Python `PlugRouter`
+    is the single source of truth for which plugs exist: organise registration per entity (one router
+    per entity — orders, subscriptions, agreements, and so on), keep no orphan bundle without a
+    registration and no registration without a bundle, and ensure each plug's `href` resolves to the
+    built module bundle, or the platform cannot load the iframe.
+40. Cover many near-identical sockets by giving each socket its own thin module that mounts a shared
+    component with the socket passed as a prop — still one module per plug. Do not fan out a single
+    source into many bundles through build-time injection or a separate socket manifest.
+
+### iframe compatibility shims
+
+41. Extensions run in an isolated cross-origin iframe, so the design system's assumptions about a host
+    environment do not all hold. Bridge the gap with a small, shared set of shims and document them in
+    one place: global base typography and `box-sizing`, wizard step sizing that relies on inherited
+    line-height, modal layout (header/content/actions) for plugs rendered inside platform modals, and
+    the in-memory `localStorage`/`sessionStorage` fallback (rule 30). These are expected to move into
+    the UI SDK over time.
 
 ## Related Documents
 
