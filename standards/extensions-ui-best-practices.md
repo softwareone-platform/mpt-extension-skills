@@ -403,13 +403,10 @@ setup((element: Element) => {
     per entity — orders, subscriptions, agreements, and so on), keep no orphan bundle without a
     registration and no registration without a bundle, and ensure each plug's `href` resolves to the
     built module bundle, or the platform cannot load the iframe.
-40. Cover many near-identical sockets by giving each socket its own thin module that mounts a shared
-    component with the socket passed as a prop — still one module per plug. Do not fan out a single
-    source into many bundles through build-time injection or a separate socket manifest.
 
 ### iframe compatibility shims
 
-41. Extensions run in an isolated cross-origin iframe, so the design system's assumptions about a host
+40. Extensions run in an isolated cross-origin iframe, so the design system's assumptions about a host
     environment do not all hold. Bridge the gap with a small, shared set of shims and document them in
     one place: global base typography and `box-sizing`, wizard step sizing that relies on inherited
     line-height, modal layout (header/content/actions) for plugs rendered inside platform modals, and
