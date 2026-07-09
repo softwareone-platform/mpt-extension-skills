@@ -16,7 +16,7 @@ Describe the general conventions for Python code.
 1. Use type annotations (PEP 484), except in the `tests/` folder unless a repository explicitly requires them there.
 2. All public functions, methods, and classes must include [Google-style docstrings](https://google.github.io/styleguide/pyguide.html).
 3. Do not add explanatory comments for obvious code. Use comments only when they provide context that is hard to express in code or docstrings.
-4. `__init__.py` files must not include module-level docstrings. More generally, avoid redundant module-level docstrings: do not add one that only restates the module name or path — if a module seems to need a docstring to explain "what it contains", that usually signals a naming problem. This rule `#4` does not override rule `#2`: public functions, methods, and classes still require docstrings.
+4. `__init__.py` files must not include module-level docstrings. More generally, avoid redundant module-level docstrings: do not add one that only restates the module name or path — if a module seems to need a docstring to explain "what it contains", that usually signals a naming problem. This rule `#4` does not override rule `#2`: public functions, methods, and classes still require docstrings. For this rule to be enforceable, repositories that enable ruff's `D` (pydocstyle) rules must add `D100` (missing docstring in public module) and `D104` (missing docstring in public package) to the global `[tool.ruff.lint]` `ignore` list; otherwise the linter forces module-level docstrings everywhere and contradicts this standard.
 5. Function and variable names must be explicit and intention-revealing.
 6. `pyproject.toml` is the source of truth for code quality rules. Generated code must not violate any configured rules.
 7. `ruff` is the primary linter for general Python style and best practices.
@@ -61,7 +61,21 @@ GOOD
 result = compute(data)
 ```
 
-13. Inline suppressions (`# noqa`, `# noqa: <rule>`, `# type: ignore`, ruff per-file ignores) are a last resort. When a suppression is genuinely unavoidable, use it only for a specific rule, on the narrowest possible scope, place it on the same line as the code it suppresses, and add a short comment explaining why it is justified. Do not silence whole files or broad rule sets just to make checks pass.
+13. Write all code artifacts in English: identifiers, comments, docstrings, log messages, error messages, and test names. This applies regardless of the language of the conversation, prompt, or requirements that produced the code.
+
+BAD
+```python
+def _adobe_client(self: APIContext) -> AdobeClient:
+    """Construye (una vez) y cachea el cliente de Adobe en el contexto."""
+```
+
+GOOD
+```python
+def _adobe_client(self: APIContext) -> AdobeClient:
+    """Build the Adobe client once and cache it on the context."""
+```
+
+14. Inline suppressions (`# noqa`, `# noqa: <rule>`, `# type: ignore`, ruff per-file ignores) are a last resort. When a suppression is genuinely unavoidable, use it only for a specific rule, on the narrowest possible scope, place it on the same line as the code it suppresses, and add a short comment explaining why it is justified. Do not silence whole files or broad rule sets just to make checks pass.
 
 BAD
 ```python
