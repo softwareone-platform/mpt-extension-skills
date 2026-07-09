@@ -46,6 +46,8 @@ reviews:
         Follow the linting rules defined in `backend/pyproject.toml` under `[tool.ruff]` and `[tool.flake8]`.
         For formatting, use Ruff instead of Black. Do not suggest Black formatting changes.
         Review code against the linked repository's `standards/python-coding.md`.
+        Flag any code artifact not written in English: identifiers, comments, docstrings, log messages, error messages, or test names in any other language must be reported and translated to English.
+        Flag module-level docstrings in `__init__.py` files, and redundant module-level docstrings that only restate the module name or path.
         Verify modules are organized into cohesive packages instead of flat or grab-bag `utils`/`helpers` modules, and flag inline linter or type-checker ignores (`# noqa`, `# type: ignore`) that are not a narrow, justified last resort.
     - path: "docs/**"
       instructions: |
