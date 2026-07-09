@@ -1,6 +1,6 @@
 {
   "name": "mpt-extension-skills",
-  "version": "1.10.6",
+  "version": "1.11.0",
   "description": "SoftwareOne MPT extension SDLC skills: Jira work items, branching, commits, pull requests, review feedback, documentation, dependency policy, and release workflows.",
   "author": {
     "name": "SoftwareOne Platform",
