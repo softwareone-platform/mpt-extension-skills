@@ -39,6 +39,29 @@ Typical expectations:
 - `build` refreshes the local build environment when dependency lock files change
 - `check-all` runs the full validation set expected before merge
 
+## Stale Toolchain After Branch Or Dependency Changes
+
+A validation tool can fail on its own configuration instead of reporting a real
+finding when the local build environment is out of sync with the currently
+checked-out branch. Typical symptoms:
+
+- a linter or formatter fails to parse `pyproject.toml` or its own config
+- an "unknown rule", "unknown option", or "unrecognized selector" error
+  reported by the tool itself, not a finding tied to a specific file or line
+- the failure appears immediately after switching branches or otherwise
+  changing pinned tool versions, with no corresponding source-code change
+
+This usually means the tool version installed in the local build environment
+is stale relative to the versions pinned by the currently checked-out branch,
+for example different branches pinning different `ruff` versions. Treat it as
+an environment/setup failure, not a lint or test finding:
+
+1. Rebuild the local environment once with `make build` (or the repository's
+   documented rebuild target).
+2. Rerun the failing check.
+
+Do this before treating the failure as a real finding to fix.
+
 ## Pre-commit
 
 Before committing changes, make sure `pre-commit` is installed or updated locally.

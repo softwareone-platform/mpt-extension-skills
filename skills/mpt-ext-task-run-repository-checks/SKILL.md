@@ -40,6 +40,12 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 - Repository-required tooling and dependencies are installed or otherwise available before the check run starts.
 - Any credentials, tokens, or repository access needed by the documented validation flow are already available.
 
+## Shared References
+
+Use this shared document as the source of truth instead of restating its guidance. When shared guidance is needed, resolve it from `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current` when available; otherwise read the same path from the `main` branch of the shared GitHub repository.
+
+- `knowledge/build-and-checks.md`
+
 ## Workflow
 
 1. Build repository context first.
@@ -65,6 +71,7 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 
 5. Interpret failures clearly.
 - Separate environment or setup failures from real lint, test, or build failures.
+- Treat a validation tool failing on its own configuration (for example an "unknown rule" or "unrecognized selector" error instead of a finding tied to a specific file or line) as an environment/setup failure, not a real finding; see the stale-toolchain pattern in `knowledge/build-and-checks.md`.
 - Identify which command failed and which files or checks are implicated.
 - If checks modify files automatically, report that clearly so the next task can decide whether to keep and recommit the changes.
 

@@ -39,6 +39,12 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 - The failing validation output being handled matches the current repository state.
 - Repository-required tooling is installed or otherwise available before rerunning checks.
 
+## Shared References
+
+Use this shared document as the source of truth instead of restating its guidance. When shared guidance is needed, resolve it from `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current` when available; otherwise read the same path from the `main` branch of the shared GitHub repository.
+
+- `knowledge/build-and-checks.md`
+
 ## Workflow
 
 1. Build repository context first.
@@ -51,23 +57,29 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 - Identify the first actionable failing check, test, or build step.
 - Separate true repository failures from environment or setup problems.
 
-3. Fix one blocker at a time.
+3. Check for a stale-toolchain/config-parse failure first.
+- Before spending a fix iteration, check whether the failure matches the stale-toolchain/config-parse pattern in `knowledge/build-and-checks.md`: the validation tool fails on its own configuration or rejects an option/rule it does not recognize, rather than reporting a finding tied to a specific file, line, or test (for example a `ruff` "unknown rule selector" error right after switching to a branch that pins a different `ruff` version).
+- If the failure matches this pattern, rebuild the local environment once using the repository's documented rebuild target (for example `make build`), then rerun the failing check. This single rebuild-and-rerun attempt is not counted as one of the 5 fix iterations.
+- If the rebuild resolves the failure, treat that check as passing and continue with the remaining required validation instead of entering the fix loop for it.
+- If the failure does not match this pattern, or persists after the rebuild, proceed to the bounded fix loop starting at the next step.
+
+4. Fix one blocker at a time.
 - Apply the smallest change that addresses the current blocker.
 - Keep the fix scoped to the reported failure instead of opportunistically refactoring unrelated areas.
 - If the failing output is ambiguous, stop and inspect the implicated file or test before changing more code.
 
-4. Rerun the relevant validation.
+5. Rerun the relevant validation.
 - Rerun the narrowest safe command that confirms the fix for the current blocker.
 - When the repository workflow requires a broader rerun before the work is considered clean, run the broader check after the targeted rerun passes.
 
-5. Repeat until clean, blocked, or the iteration limit is reached.
-- One iteration = one scoped fix + one targeted re-run of the affected check. A final full-suite confirmation run after the loop is not an iteration.
+6. Repeat until clean, blocked, or the iteration limit is reached.
+- One iteration = one scoped fix + one targeted re-run of the affected check. A final full-suite confirmation run after the loop is not an iteration. The pre-loop rebuild-and-rerun attempt in Step 3 is not an iteration either.
 - Before each attempt, state the iteration explicitly: `Iteration N/5 — failing check: <command>`.
 - Continue through the next failing blocker only after the current one is resolved or explicitly understood.
 - Stop early, without consuming the remaining iterations, when there is no progress: the same check fails with the same error signature after a fix attempt, or a fix re-introduces a previously-passing check. Report it as a non-converging blocker.
 - Stop when all required validation passes, when the remaining failure needs user input, unavailable environment access, or a broader design decision, or after 5 fix iterations. Report the last failing command output as the blocker.
 
-6. Report the result clearly.
+7. Report the result clearly.
 - State which failures were fixed.
 - State which commands were rerun.
 - State what is still failing or blocked, if anything.
@@ -84,10 +96,11 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 - Never batch unrelated speculative fixes together when the validation output identifies a narrower blocker.
 - Never treat environment/setup failures as product-code failures.
 - Never run more than 5 validation-fix iterations before stopping with a blocker, and stop sooner when the loop stops converging.
+- Never spend a fix iteration on a config-parse/unknown-rule failure before attempting the single pre-loop rebuild described in Step 3.
+- Never rebuild more than once per failure before falling back to the bounded loop; a rebuild that does not resolve the failure is evidence of a real blocker, not a retry target.
 - Never let the caller re-loop this task; this task owns the bounded fix-and-rerun loop and returns a single classified outcome.
 - Never mix commit creation, PR creation, or Jira transitions into this task.
-- For repositories that follow this shared package validation guidance, read `knowledge/build-and-checks.md` using the shared-doc resolution rule from the repository context step as the shared reference for the validation loop.
 
 ## Expected Outcome
 
-Repository validation failures are addressed one by one with scoped fixes and targeted reruns until the required checks pass, the loop stops converging, a precise blocker remains, or the 5-iteration limit is reached, and the task returns a single classified outcome (`fixed`, `needs-user-input`, `environment-blocker`, `non-converging`, or `iteration-limit-reached`) for the caller to act on.
+A stale-toolchain/config-parse failure is caught and resolved with a single pre-loop rebuild-and-rerun before any fix iteration is spent on it. Remaining repository validation failures are addressed one by one with scoped fixes and targeted reruns until the required checks pass, the loop stops converging, a precise blocker remains, or the 5-iteration limit is reached, and the task returns a single classified outcome (`fixed`, `needs-user-input`, `environment-blocker`, `non-converging`, or `iteration-limit-reached`) for the caller to act on.
