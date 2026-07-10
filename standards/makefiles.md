@@ -15,6 +15,13 @@ Describe the shared `Makefile` approach, its usage, and its structure.
 
 Common development workflows are wrapped in the `Makefile`. Run `make help` to see the list of available commands.
 
+Target names that are not self-explanatory in this repository family:
+
+- `make check-all`: the full local validation flow expected before merge
+- `make bash`: open a shell in the application container
+- `make shell`: open an application-specific shell, for example a Django shell
+- `make review`: run repository-supported review tooling, if available
+
 ## How the Makefile Works
 
 The project uses a modular `Makefile` structure that organizes commands into logical groups:

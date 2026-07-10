@@ -59,8 +59,6 @@ The `knowledge/` directory contains reusable operational guidance and common how
 Use `knowledge/` when the task involves:
 
 - building and validating a repository
-- understanding common `make` targets
-- managing dependencies through shared `uv` workflows
 - running checks and tests
 - preparing a repository for commit-time validation such as `pre-commit`
 - working with migrations
@@ -85,8 +83,6 @@ Treat `knowledge/` as reusable guidance. Repository-specific commands and except
 
 ## Current Knowledge
 
-- [make-targets.md](./knowledge/make-targets.md): shared reference for common `make` target meanings
-- [manage-dependencies.md](./knowledge/manage-dependencies.md): shared dependency-management workflow for repositories that use `uv`
 - [build-and-checks.md](./knowledge/build-and-checks.md): shared build and validation workflow guidance
 - [migrations.md](./knowledge/migrations.md): shared migration workflow guidance
 - [backports.md](./knowledge/backports.md): shared backport workflow guidance

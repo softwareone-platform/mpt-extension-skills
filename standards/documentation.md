@@ -11,13 +11,6 @@ Applies to:
 ## Purpose
 Define a shared documentation structure and authoring rules that make repository context clear, discoverable, and scalable for both humans and AI agents.
 
-## Definitions
-
-- `Source documentation` is the repository documentation that describes how the repository works, for example `README.md` and files in `docs/`.
-- `AI entry point` is the document that tells AI agents how to navigate the repository documentation, normally `AGENTS.md`.
-- `Tool-specific adapter` is a thin file required by a specific tool, for example `.github/copilot-instructions.md`, that points to the main repository documentation instead of duplicating it.
-- `Shared standard` is a document from the shared `standards/` directory that defines practices reused across multiple repositories.
-
 ## General Rules
 
 1. Every repository must expose a predictable documentation structure.
@@ -35,37 +28,9 @@ Define a shared documentation structure and authoring rules that make repository
 8. `docs/testing.md` must describe the repository-specific testing strategy, test commands, and any special testing constraints or exceptions.
 9. Repository documentation must not duplicate shared engineering rules that already exist in shared standards. Repository documents should link to shared standards and document only repository-specific behavior, exceptions, or additional context.
 10. Tool-specific adapter files such as `.github/copilot-instructions.md` should remain thin. They should point to `AGENTS.md` or the relevant repository documentation instead of repeating repository policy.
-11. Each document should focus on a single topic. Do not mix architecture, setup, testing strategy, and shared policy in one large file unless there is a strong repository-specific reason.
-12. Use predictable file names so humans and AI agents can discover information without guessing.
-13. Write documentation in explicit and testable language. Prefer `must`, `should`, and `may` over vague wording.
-14. Keep examples short, valid, and directly relevant to the rule or workflow they explain.
-15. Make the distinction between shared rules and repository-specific rules explicit in every document that references both.
+11. Make the distinction between shared rules and repository-specific rules explicit in every document that references both.
 
-## Recommended Structure
-
-Baseline repository documentation structure:
-
-```text
-README.md
-AGENTS.md
-docs/
-  architecture.md
-  contributing.md
-  testing.md
-```
-
-Recommended conditional documents:
-
-```text
-docs/
-  local-development.md
-  deployment.md
-  external-integrations.md
-  e2e.md
-  migrations.md
-```
-
-Recommended document responsibilities:
+## Recommended Document Responsibilities
 
 - `README.md`: repository overview, quick start, and links to detailed documentation
 - `AGENTS.md`: agent-oriented navigation order and repository reading guidance
@@ -78,12 +43,3 @@ Recommended document responsibilities:
 - `docs/e2e.md`: end-to-end test setup, execution, and environment requirements
 - `docs/migrations.md`: migration workflow, tooling, and operational guidance
 - `docs/documentation.md`: repository documentation guideline, rules
-
-## Authoring Guidance
-
-- Prefer modular documentation over one large document.
-- Keep `README.md` short and use it to route readers to more specific documents.
-- Keep `AGENTS.md` operational and navigational, not explanatory.
-- When a shared standard exists, link to it instead of copying it.
-- When repository-specific behavior differs from a shared standard, document the exception explicitly.
-- Write documents so a new developer or an AI agent can discover the right next file without additional context.

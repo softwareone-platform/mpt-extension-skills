@@ -17,8 +17,8 @@ pointer to the same skills and standards that the Claude and Codex plugins load.
 - `standards/` — normative engineering rules (commit messages, pull requests,
   Python coding, testing, documentation, dependencies). Follow these; do not
   restate or contradict them.
-- `knowledge/` — reusable how-to guidance (build and checks, make targets,
-  dependency management, migrations, backports).
+- `knowledge/` — reusable how-to guidance (build and checks, migrations,
+  backports).
 
 When a consuming repository does not vendor these directories, read them from the
 installed skills root (`~/.mpt-extension-skills/current`) or from the `main`

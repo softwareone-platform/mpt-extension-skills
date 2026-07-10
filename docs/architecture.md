@@ -39,7 +39,7 @@ Makefile                entry point that includes make/*.mk
   dependencies, extension best practices, skills). Repositories link to these
   rather than copying them.
 - **`knowledge/`** — reusable how-to and operational guidance (build and checks,
-  make targets, dependency management, migrations, backports). Non-normative:
+  migrations, backports). Non-normative:
   the target repository's own commands take precedence when they differ.
 - **`docs/`** — documentation about *this* repository (installation, usage,
   contributing, testing, the documentation rules, and this architecture). It
@@ -50,7 +50,7 @@ Makefile                entry point that includes make/*.mk
 - **`make/`** — repository targets (`check`, `test`, `token-budget`,
   `token-budget-check`, `check-all`, install/update). See
   [docs/contributing.md](contributing.md) and the shared
-  [knowledge/make-targets.md](../knowledge/make-targets.md).
+  [standards/makefiles.md](../standards/makefiles.md).
 - **`coderabbit-shared.yaml`** — the shared CodeRabbit review configuration that
   consuming repositories inherit, including the cross-repo review path
   instructions and pre-merge checks.

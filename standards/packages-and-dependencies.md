@@ -56,3 +56,12 @@ dependencies = [
   "mpt-extension-sdk>=6.3,<7",
 ]
 ```
+
+6. When a repository exposes the `uv` wrapper targets below, prefer them over direct `uv` commands so dependency changes go through the repository workflow. Some repositories run `uv` inside Docker through these targets, so calling `uv` directly can bypass the required environment. Deviate only when the repository documentation requires a different command.
+
+```bash
+make uv-add pkg=<package>      # add a runtime dependency
+make uv-add-dev pkg=<package>  # add a development dependency
+make uv-upgrade                # upgrade all dependencies and refresh uv.lock
+make uv-upgrade pkg=<package>  # upgrade one dependency and refresh uv.lock
+```

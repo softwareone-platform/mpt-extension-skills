@@ -28,19 +28,3 @@ docs: add property
 Update the shared documentation for the new property naming rule and
 link the related standards.
 ```
-
-GOOD (breaking change)
-
-```text
-feat(api)!: drop deprecated v1 endpoints
-
-Remove the v1 routes that were marked deprecated in the previous
-release. Clients must migrate to v2.
-
-BREAKING CHANGE: v1 endpoints are no longer served.
-```
-
-## Related Documents
-
-- [pull-requests.md](./pull-requests.md)
-- [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/)

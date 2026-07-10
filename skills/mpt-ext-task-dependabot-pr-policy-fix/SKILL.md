@@ -38,7 +38,6 @@ Apply SoftwareOne dependency policy fixes to one already selected Dependabot PR 
 Use these shared documents as the source of truth instead of restating their policy. When shared guidance is needed, resolve it from `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current` when available; otherwise read the same path from the `main` branch of the shared GitHub repository.
 
 - `standards/packages-and-dependencies.md`
-- `knowledge/manage-dependencies.md`
 - `knowledge/build-and-checks.md`
 - `standards/pull-requests.md`
 
