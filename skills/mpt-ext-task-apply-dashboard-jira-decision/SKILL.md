@@ -35,21 +35,19 @@ Apply one user-approved dashboard failure decision to Jira with the standard das
 - Approved decision:
   - `new`
   - `update <issue-key>`
-  - `reopen <issue-key>`
-  - `merge <issue-key>`
+  - `reopen <issue-key>` — include whether HitCount accumulation was approved (default: reset to `failures_count`)
+  - `merge <issue-key>` — include the target issue's approved action (`new`, `update`, or `reopen`) that determines its HitCount rule
   - `skip <reason>`
 - Jira project key, defaulting to `MPT`.
 - Component selected by the workflow or user.
-- Dashboard policy fields:
-  - `fixVersions`: `v6` and `hotfix`
-  - `Environment`: `prod`
-  - `Keywords`: include `dashboard`
-  - `HitCount`: finding `failures_count`
+- Dashboard policy fields: defined in `knowledge/dashboard-triage.md` (required Jira fields, HitCount rules, and evidence format).
 
 ## Shared References
 
-The path below is relative to the installed package root `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current`. If that root is unavailable while editing this source repository, use the same path under the repository root.
+The paths below are relative to the installed package root `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current`. If that root is unavailable while editing this source repository, use the same paths under the repository root.
 
+- `standards/skills.md`
+- `knowledge/dashboard-triage.md`
 - `skills/mpt-ext-tool-jira-workitem-ops/SKILL.md`
 
 ## Bundled Resources
@@ -78,18 +76,11 @@ The path below is relative to the installed package root `${MPT_EXTENSION_SKILLS
 - Capture status, components, fixVersions, Environment, Keywords, and current HitCount.
 - If the target is assigned to someone else, follow the assignee safety rule from `mpt-ext-tool-jira-workitem-ops`.
 
-4. Apply the decision.
-- For `new`, create an `MPT` Bug with:
-  - generated summary
-  - component
-  - fixVersions `v6` and `hotfix`
-  - Environment `prod`
-  - Keywords including `dashboard`
-  - HitCount set to `failures_count`
-  - dashboard evidence as description
-- For `update`, add dashboard evidence as a comment and increment current HitCount by `failures_count`.
-- For `reopen`, add dashboard evidence as a comment, set HitCount to `failures_count` unless the user explicitly approved accumulation, ensure dashboard policy fields are present, and transition through an explicit available reopen transition.
-- For `merge`, add dashboard evidence as a comment to the target issue and update HitCount according to the target issue's approved action semantics.
+4. Apply the decision. Apply the dashboard policy fields and HitCount rules from `knowledge/dashboard-triage.md`.
+- For `new`, create an `MPT` Bug with the generated summary, the resolved component, the dashboard policy fields, and the dashboard evidence as the description.
+- For `update`, add dashboard evidence as a comment and update HitCount per the update rule.
+- For `reopen`, add dashboard evidence as a comment, apply the HitCount reopen rule, ensure the dashboard policy fields are present, and transition through an explicit available reopen transition.
+- For `merge`, add dashboard evidence as a comment to the target issue and update HitCount per the merge rule.
 
 5. Verify the write.
 - Read the issue after create, update, reopen, or merge.
