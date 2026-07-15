@@ -13,7 +13,7 @@ Operate Jira work items primarily through an MCP Jira integration, falling back 
 
 - An MCP Jira integration is the primary interface. Use it for all Jira operations whenever it is available.
 - `acli jira` is the fallback interface, assumed present as the baseline. Use it only when no MCP Jira integration is available.
-- Prefer MCP especially for writes that set custom fields: the fallback `acli` cannot set custom fields such as Sprint (`customfield_10020`), Team (`customfield_10001`), Keywords (`customfield_10287`), or `HitCount`. When such a field is required and only `acli` is available, do not perform the write: stop before execution and report the blocker. Proceed with a partial write only after explicit user approval, and then verify every omitted field afterward.
+- Prefer MCP especially for writes that set custom fields: the fallback `acli` cannot set custom fields such as Sprint, Team, Keywords, or HitCount (see `standards/jira-fields.md` for their IDs). When such a field is required and only `acli` is available, do not perform the write: stop before execution and report the blocker. Proceed with a partial write only after explicit user approval, and then verify every omitted field afterward.
 - The rules in this skill are interface-independent: read before write, inherit parent context, apply assignee safety, set required fields, and add AI attribution regardless of interface.
 - The `acli` commands in this skill are the fallback reference. When using MCP, map each to the equivalent MCP call and the same field names (for example `components`, `fixVersions`, parent, and the Sprint field).
 
@@ -62,9 +62,9 @@ Operate Jira work items primarily through an MCP Jira integration, falling back 
 5. Inherit parent context when creating a child issue.
 - When the create payload includes a parent key with a non-null, non-empty value, fetch the parent issue first:
   - `acli jira workitem view <PARENT-KEY> --fields '*all' --json`
-- Propagate the following parent values into the new issue by default, unless the caller has explicitly overridden them:
-  - Team (`customfield_10001`)
-  - Keywords (`customfield_10287`)
+- Propagate the following parent values into the new issue by default, unless the caller has explicitly overridden them (resolve custom-field IDs from `standards/jira-fields.md`):
+  - Team
+  - Keywords
   - `components`
   - `fixVersions`
 - Treat a field as caller-provided only when its key is present in the create payload with a non-null, non-empty value.
@@ -167,6 +167,7 @@ Do not hand-write ADF snippets in the skill workflow. Use the script so the attr
 - Preserve requested components and fixVersions unless the user asks to change them.
 - Prefer `--json` output for parseable responses whenever available.
 - When a command fails, show the exact error and request user direction.
+- For repositories that follow this package standard, read `standards/jira-fields.md` using the shared-doc resolution rule from the repository context step, and use it as the source of truth for Jira custom-field IDs instead of hardcoding them.
 
 ## Expected Outcome
 
