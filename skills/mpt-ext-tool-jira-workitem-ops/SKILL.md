@@ -7,14 +7,15 @@ description: Read, create, edit, comment, assign, search, link, and transition J
 
 ## Purpose
 
-Operate Jira work items with `acli jira`, or with an available MCP Jira integration, safely and consistently.
+Operate Jira work items primarily through an MCP Jira integration, falling back to `acli jira` when MCP is unavailable, safely and consistently.
 
 ## Interface Selection
 
-- `acli jira` is the baseline interface and is always assumed available.
-- `acli jira` is the primary interface. When an MCP Jira integration is available, use it as an equivalent fallback for the same operations — not as a mere convenience choice; the `acli` behavior remains the reference contract.
+- An MCP Jira integration is the primary interface. Use it for all Jira operations whenever it is available.
+- `acli jira` is the fallback interface, assumed present as the baseline. Use it only when no MCP Jira integration is available.
+- Prefer MCP especially for writes that set custom fields: the fallback `acli` cannot set custom fields such as Sprint (`customfield_10020`), Team (`customfield_10001`), Keywords (`customfield_10287`), or `HitCount`. When such a field is required and only `acli` is available, do not perform the write: stop before execution and report the blocker. Proceed with a partial write only after explicit user approval, and then verify every omitted field afterward.
 - The rules in this skill are interface-independent: read before write, inherit parent context, apply assignee safety, set required fields, and add AI attribution regardless of interface.
-- The `acli` commands in this skill are the reference. When using MCP, map each to the equivalent MCP call and the same field names (for example `components`, `fixVersions`, parent, and the Sprint field). Some MCP edit calls accept custom fields that `acli` edit does not; use whichever interface can set the field you need.
+- The `acli` commands in this skill are the fallback reference. When using MCP, map each to the equivalent MCP call and the same field names (for example `components`, `fixVersions`, parent, and the Sprint field).
 
 ## Use When
 
@@ -34,7 +35,7 @@ Operate Jira work items with `acli jira`, or with an available MCP Jira integrat
 - Jira issue key for issue-specific operations such as read, edit, assign, comment, link, or transition.
 - Project key and issue type for issue creation.
 - Required field values for the target Jira project, such as summary, components, fixVersions, parent, or description.
-- Authenticated Jira user context through `acli jira auth status`.
+- Authenticated Jira user context: an authenticated MCP session verified by a non-mutating identity call, or `acli jira auth status` when using the fallback.
 - The target workflow transition or destination status when the task requires moving an issue through the Jira workflow.
 
 ## Workflow
@@ -45,7 +46,8 @@ Operate Jira work items with `acli jira`, or with an available MCP Jira integrat
 - Read shared docs only when the repository explicitly points to them. Resolve those shared docs from `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current` when available; otherwise read them from the `main` branch of the shared GitHub repository.
 
 2. Verify auth and target context.
-- Run `acli jira auth status` before write operations (or handle auth errors from the first command).
+- Prefer the MCP Jira integration. Before any write operation, establish an authenticated MCP context with a non-mutating identity call (for example the current-user lookup, `atlassianUserInfo`) and confirm it succeeds; do not write through MCP until the active Jira identity is verified.
+- If no MCP integration is available, fall back to `acli jira` and run `acli jira auth status` before write operations (or handle auth errors from the first command).
 - Confirm the intended Jira site and project key from the user request.
 
 3. Collect required inputs.
@@ -96,6 +98,8 @@ Operate Jira work items with `acli jira`, or with an available MCP Jira integrat
 - Report the exact CLI error and ask the user for direction.
 
 ## Command Patterns
+
+These `acli` commands are the fallback reference. When the MCP Jira integration is available, use the equivalent MCP call instead.
 
 ```bash
 # Read one issue
