@@ -11,6 +11,8 @@ This repository currently validates:
 - shell script quality with `shellcheck`
 - shell script behavior with repository integration tests
 - skill token budget: the always-on and per-invocation fields of each skill (`SKILL.md` `description`/body and `agents/openai.yaml` `short_description`/`default_prompt`) stay within the limits in [standards/skills.md](../standards/skills.md)
+- skill-script behavior with `pytest` and a 95% branch-coverage gate (see Skill Script Tests below)
+- internal Markdown links: every relative link across the repository's `*.md` files resolves to an existing file (checked with `lychee` in offline mode)
 
 ## Install Shellcheck
 
@@ -57,6 +59,7 @@ make test
 make test-scripts
 make token-budget
 make token-budget-check
+make check-links
 make check-all
 make install-skills
 make update-skills
@@ -70,7 +73,8 @@ Current commands:
 - `make test-scripts`: runs the skill-script `pytest` suite with branch coverage inside Docker via `docker compose run --rm tests` (needs Docker; no host Python packages required)
 - `make token-budget`: reports the token footprint of every skill across both runtimes (Claude `SKILL.md` `description`/body and Codex `agents/openai.yaml` `short_description`/`default_prompt`)
 - `make token-budget-check`: fails if any gated field exceeds its budget (`description`, `short_description`, or `default_prompt`)
-- `make check-all`: runs validation, tests, and the skill token-budget check
+- `make check-links`: fails if any internal (relative) Markdown link across the repository points at a missing file. Runs `lychee` in offline mode (local links only, no network) via `docker compose run --rm links`; configured in `lychee.toml`
+- `make check-all`: runs validation, tests, the skill token-budget check, and the Markdown link check
 - `make install-skills`: installs skills from the local repository checkout
 - `make update-skills`: upgrades installed skills from GitHub Releases
 - `make review`: runs the local CodeRabbit review command
@@ -150,7 +154,7 @@ GitHub Actions runs the shell validation workflow on:
 The workflow runs:
 
 - `shellcheck 0.11.0` (pinned action) over `./scripts`
-- `make check-all`, which runs `shellcheck` for `scripts/mpt-extensions-skills.sh` and `scripts/mpt-extensions-skills-install.sh`, `bash tests/test_mpt_skills.sh`, `make test-scripts` (pytest with a 95% branch-coverage gate, run in Docker via `docker compose`), and `make token-budget-check`.
+- `make check-all`, which runs `shellcheck` for `scripts/mpt-extensions-skills.sh` and `scripts/mpt-extensions-skills-install.sh`, `bash tests/test_mpt_skills.sh`, `make test-scripts` (pytest with a 95% branch-coverage gate, run in Docker via `docker compose`), `make token-budget-check`, and `make check-links` (internal Markdown link check).
 
 So the skill token-budget gate runs in CI as part of `make check-all`.
 
