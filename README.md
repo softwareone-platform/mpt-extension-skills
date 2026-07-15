@@ -158,6 +158,7 @@ Current documents in `knowledge/`:
 - [build-and-checks.md](./knowledge/build-and-checks.md): shared guidance for building repositories and validating that checks and tests pass
 - [migrations.md](./knowledge/migrations.md): shared workflow for running, checking, and creating migrations
 - [backports.md](./knowledge/backports.md): shared workflow for backporting changes to the active release branch
+- [dashboard-triage.md](./knowledge/dashboard-triage.md): single source of truth for the dashboard bug policy — Jira fields, HitCount rules, and evidence format
 
 Repository docs in `docs/`:
 

@@ -91,6 +91,7 @@ Treat `knowledge/` as reusable guidance. Repository-specific commands and except
 - [build-and-checks.md](./knowledge/build-and-checks.md): shared build and validation workflow guidance
 - [migrations.md](./knowledge/migrations.md): shared migration workflow guidance
 - [backports.md](./knowledge/backports.md): shared backport workflow guidance
+- [dashboard-triage.md](./knowledge/dashboard-triage.md): dashboard bug policy — Jira fields, HitCount rules, and evidence format
 
 ## Repository Docs
 
