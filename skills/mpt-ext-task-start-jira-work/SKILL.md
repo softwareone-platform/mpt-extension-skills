@@ -64,9 +64,9 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 - Preserve already-correct status values rather than rewriting them unnecessarily.
 
 5. Resolve active sprint and sprint target.
-- Check whether the Jira issue already belongs to an active sprint in `customfield_10020`.
+- Check whether the Jira issue already belongs to an active sprint in the Sprint field (resolve its ID from `standards/jira-fields.md`).
 - If it already has an active sprint, preserve sprint placement and report it as already correct.
-- If the issue has only closed or future sprint entries, derive the board id from `customfield_10020[].boardId`.
+- If the issue has only closed or future sprint entries, derive the board id from the Sprint field's `boardId` entries.
 - If the target issue is a subtask and does not expose useful sprint history, read the direct parent and derive the board id from the parent sprint history.
 - If no board id can be determined from the issue or the relevant parent, ask the user for the correct board id before changing sprint placement.
 - Resolve the active sprint for the board with:
