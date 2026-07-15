@@ -54,6 +54,7 @@ This repository exposes the main validation commands through `make`:
 ```bash
 make check
 make test
+make test-scripts
 make token-budget
 make token-budget-check
 make check-all
@@ -66,6 +67,7 @@ Current commands:
 
 - `make check`: runs `shellcheck` for the CLI and release installer scripts
 - `make test`: runs the shell integration tests
+- `make test-scripts`: runs the skill-script `pytest` suite with branch coverage inside Docker via `docker compose run --rm tests` (needs Docker; no host Python packages required)
 - `make token-budget`: reports the token footprint of every skill across both runtimes (Claude `SKILL.md` `description`/body and Codex `agents/openai.yaml` `short_description`/`default_prompt`)
 - `make token-budget-check`: fails if any gated field exceeds its budget (`description`, `short_description`, or `default_prompt`)
 - `make check-all`: runs validation, tests, and the skill token-budget check
@@ -74,6 +76,15 @@ Current commands:
 - `make review`: runs the local CodeRabbit review command
 
 Use `make help` to see the available commands.
+
+## Skill Script Tests
+
+Skill scripts under `skills/*/scripts/*.py` are covered by `pytest` tests in `tests/scripts/`, run with `make test-scripts` and as part of `make check-all` (so they gate PRs and merges to `main`).
+
+- Test dependencies (`pytest`, `pytest-cov`) are managed with `uv` in the `dev` dependency group of `pyproject.toml` and locked in `uv.lock`. Add or change them with `uv add --dev <pkg>` / `uv lock`.
+- Run them with `make test-scripts`, which builds the `tests` service from the repository `Dockerfile` (Python 3.12; `uv sync --frozen --only-group dev` installs the locked dev group) and runs `pytest` in the container via `docker compose`. No host Python packages are needed; the repository is mounted so coverage runs against the current source. To run without Docker instead, use `uv run --group dev pytest`.
+- Tests import each script in-process and exercise its `main()` and pure functions, so `pytest-cov` measures real line and branch coverage. Shared helpers (module loader, in-process `main()` runner) live in `tests/scripts/helpers.py`.
+- Coverage is configured in `pyproject.toml`: pytest enables it via `[tool.pytest.ini_options] addopts = "--cov --cov-report=term-missing"`; `[tool.coverage.run]` sets `branch = true` and `source = ["skills"]`; `[tool.coverage.report]` restricts it with `include = ["skills/*/scripts/*.py"]` and enforces `fail_under = 95`. Because the coverage source is the scripts directory, a script with no test counts as uncovered and drags the total below the threshold — so adding a new skill script requires adding its tests. This branch-coverage gate replaces the need for a separate coverage-guard module.
 
 ## Local CodeRabbit Review
 
@@ -139,7 +150,7 @@ GitHub Actions runs the shell validation workflow on:
 The workflow runs:
 
 - `shellcheck 0.11.0` (pinned action) over `./scripts`
-- `make check-all`, which runs `shellcheck` for `scripts/mpt-extensions-skills.sh` and `scripts/mpt-extensions-skills-install.sh`, `bash tests/test_mpt_skills.sh`, and `make token-budget-check`
+- `make check-all`, which runs `shellcheck` for `scripts/mpt-extensions-skills.sh` and `scripts/mpt-extensions-skills-install.sh`, `bash tests/test_mpt_skills.sh`, `make test-scripts` (pytest with a 95% branch-coverage gate, run in Docker via `docker compose`), and `make token-budget-check`.
 
 So the skill token-budget gate runs in CI as part of `make check-all`.
 
