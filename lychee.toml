@@ -1,0 +1,18 @@
+# lychee configuration for the internal Markdown link check.
+# Scope: local (relative) links only — network checks are disabled so external
+# URLs never make the gate flaky.
+offline = true
+no_progress = true
+
+# Directories that never contain repository docs we author.
+# NOTE: exclude_path entries are regexes, so dots are escaped and each name is
+# anchored to a full path segment to avoid matching unrelated paths (e.g. a bare
+# ".git" would otherwise match "legit/" and skip real docs).
+exclude_path = [
+    '(^|/)\.git(/|$)',
+    '(^|/)\.venv(/|$)',
+    '(^|/)venv(/|$)',
+    '(^|/)node_modules(/|$)',
+    '(^|/)__pycache__(/|$)',
+    '(^|/)\.pytest_cache(/|$)',
+]

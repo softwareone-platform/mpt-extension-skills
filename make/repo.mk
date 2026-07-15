@@ -19,7 +19,10 @@ token-budget:  ## Report the token footprint of skill descriptions and bodies. P
 token-budget-check:  ## Fail if any skill description exceeds the token budget
 	python3 scripts/skill_token_budget.py --check
 
-check-all: check test test-scripts token-budget-check  ## Run all validation and tests
+check-links:  ## Fail if any internal (relative) Markdown link is broken (lychee via docker compose)
+	docker compose run --rm links
+
+check-all: check test test-scripts token-budget-check check-links  ## Run all validation and tests
 
 install-skills:  ## Install skills from this local checkout. Pass runtime="--codex|--claude|--all" to target a runtime
 	./scripts/mpt-extensions-skills.sh install --path "$(CURDIR)" $(runtime)

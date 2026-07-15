@@ -6,3 +6,10 @@ services:
     working_dir: /work
     volumes:
       - .:/work
+
+  links:
+    image: lycheeverse/lychee:0.24.2
+    working_dir: /work
+    volumes:
+      - .:/work
+    command: ["**/*.md"]
