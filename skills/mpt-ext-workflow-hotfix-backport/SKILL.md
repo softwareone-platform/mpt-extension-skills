@@ -1,6 +1,6 @@
 ---
 name: mpt-ext-workflow-hotfix-backport
-description: Carry a main PR change to the active release branch as a hotfix or backport: find the source PR, cherry-pick its commits, validate, open the release PR, and keep Jira accurate.
+description: Use when a hotfix or backport must carry an existing main PR onto the active release branch and produce a validated release PR. Orchestrates the cherry-pick, validation, release PR, and Jira updates.
 ---
 
 # Hotfix And Backport

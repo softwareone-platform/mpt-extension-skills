@@ -1,4 +1,4 @@
 interface:
   display_name: "Update Docs From Changes"
-  short_description: "Update repository docs from a code change set"
+  short_description: "Update only docs for a code change set"
   default_prompt: "Update repository documentation from a change set: build repository context, pick the change source (unstaged, uncommitted, last commit, or branch diff), run the bundled collect_changes.py to map changed paths to affected docs, then edit only the affected docs/README/AGENTS per standards/documentation.md. Do not commit or open a PR."

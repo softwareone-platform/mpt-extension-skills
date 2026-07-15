@@ -1,6 +1,6 @@
 ---
 name: mpt-ext-workflow-start-work
-description: Start work on a Jira issue for a feature, bugfix, hotfix, or backport: create the correctly named branch from Jira context and move the issue into active development.
+description: Run the full start-of-work flow for a Jira issue, leaving a work branch created and the issue in active development. Orchestrates the branch and Jira-start tasks; use for feature, bugfix, hotfix, or backport.
 ---
 
 # Start Work

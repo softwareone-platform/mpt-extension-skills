@@ -1,6 +1,6 @@
 ---
 name: mpt-ext-tool-git-branch-ops
-description: Create and switch Git branches for feature, bugfix, hotfix, or backport work. Selects and updates the base branch, detects dirty worktrees or conflicts, and creates the branch safely.
+description: Low-level Git branch primitive for an already-decided branch name: create or switch the branch safely on the correct base. Used by branch tasks, not for deriving names from Jira.
 ---
 
 # Git Branch Ops

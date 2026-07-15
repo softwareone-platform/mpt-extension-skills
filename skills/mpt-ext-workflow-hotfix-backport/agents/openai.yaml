@@ -1,4 +1,4 @@
 interface:
   display_name: "Hotfix And Backport"
-  short_description: "Prepare release-branch hotfix and backport PRs"
+  short_description: "Orchestrate hotfix/backport release PRs from main"
   default_prompt: "Prepare a hotfix or backport release-branch PR: find the source main PR from Jira, classify Bug as hotfix and other types as backport, confirm the matching Jira fixVersion, cherry-pick its commits onto the active release branch without merging main, validate, open the release PR, and update Jira."

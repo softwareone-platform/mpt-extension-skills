@@ -1,6 +1,6 @@
 ---
 name: mpt-ext-task-handle-pr-comments
-description: Handle unresolved pull request review comments. Decides whether each comment needs a fix or an answer, applies changes when needed, and posts an explicit follow-up reply in the thread.
+description: Only triage and respond to unresolved PR review comments: decide fix versus answer per comment, apply scoped changes, and reply in the thread. Does not create the PR, commit, or push the branch.
 ---
 
 # Handle PR Comments
