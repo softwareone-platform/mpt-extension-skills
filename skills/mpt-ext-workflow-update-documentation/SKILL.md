@@ -1,6 +1,6 @@
 ---
 name: mpt-ext-workflow-update-documentation
-description: Bring documentation up to date for a change set end to end: update affected docs, self-check against the guideline, and stage them. Use before committing or sending a change to review.
+description: Run the full documentation-update flow before committing or sending to review, leaving affected docs updated, self-checked, and staged. Orchestrates the documentation task end to end.
 ---
 
 # Update Documentation Workflow

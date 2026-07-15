@@ -1,6 +1,6 @@
 ---
 name: mpt-ext-task-start-jira-work
-description: Start Jira work on an issue when beginning a feature, bugfix, hotfix, or backport. Moves the issue and its parent chain to In Progress, ensures active-sprint placement, and checks reassignment.
+description: Only move Jira state when starting work: transition the issue and its parent chain to In Progress, ensure active-sprint placement, and check reassignment. Does not create a branch.
 ---
 
 # Start Jira Work

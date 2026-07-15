@@ -1,6 +1,6 @@
 ---
 name: mpt-ext-task-open-pull-request
-description: Open or update a repository-compliant pull request to publish committed work. Builds title and body from repo rules, and updates the existing PR instead of creating a duplicate.
+description: Only open or update a repository-compliant pull request to publish committed work, reusing the existing PR instead of duplicating. Does not update docs, run checks, or transition Jira.
 ---
 
 # Open Pull Request

@@ -1,6 +1,6 @@
 ---
 name: mpt-ext-task-create-work-branch
-description: Create a work branch from Jira issue context when starting a feature, bugfix, hotfix, or backport. Derives the branch name from the issue and applies the repo naming pattern.
+description: Only create the work branch when starting work: derive the branch name from the Jira issue and apply the repo naming pattern. Does not change Jira state.
 ---
 
 # Create Work Branch

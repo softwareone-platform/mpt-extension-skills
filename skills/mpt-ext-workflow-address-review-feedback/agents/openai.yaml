@@ -1,4 +1,4 @@
 interface:
   display_name: "Address Review Feedback"
-  short_description: "Process review comments and update the branch"
+  short_description: "Run the full re-review iteration on a PR"
   default_prompt: "Address review feedback on the current pull request: triage the unresolved comments first, apply the selected fixes or replies, rerun repository validation, update the commit, and push the branch back for another review pass."

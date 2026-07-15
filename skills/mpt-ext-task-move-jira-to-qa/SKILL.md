@@ -1,6 +1,6 @@
 ---
 name: mpt-ext-task-move-jira-to-qa
-description: Move a Jira issue to its correct post-merge status after the reviewed PR is merged. Resolves the target status from issue and repo context, and stops with a blocker if not post-merge.
+description: Only transition one issue's Jira status to its correct post-merge state (QA or Done) after merge. Resolves the target from issue and repo context; usually called by the complete-after-merge workflow.
 ---
 
 # Move Jira After Merge
