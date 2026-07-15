@@ -52,6 +52,10 @@ The paths below are relative to the installed package root `${MPT_EXTENSION_SKIL
 
 ## Bundled Resources
 
+- `scripts/plan_dashboard_decision.py`
+  - Validates the approved decision and deterministically computes the HitCount and policy fields, encoding the rules from `knowledge/dashboard-triage.md`.
+  - Input: `--decision`, `--target-key`, `--component`, `--failures-count`, `--current-hitcount`, `--accumulate`, `--merge-target-action`, `--reason`, `--release-fix-version`.
+  - Output: JSON with `action`, `target_key`, `component`, `hitcount`, `policy`, `skip_reason`, and a `blockers` list. Stop and report when `blockers` is non-empty.
 - `scripts/render_dashboard_adf.py`
   - Renders Jira ADF for dashboard evidence.
   - Use it for new issue descriptions and update/reopen/merge comments.
@@ -60,8 +64,9 @@ The paths below are relative to the installed package root `${MPT_EXTENSION_SKIL
 
 1. Validate the approved decision.
 - Stop if the decision is missing, ambiguous, or not approved by the user.
-- Stop if `new` is missing a component.
-- Stop if `update`, `reopen`, or `merge` is missing a target Jira key.
+- For `update`, accumulating `reopen`, and `merge`, first read the target issue (see step 3, via `mpt-ext-tool-jira-workitem-ops`) to obtain its current HitCount, so the planner can compute the value instead of stopping on `current_hitcount_missing`.
+- Then run `scripts/plan_dashboard_decision.py` with the approved decision, the finding `failures_count`, the current HitCount when read, the component, and (for `reopen`/`merge`) the accumulation approval and merge target action. Use its output as the deterministic plan.
+- Stop and report when the script's `blockers` list is non-empty (for example `component_missing`, `target_key_missing`, `current_hitcount_missing`, `merge_target_action_missing`).
 - For `skip`, do not write Jira; return the skipped finding and reason.
 
 2. Build dashboard evidence.
@@ -76,8 +81,8 @@ The paths below are relative to the installed package root `${MPT_EXTENSION_SKIL
 - Capture status, components, fixVersions, Environment, Keywords, and current HitCount.
 - If the target is assigned to someone else, follow the assignee safety rule from `mpt-ext-tool-jira-workitem-ops`.
 
-4. Apply the decision. Apply the dashboard policy fields and HitCount rules from `knowledge/dashboard-triage.md`.
-- For `new`, create an `MPT` Bug with the generated summary, the resolved component, the dashboard policy fields, and the dashboard evidence as the description.
+4. Apply the decision. Apply the `hitcount` and `policy` computed by `scripts/plan_dashboard_decision.py` (which encodes the HitCount rules and policy fields from `knowledge/dashboard-triage.md`).
+- For `new`, create an `MPT` Bug with the generated summary, the resolved component, the computed policy fields, and the dashboard evidence as the description.
 - For `update`, add dashboard evidence as a comment and update HitCount per the update rule.
 - For `reopen`, add dashboard evidence as a comment, apply the HitCount reopen rule, ensure the dashboard policy fields are present, and transition through an explicit available reopen transition.
 - For `merge`, add dashboard evidence as a comment to the target issue and update HitCount per the merge rule.
