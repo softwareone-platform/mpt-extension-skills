@@ -230,6 +230,7 @@ The exact headings may vary, but the content should remain explicit and easy to 
 - When reviewing a draft skill, identify deterministic prose instructions and either move them into a script or explicitly keep them in prose only when scripting would add more maintenance than reliability.
 - Keep skill scripts in Bash or Python, with Python preferred when structured parsing, JSON/YAML handling, or non-trivial validation is required.
 - Add an explicit runtime guard to Python skill scripts so `python3` versions older than 3.12 fail with a clear error message.
+- Every skill script must be covered by `pytest` tests under `tests/scripts/`, written to import the script and exercise `main()` in-process so coverage is measured. Skill-script branch coverage is gated at 95%: an untested script fails the build. The repository's [docs/testing.md](../docs/testing.md) owns the exact commands and coverage configuration.
 - Prefer deterministic steps over open-ended suggestions when the task has a known correct workflow.
 - Call out assumptions explicitly when the workflow depends on environment, auth, repository state, or external systems.
 

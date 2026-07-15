@@ -22,5 +22,10 @@ jobs:
           version: v0.11.0
           scandir: ./scripts
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
       - name: Run make checks and tests
-        run: make check-all
+        run: make check-all  # skill-script tests run in Docker via docker compose
