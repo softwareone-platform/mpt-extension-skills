@@ -1,6 +1,6 @@
 # Test runner image for the skill-script pytest suite.
 # Dependencies are managed with uv (pyproject.toml + uv.lock).
-FROM python:3.12-slim
+FROM python:3.14-slim
 
 # uv binary from the official distroless image.
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
