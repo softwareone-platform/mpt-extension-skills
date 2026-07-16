@@ -64,6 +64,14 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 - Preserve already-correct status values rather than rewriting them unnecessarily.
 
 5. Resolve active sprint and sprint target.
+- Classify the Sprint field deterministically with the bundled script before deciding placement. Pass the issue JSON (fields object or full issue) and, when it differs from the default, the Sprint field id resolved from `standards/jira-fields.md`:
+
+```bash
+acli jira workitem view <issue-key> --json \
+  | python3 "${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skills/mpt-ext-task-start-jira-work/scripts/analyze_sprint_field.py"
+```
+
+- Use its `has_active_sprint`, `active_sprints`, `board_ids`, and `is_subtask` output; the script surfaces facts only — you still make the multi-active-sprint choice and the board-id prompt.
 - Check whether the Jira issue already belongs to an active sprint in the Sprint field (resolve its ID from `standards/jira-fields.md`).
 - If it already has an active sprint, preserve sprint placement and report it as already correct.
 - If the issue has only closed or future sprint entries, derive the board id from the Sprint field's `boardId` entries.
@@ -110,6 +118,13 @@ acli jira board list-sprints --id <board-id> --state active --json
 - Never traverse more than 10 parent links without stopping and reporting a Jira hierarchy blocker.
 - Never rewrite already-correct Jira state without need.
 - Never mix branch creation or PR operations into this task.
+
+## Bundled Resources
+
+- `scripts/analyze_sprint_field.py`
+  - Inputs: issue JSON on stdin or `--issue-file` (fields object or full issue); `--sprint-field-id` (default `customfield_10020`, per `standards/jira-fields.md`)
+  - Output: JSON with `is_subtask`, `sprints`, `active_sprints`/`closed_sprints`/`future_sprints`, `has_active_sprint`, `multiple_active_sprints`, and de-duplicated `board_ids`. Handles both the object and legacy greenhopper string forms of the Sprint field; leaves multi-active-sprint choice and board-id prompts to the skill
+  - Runtime path: `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skills/mpt-ext-task-start-jira-work/scripts/analyze_sprint_field.py`
 
 ## Expected Outcome
 
