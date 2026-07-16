@@ -55,7 +55,7 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 
 2. Create the work branch.
 - Use `mpt-ext-task-create-work-branch`.
-- Let that task read Jira issue content, derive the short branch description, choose the correct branch naming pattern, and create the branch through the shared Git branch tool skill.
+- Let that task read Jira issue content, derive the short branch description, choose the correct branch naming pattern, and create the branch through the shared Git branch tool skill. The naming pattern, base-branch selection, and push conventions come from `standards/branching.md`; do not restate or diverge from them here.
 
 3. Start Jira work.
 - Use `mpt-ext-task-start-jira-work`.

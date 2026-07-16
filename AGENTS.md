@@ -71,6 +71,7 @@ Treat `knowledge/` as reusable guidance. Repository-specific commands and except
 
 ## Current Standards
 
+- [branching.md](./standards/branching.md): work branch naming, base-branch selection, hotfix/backport rules, and push conventions
 - [cli.md](./standards/cli.md): CLI command implementation rules (`typer` / Django management commands, runnable inside Docker)
 - [commit-messages.md](./standards/commit-messages.md): shared commit message format with tag, Jira ID, short summary, and descriptive commit body guidance
 - [documentation.md](./standards/documentation.md): repository documentation structure and authoring guidance

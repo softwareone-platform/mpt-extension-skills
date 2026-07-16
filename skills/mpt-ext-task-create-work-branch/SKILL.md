@@ -58,6 +58,7 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 - Use the description only as fallback when the title is not sufficient.
 
 3. Derive the short branch description.
+- For repositories that follow this package standard, read `standards/branching.md` using the shared-doc resolution rule from the repository context step, and use it as the source of truth for the branch naming pattern.
 - Use the bundled deterministic script to render the short description and target branch name from the Jira key, branch type, and issue text:
 
 ```bash
