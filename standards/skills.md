@@ -195,11 +195,13 @@ These may be expressed with equivalent headings, but all of the information abov
 
 The frontmatter `description` is loaded into the agent context for every session, whether or not the skill is used. Treat it as an always-on token cost and keep it tight.
 
-1. Keep the `description` to roughly 30 words, in one or two sentences.
+1. Keep the `description` to 35 words or fewer, in one or two sentences.
 2. Lead with the trigger condition (what situation should select this skill) and state the outcome.
 3. Do not restate every workflow step. The step list belongs in the `Workflow` section, not the description.
 4. Do not duplicate the `Use When` / `Do Not Use When` content; the description is a selector, not a summary of the whole skill.
 5. Keep the distinguishing keywords that help an agent pick this skill over a sibling skill.
+
+These word limits are gated in CI by `scripts/skill_token_budget.py` (via `make check-all`): `description` 35 words, `short_description` 15 words, `default_prompt` 50 words.
 
 ## Recommended SKILL.md Shape
 
