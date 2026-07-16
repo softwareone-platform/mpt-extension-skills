@@ -128,6 +128,12 @@ git push --force-with-lease origin <head-branch>
 9. Report results.
 - Record processed, skipped, fixed, pushed, and blocked PRs.
 - Include PR number and URL, status, fixed rules, changed files, validation commands and results, amended commit SHA, push result, and skip or blocker reasons.
+- Render the multi-PR report deterministically: collect the per-PR result objects into a JSON file and pass it to the bundled `render_result.py` for a stable Markdown summary.
+
+```bash
+python3 "${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skills/mpt-ext-workflow-fix-dependabot-prs/scripts/render_result.py" \
+  --results-json results.json
+```
 
 ## Guardrails
 
