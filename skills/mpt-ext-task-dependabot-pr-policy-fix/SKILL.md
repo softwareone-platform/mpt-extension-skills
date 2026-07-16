@@ -1,6 +1,6 @@
 ---
 name: mpt-ext-task-dependabot-pr-policy-fix
-description: Apply dependency-policy fixes to a selected Dependabot PR or checked-out branch: sync dev dependency pins, revert opentelemetry-family bumps, and refresh the dependency lock.
+description: "Apply dependency-policy fixes to a selected Dependabot PR or checked-out branch: sync dev dependency pins, revert opentelemetry-family bumps, and refresh the dependency lock."
 ---
 
 # Dependabot PR Policy Fix

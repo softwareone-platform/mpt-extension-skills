@@ -27,6 +27,8 @@ exclude_also = [
 
 [dependency-groups]
 dev = [
+    "jsonschema==4.26.*",
     "pytest==9.1.*",
     "pytest-cov==7.1.*",
+    "python-frontmatter==1.3.*",
 ]

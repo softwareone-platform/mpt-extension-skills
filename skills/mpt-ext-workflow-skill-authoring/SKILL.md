@@ -1,6 +1,6 @@
 ---
 name: mpt-ext-workflow-skill-authoring
-description: Create or update a reusable shared skill: classify it as tool, task, or workflow, apply shared naming and structure rules, keep it concise, add required metadata, and avoid duplicating standards.
+description: "Create or update a reusable shared skill: classify it as tool, task, or workflow, apply shared naming and structure rules, keep it concise, add required metadata, and avoid duplicating standards."
 ---
 
 # Skill Authoring

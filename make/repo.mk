@@ -11,7 +11,7 @@ test:  ## Run shell tests
 	bash tests/test_mpt_skills.sh
 
 test-scripts:  ## Run the pytest branch-coverage suite in Docker via docker compose (fails under 95%)
-	docker compose run --rm tests
+	docker compose run --build --rm tests
 
 token-budget:  ## Report the token footprint of skill descriptions and bodies. Pass args="--check" to fail on over-limit descriptions
 	python3 scripts/skill_token_budget.py $(args)

@@ -1,6 +1,6 @@
 ---
 name: mpt-ext-task-handle-pr-comments
-description: Only triage and respond to unresolved PR review comments: decide fix versus answer per comment, apply scoped changes, and reply in the thread. Does not create the PR, commit, or push the branch.
+description: "Only triage and respond to unresolved PR review comments: decide fix versus answer per comment, apply scoped changes, and reply in the thread. Does not create the PR, commit, or push the branch."
 ---
 
 # Handle PR Comments
