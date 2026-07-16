@@ -1,6 +1,6 @@
 ---
 name: mpt-ext-task-fix-pre-commit-failures
-description: Fix pre-commit hook failures when a git commit is blocked. Reads hook output, fixes one failure at a time, reruns validation, and retries the commit (max 5 iterations).
+description: Fix failures raised by the pre-commit hook during `git commit` (not standalone make/test runs). Reads hook output, fixes one failure at a time, reruns, and retries the commit; max 5 iterations.
 ---
 
 # Fix Pre-commit Failures
