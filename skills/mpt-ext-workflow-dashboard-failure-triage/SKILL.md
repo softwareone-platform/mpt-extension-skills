@@ -29,7 +29,7 @@ Process dashboard monitoring failures for MPT extensions as a batch: collect fin
 - Azure subscription name or id, and App Insights component name or app id, when the data must be fetched from Azure.
 - App Insights query window. Default to the last 24 hours when the user does not specify a different period.
 - Jira project key, defaulting to `MPT` only when the user does not specify another MPT project context.
-- Dashboard issue policy: the required Jira fields (`fixVersions`, `Environment`, `Keywords`, `HitCount`), the HitCount rules, and the evidence format are defined in `knowledge/dashboard-triage.md`.
+- Dashboard issue policy: the required Jira fields (`fixVersions`, `Environment`, `Keywords`, `HitCount`), the HitCount rules, and the evidence format are defined in `standards/dashboard-triage.md`.
 - Component mapping from the finding context. Ask the user to choose from available Jira components when the component is not clear.
 
 ## Shared References
@@ -37,7 +37,7 @@ Process dashboard monitoring failures for MPT extensions as a batch: collect fin
 Paths below are relative to the installed package root `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current`. If that root is unavailable while editing this source repository, use the same paths under the repository root.
 
 - `standards/skills.md`
-- `knowledge/dashboard-triage.md`
+- `standards/dashboard-triage.md`
 - `skills/mpt-ext-tool-jira-workitem-ops/SKILL.md`
 - `skills/mpt-ext-task-apply-dashboard-jira-decision/SKILL.md`
 

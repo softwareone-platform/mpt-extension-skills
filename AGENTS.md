@@ -74,6 +74,7 @@ Treat `knowledge/` as reusable guidance. Repository-specific commands and except
 - [branching.md](./standards/branching.md): work branch naming, base-branch selection, hotfix/backport rules, and push conventions
 - [cli.md](./standards/cli.md): CLI command implementation rules (`typer` / Django management commands, runnable inside Docker)
 - [commit-messages.md](./standards/commit-messages.md): shared commit message format with tag, Jira ID, short summary, and descriptive commit body guidance
+- [dashboard-triage.md](./standards/dashboard-triage.md): dashboard bug policy — Jira fields, HitCount rules, and evidence format
 - [documentation.md](./standards/documentation.md): repository documentation structure and authoring guidance
 - [extensions-best-practices.md](./standards/extensions-best-practices.md): extension architecture and local development guidance
 - [extensions-ui-best-practices.md](./standards/extensions-ui-best-practices.md): frontend (UI) authoring rules for extension modules — structure, naming, SDK and design-system usage, data fetching, plug declaration, styling, and iframe compatibility shims
@@ -95,7 +96,6 @@ Treat `knowledge/` as reusable guidance. Repository-specific commands and except
 - [build-and-checks.md](./knowledge/build-and-checks.md): shared build and validation workflow guidance
 - [migrations.md](./knowledge/migrations.md): shared migration workflow guidance
 - [backports.md](./knowledge/backports.md): shared backport workflow guidance
-- [dashboard-triage.md](./knowledge/dashboard-triage.md): dashboard bug policy — Jira fields, HitCount rules, and evidence format
 
 ## Repository Docs
 
