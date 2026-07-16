@@ -13,6 +13,7 @@ This repository currently validates:
 - skill token budget: the always-on and per-invocation fields of each skill (`SKILL.md` `description`/body and `agents/openai.yaml` `short_description`/`default_prompt`) stay within the limits in [standards/skills.md](../standards/skills.md)
 - skill-script behavior with `pytest` and a 95% branch-coverage gate (see Skill Script Tests below)
 - internal Markdown links: every relative link across the repository's `*.md` files resolves to an existing file (checked with `lychee` in offline mode)
+- plugin version parity: every plugin manifest and the Cursor rule — including the marketplace `source.ref` pins — declare the same version (`tests/scripts/test_version_parity.py`)
 
 ## Install Shellcheck
 
