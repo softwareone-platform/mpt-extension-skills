@@ -59,6 +59,11 @@ reviews:
       instructions: |
         Review skill changes against `standards/skills.md`.
         Use that document as the source of truth for skill naming, scope, type, structure, required files, and local shared references.
+    - path: "skills/**/SKILL.md"
+      instructions: |
+        When a skill's SKILL.md changes in this PR, check whether its sibling agents/openai.yaml (same skill directory) is also modified in the PR.
+        If SKILL.md changed but the openai.yaml adapter was not, flag it as a reminder to confirm the Codex adapter does not need the same update.
+        This is a reminder, not a blocker: many SKILL.md edits legitimately need no adapter change.
   abort_on_close: true
   disable_cache: false
   auto_review:

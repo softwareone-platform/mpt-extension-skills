@@ -138,6 +138,8 @@ Required field expectations:
 - `short_description`: concise summary of the skill purpose
 - `default_prompt`: default runtime prompt aligned with the skill scope and intent
 
+Keep the adapter in sync with `SKILL.md`: when a change to `SKILL.md` affects the skill's scope or behavior, update `short_description`/`default_prompt` in the same change. CodeRabbit flags a `SKILL.md` change whose sibling `agents/openai.yaml` is untouched as a review reminder (advisory, not a hard failure, since many edits legitimately need no adapter change).
+
 Like the `SKILL.md` `description`, these fields are a token surface for the Codex/OpenAI runtime: `short_description` is loaded as an always-on selector and `default_prompt` is loaded when the skill runs. Keep them tight:
 
 - `short_description`: roughly 15 words or fewer; it is a selector, not a summary.

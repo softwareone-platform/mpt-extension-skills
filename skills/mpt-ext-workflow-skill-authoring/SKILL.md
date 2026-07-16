@@ -142,6 +142,7 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 - Do not hide destructive or high-risk actions inside vague steps.
 - Do not add auxiliary files such as `README.md`, `CHANGELOG.md`, or quick-reference notes inside the skill folder unless they are truly required by the runtime.
 - Prefer links to shared docs resolved from the installed local package when available over copied policy text.
+- When editing an existing skill's `SKILL.md`, review its `agents/openai.yaml` sibling and update the `short_description`/`default_prompt` when the change affects the skill's scope or behavior, so the Codex adapter does not drift. CodeRabbit flags a `SKILL.md` change whose adapter was not touched as a review reminder.
 - Never run more than 5 skill-authoring review iterations before stopping with the remaining gaps.
 
 ## Expected Outcome
