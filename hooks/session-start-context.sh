@@ -29,6 +29,8 @@ SDLC slash commands (thin wrappers over the workflow skills):
 - /mpt-fix-dependabot           process Dependabot PRs
 - /mpt-hotfix-backport <KEY>    hotfix/backport to the active release branch
 - /mpt-skill-authoring [purpose] create or update a reusable shared skill
+- /mpt-update-docs              update affected docs for a change set and stage them
+- /mpt-dashboard-triage         triage extension dashboard failures into Jira
 EOF
 
 exit 0

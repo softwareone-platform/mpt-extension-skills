@@ -80,6 +80,8 @@ skills, for a guaranteed, named entry point into each SDLC step:
 - `/mpt-fix-dependabot` — process Dependabot PRs
 - `/mpt-hotfix-backport <KEY>` — hotfix/backport to the active release branch
 - `/mpt-skill-authoring [purpose]` — create or update a reusable shared skill
+- `/mpt-update-docs` — update affected documentation for a change set and stage it
+- `/mpt-dashboard-triage` — triage extension dashboard failures into Jira
 
 The [hooks/](./hooks/) directory holds a `SessionStart` hook that injects a
 compact standards reminder and the command list at the start of each session.
