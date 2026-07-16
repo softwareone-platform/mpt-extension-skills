@@ -50,7 +50,7 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 - Read shared docs only when the repository explicitly points to them. Resolve those shared docs from `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current` when available; otherwise read them from the `main` branch of the shared GitHub repository.
 
 2. Bring documentation up to date for the change.
-- Use `mpt-ext-task-update-docs-from-changes` against the uncommitted change set to map the change to affected documents and edit them, then stage only the updated documentation files so docs are validated and committed together with the change.
+- Use `mpt-ext-task-update-docs-from-changes` against the uncommitted change set to map the change to affected documents and edit them. That task does not stage; then stage only those updated documentation files here so docs are validated and committed together with the change.
 - The task no-ops when the change has no documentation impact, so this step is safe to always run.
 - Call the task directly here; do not enter a separate documentation workflow, to avoid nested workflow loading and repeated context rebuilds.
 

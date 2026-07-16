@@ -78,7 +78,7 @@ python3 "${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skill
 - Never duplicate shared engineering rules that already live in `standards/`; link to them instead.
 - Never edit documentation unrelated to the change set.
 - Never reproduce the deterministic change collection in prose; always use the bundled script.
-- Never commit, push, open a pull request, or change Jira state in this task.
+- Never stage, commit, push, open a pull request, or change Jira state in this task; the invoking workflow stages the updated documentation files.
 - Keep edits minimal and scoped to the change; do not rewrite untouched sections.
 
 ## Shared References
