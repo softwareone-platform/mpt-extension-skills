@@ -1,6 +1,6 @@
 ---
 name: mpt-ext-tool-jira-workitem-ops
-description: Read, create, edit, comment, assign, search, link, and transition Jira work items. Verifies auth and project context, enforces assignee safety, and surfaces permission blockers.
+description: When a task needs low-level Jira work-item operations — read, create, edit, comment, assign, search, link, or transition issues (MCP-first, acli fallback). A primitive under Jira workflows.
 ---
 
 # Jira Workitem Ops

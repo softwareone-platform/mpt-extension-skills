@@ -1,4 +1,4 @@
 interface:
   display_name: "Fix Dependabot PRs"
-  short_description: "Process Dependabot PRs end to end: policy fixes, validation, scoped fixes, amend, and push"
+  short_description: "Process open Dependabot PRs: apply policy, validate, push fixes back"
   default_prompt: "Process Dependabot pull requests in a softwareone-platform extension repository: find relevant PRs, check out their upstream branches, apply dependency-policy fixes, run repository checks, fix actionable failures caused by the dependency change, amend the existing Dependabot commits, push back to the same branches, and report processed, skipped, and blocked PRs."

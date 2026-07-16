@@ -1,6 +1,6 @@
 ---
 name: mpt-ext-tool-git-branch-ops
-description: Low-level Git branch primitive for an already-decided branch name: create or switch the branch safely on the correct base. Used by branch tasks, not for deriving names from Jira.
+description: When a task needs a low-level Git branch operation for an already-decided branch name — create or switch safely on the correct base. Used by branch tasks, not for deriving names from Jira.
 ---
 
 # Git Branch Ops

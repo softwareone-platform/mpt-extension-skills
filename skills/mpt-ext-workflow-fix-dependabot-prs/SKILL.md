@@ -1,6 +1,6 @@
 ---
 name: mpt-ext-workflow-fix-dependabot-prs
-description: Process Dependabot PRs end to end: find relevant PRs, check out their branches, apply dependency-policy fixes, run checks, fix failures, amend the Dependabot commit, and push back.
+description: Process open Dependabot PRs end to end: apply the shared dependency policy, validate, and push the fixes back to the same upstream branches for review.
 ---
 
 # Fix Dependabot PRs
