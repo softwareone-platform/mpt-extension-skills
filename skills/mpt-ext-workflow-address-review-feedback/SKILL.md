@@ -64,7 +64,7 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 - Act on its returned outcome: continue only on `committed`; on any other outcome stop and report the blocker.
 
 5. Update the pull request branch.
-- Push the updated branch so the existing PR reflects the latest review fixes.
+- Push the updated branch so the existing PR reflects the latest review fixes. The commit step amends the existing commit, so this rewrites the already-published branch history — push with `git push --force-with-lease` (never a bare `git push --force`, which can clobber concurrent remote commits).
 - Use `mpt-ext-task-open-pull-request` only when the PR title, description, or reporting contract must be refreshed instead of reimplementing that logic locally.
 
 6. Post the deferred fix-confirmation replies.

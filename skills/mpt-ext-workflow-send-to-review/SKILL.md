@@ -65,7 +65,7 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 - Act on its returned outcome: continue only on `committed`; on any other outcome stop and report the blocker.
 
 5. Publish the branch for review.
-- Push the committed branch before creating or updating the PR so review state is based on the published branch instead of unpublished local history.
+- Push the committed branch before creating or updating the PR so review state is based on the published branch instead of unpublished local history. For a branch not yet published, use a normal push; when the commit was amended on an already-published branch, push with `git push --force-with-lease` (never a bare `git push --force`, which can clobber concurrent remote commits).
 - Stop and report the blocker when branch push permissions, remote configuration, or branch protection prevent publication.
 
 6. Open or update the pull request.
