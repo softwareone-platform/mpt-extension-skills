@@ -1,6 +1,6 @@
 ---
 name: mpt-ext-workflow-dashboard-failure-triage
-description: Triage MPT extension dashboard failures from App Insights or CSV: prepare a batch review of findings with proposed Jira actions, then apply approved decisions via the dashboard Jira task.
+description: "Triage MPT extension dashboard failures from App Insights or CSV: prepare a batch review of findings with proposed Jira actions, then apply approved decisions via the dashboard Jira task."
 ---
 
 # Dashboard Failure Triage

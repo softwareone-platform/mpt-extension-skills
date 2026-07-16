@@ -1,6 +1,6 @@
 ---
 name: mpt-ext-task-apply-dashboard-jira-decision
-description: Apply one approved dashboard-failure Jira decision: create, update, reopen, merge, or skip an MPT bug with dashboard evidence fields.
+description: "Apply one approved dashboard-failure Jira decision: create, update, reopen, merge, or skip an MPT bug with dashboard evidence fields."
 ---
 
 # Apply Dashboard Jira Decision

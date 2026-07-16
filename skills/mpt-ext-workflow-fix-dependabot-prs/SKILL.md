@@ -1,6 +1,6 @@
 ---
 name: mpt-ext-workflow-fix-dependabot-prs
-description: Process open Dependabot PRs end to end: apply the shared dependency policy, validate, and push the fixes back to the same upstream branches for review.
+description: "Process open Dependabot PRs end to end: apply the shared dependency policy, validate, and push the fixes back to the same upstream branches for review."
 ---
 
 # Fix Dependabot PRs

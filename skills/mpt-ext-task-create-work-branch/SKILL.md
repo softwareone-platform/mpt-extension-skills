@@ -1,6 +1,6 @@
 ---
 name: mpt-ext-task-create-work-branch
-description: Only create the work branch when starting work: derive the branch name from the Jira issue and apply the repo naming pattern. Does not change Jira state.
+description: "Only create the work branch when starting work: derive the branch name from the Jira issue and apply the repo naming pattern. Does not change Jira state."
 ---
 
 # Create Work Branch

@@ -1,6 +1,6 @@
 ---
 name: mpt-ext-task-update-docs-from-changes
-description: Only update repository docs to match a code change set (docs/*, README.md, AGENTS.md) for unstaged, uncommitted, last-commit, or branch-diff changes. A building block: no self-check or staging.
+description: "Only update repository docs to match a code change set (docs/*, README.md, AGENTS.md) for unstaged, uncommitted, last-commit, or branch-diff changes. A building block: no self-check or staging."
 ---
 
 # Update Docs From Changes

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/softwareone-platform/mpt-extension-skills/schemas/skill_frontmatter.schema.json",
+  "title": "MPT skill SKILL.md frontmatter",
+  "description": "Frontmatter contract for skills/<name>/SKILL.md, per standards/skills.md.",
+  "type": "object",
+  "required": ["name", "description"],
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "type": "string",
+      "pattern": "^mpt-ext-(tool|task|workflow)-[a-z0-9]+(-[a-z0-9]+)*$"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    }
+  }
+}

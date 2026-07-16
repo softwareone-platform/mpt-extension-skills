@@ -1,6 +1,6 @@
 ---
 name: mpt-ext-task-start-jira-work
-description: Only move Jira state when starting work: transition the issue and its parent chain to In Progress, ensure active-sprint placement, and check reassignment. Does not create a branch.
+description: "Only move Jira state when starting work: transition the issue and its parent chain to In Progress, ensure active-sprint placement, and check reassignment. Does not create a branch."
 ---
 
 # Start Jira Work

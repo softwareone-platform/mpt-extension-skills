@@ -1,6 +1,6 @@
 ---
 name: mpt-ext-workflow-complete-after-merge
-description: Run the final post-merge step after a PR is merged: verify the merge, then hand off Jira to its correct post-merge status. End-of-flow wrapper; excludes review publication and feedback.
+description: "Run the final post-merge step after a PR is merged: verify the merge, then hand off Jira to its correct post-merge status. End-of-flow wrapper; excludes review publication and feedback."
 ---
 
 # Complete After Merge
