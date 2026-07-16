@@ -54,6 +54,15 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 - Use repository PR rules from repo docs first.
 - When the repository relies on this shared package standard for PR formatting, read `standards/pull-requests.md` using the shared-doc resolution rule from the repository context step, and use it as the source of truth.
 - Build the complete PR title and description before creating the PR. Follow `standards/pull-requests.md` for the description-at-creation rule and the AI-generated warning line; `mpt-ext-tool-gh-pr-ops` sets them atomically.
+- Render the title deterministically with the bundled `render_pr_title.py` so the Jira key, the summary, and any `[HF]`/`[BACKPORT]` marker match what the shared Danger action enforces:
+
+```bash
+python3 "${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skills/mpt-ext-task-open-pull-request/scripts/render_pr_title.py" \
+  --jira-key MPT-1234 \
+  --summary "<short summary>" \
+  --kind feature \
+  --base-branch main
+```
 
 4. Create or update the PR.
 - If no PR exists for the branch, create a new PR through `mpt-ext-tool-gh-pr-ops`, which sets the complete description at creation (or uses the draft-then-ready flow when it cannot be finalized yet).
@@ -93,6 +102,10 @@ python3 "${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skill
   - Inputs: PR URL, testing status, optional Jira site, and optional Jira key
   - Output: compact user-facing `PR`, optional `Jira`, and `Testing` lines
   - Runtime path: `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skills/mpt-ext-task-open-pull-request/scripts/render_result.py`
+- `scripts/render_pr_title.py`
+  - Inputs: `--jira-key`, `--summary`, `--kind {feature,bugfix,hotfix,backport}` (default `feature`), `--base-branch` (default `main`), optional `--json`
+  - Output: the PR title `[MARKER ]<JIRA-ID> <summary>`; validates the Jira key and rejects a Conventional Commit prefix in the summary; adds `[HF]`/`[BACKPORT]` only for release-branch PRs
+  - Runtime path: `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skills/mpt-ext-task-open-pull-request/scripts/render_pr_title.py`
 
 ## Expected Outcome
 
