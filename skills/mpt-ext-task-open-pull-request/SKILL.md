@@ -53,10 +53,10 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 3. Read PR rules before mutation.
 - Use repository PR rules from repo docs first.
 - When the repository relies on this shared package standard for PR formatting, read `standards/pull-requests.md` using the shared-doc resolution rule from the repository context step, and use it as the source of truth.
-- Build the complete PR title and final description, including the `🤖 AI-generated PR — Please review carefully.` warning line when the content is AI-generated, before creating the PR.
+- Build the complete PR title and description before creating the PR. Follow `standards/pull-requests.md` for the description-at-creation rule and the AI-generated warning line; `mpt-ext-tool-gh-pr-ops` sets them atomically.
 
 4. Create or update the PR.
-- If no PR exists for the branch, create a new PR through `mpt-ext-tool-gh-pr-ops` with the complete description set in the create call so automated reviewers do not review a stale description. When the description cannot be finalized at creation time, create the PR as a draft and only mark it ready after the description is complete.
+- If no PR exists for the branch, create a new PR through `mpt-ext-tool-gh-pr-ops`, which sets the complete description at creation (or uses the draft-then-ready flow when it cannot be finalized yet).
 - If a PR already exists for the branch, update the existing PR instead of creating a duplicate.
 
 5. Report the result clearly.
@@ -82,7 +82,7 @@ python3 "${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skill
 ## Guardrails
 
 - Never create a duplicate PR when one already exists for the branch.
-- Never open a PR with an empty or placeholder description and add the description or AI-generated warning line in a later edit; set the complete description at creation time, or use a draft PR until the description is finalized.
+- Never open a PR with a placeholder body and fill it in later; rely on `mpt-ext-tool-gh-pr-ops` and `standards/pull-requests.md` for the description-at-creation and draft-then-ready flow.
 - Never invent PR formatting rules; read repository context first.
 - Never mix commit creation, branch creation, or Jira transitions into this task.
 - Never silently choose the wrong base branch when repo context or user intent is ambiguous.
