@@ -140,9 +140,7 @@ python3 "${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skill
 - Never process non-Dependabot PRs with this workflow.
 - Never create new branches or pull requests for Dependabot remediation.
 - Never push fixes anywhere except the original Dependabot branch in upstream.
-- Never leave `pyproject.toml` dependency specifiers broader than the shared dependency policy allows.
-- Never keep Dependabot `opentelemetry`-family version bumps in the PR.
-- Never update `.pre-commit-config.yaml` opportunistically for unrelated tools.
+- Never restate or diverge from the dependency-policy rules that `mpt-ext-task-dependabot-pr-policy-fix` owns (broad `pyproject.toml` specifiers, `opentelemetry`-family bumps, opportunistic `.pre-commit-config.yaml` edits); delegate them to that task.
 - Never continue to amend or push after failed validation unless the failure has been fixed and the required validation flow passes.
 - Never wrap a fix task that already owns its bounded loop in a second retry loop; invoke it once per Dependabot PR, consume its classified outcome, and stop on anything other than success.
 - Never use validation auto-fix as permission to make unrelated product-code changes in a Dependabot PR.
