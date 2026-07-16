@@ -26,3 +26,11 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    # The test runner pins python to the minimum supported version (3.12) so the
+    # suite runs on the floor runtime. Keep patch updates, but do not bump the
+    # major/minor python version automatically.
+    ignore:
+      - dependency-name: "python"
+        update-types:
+          - "version-update:semver-major"
+          - "version-update:semver-minor"
