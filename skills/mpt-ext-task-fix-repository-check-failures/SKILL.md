@@ -1,6 +1,6 @@
 ---
 name: mpt-ext-task-fix-repository-check-failures
-description: Fix repository validation failures after local checks or tests fail. Isolates one blocker at a time, applies the smallest fix, and reruns checks (max 5 iterations) until clean or blocked.
+description: Fix failures from a standalone repository validation run (`make check`/`make test`), outside the `git commit` hook. Isolates one blocker at a time, applies the smallest fix, and reruns; max 5 iterations.
 ---
 
 # Fix Repository Check Failures
