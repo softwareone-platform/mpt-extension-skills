@@ -2,7 +2,7 @@ import json
 
 from helpers import call_main, load
 
-SCRIPT_UNDER_TEST = "skills/mpt-ext-task-dependabot-pr-policy-fix/scripts/render_result.py"
+SCRIPT_UNDER_TEST = "skills/mpt-ext-workflow-fix-dependabot-prs/scripts/render_result.py"
 mod = load(SCRIPT_UNDER_TEST)
 
 
