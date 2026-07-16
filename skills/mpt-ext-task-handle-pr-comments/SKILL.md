@@ -66,7 +66,7 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 5. Apply the selected fixes when needed.
 - Make the minimal code or documentation change required to address the selected review comment.
 - Keep the fix scoped to the comment instead of opportunistically changing unrelated areas.
-- Run the repository checks required for the changed scope when the repository workflow requires validation after the fix.
+- When validation is required after the fix, delegate it to `mpt-ext-task-run-repository-checks` for the changed scope instead of running the checks inline. Inside an orchestrating workflow that already validates as a later step, leave validation to that workflow so checks do not run twice.
 
 6. Reply in the review thread.
 - Before writing a reply, check the thread depth. If the reply you are about to post is not the first agent reply to the original comment but a further reply on top of an existing agent reply and a reviewer's counter-reply (original comment → your earlier reply → reviewer reply → your next reply), the thread is already going back and forth.
