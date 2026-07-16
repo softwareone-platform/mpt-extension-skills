@@ -13,3 +13,11 @@ services:
     volumes:
       - .:/work
     command: ["**/*.md"]
+
+  shellcheck:
+    image: koalaman/shellcheck-alpine:v0.11.0
+    working_dir: /work
+    volumes:
+      - .:/work
+    entrypoint: ["sh", "-c"]
+    command: ["find scripts -type f -name '*.sh' -exec shellcheck {} +"]
