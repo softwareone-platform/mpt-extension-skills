@@ -22,8 +22,8 @@ def test_render_branch_name_keeps_key_uppercase():
 
 def test_render_branch_name_all_types():
     assert mod.render_branch_name("bugfix", "MPT-1", "s") == "bugfix/MPT-1/s"
-    assert mod.render_branch_name("hotfix", "MPT-1", "s").startswith("hotfix-hotfix/MPT-1/")
-    assert mod.render_branch_name("backport", "MPT-1", "s").startswith("backport-backport/MPT-1/")
+    assert mod.render_branch_name("hotfix", "MPT-1", "s") == "hotfix/MPT-1/s"
+    assert mod.render_branch_name("backport", "MPT-1", "s") == "backport/MPT-1/s"
     try:
         mod.render_branch_name("bogus", "MPT-1", "s")
         raised = False

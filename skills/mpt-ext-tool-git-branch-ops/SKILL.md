@@ -53,6 +53,7 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 - Read shared docs only when the repository explicitly points to them. Resolve those shared docs from `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current` when available; otherwise read them from the `main` branch of the shared GitHub repository.
 
 2. Resolve the base branch from the branch type.
+- For repositories that follow this package standard, read `standards/branching.md` using the shared-doc resolution rule from the repository context step, and use it as the source of truth for base-branch selection, hotfix/backport handling, and push conventions.
 - Use the bundled deterministic script to resolve the base branch:
 
 ```bash

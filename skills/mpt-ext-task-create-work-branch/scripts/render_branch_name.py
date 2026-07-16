@@ -44,12 +44,8 @@ def is_valid_jira_key(jira_key: str) -> bool:
 
 
 def render_branch_name(branch_type: str, jira_key: str, slug: str) -> str:
-    if branch_type in {"feature", "bugfix"}:
+    if branch_type in {"feature", "bugfix", "hotfix", "backport"}:
         return f"{branch_type}/{jira_key}/{slug}"
-    if branch_type == "hotfix":
-        return f"hotfix-{branch_type}/{jira_key}/{slug}"
-    if branch_type == "backport":
-        return f"backport-{branch_type}/{jira_key}/{slug}"
     raise ValueError(f"unsupported branch type: {branch_type}")
 
 
