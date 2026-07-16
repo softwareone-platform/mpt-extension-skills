@@ -123,6 +123,7 @@ Current documents in `standards/`:
 - [branching.md](./standards/branching.md): work branch naming pattern, base-branch selection, hotfix/backport handling, and push conventions
 - [cli.md](./standards/cli.md): shared rules for implementing CLI commands with `typer` or Django management commands and keeping them runnable inside Docker
 - [commit-messages.md](./standards/commit-messages.md): shared commit message format with tag, Jira ID, short summary, and descriptive commit body guidance
+- [dashboard-triage.md](./standards/dashboard-triage.md): single source of truth for the dashboard bug policy — Jira fields, HitCount rules, and evidence format
 - [documentation.md](./standards/documentation.md): shared repository documentation structure and authoring rules for human readers and AI agents
 - [extensions-best-practices.md](./standards/extensions-best-practices.md): extension architecture and design guidance for isolation, deployability, local development, and reusability
 - [extensions-ui-best-practices.md](./standards/extensions-ui-best-practices.md): frontend (UI) authoring rules for extension modules — structure, naming, SDK and design-system usage, data fetching, plug declaration, styling, and iframe compatibility shims
@@ -161,7 +162,6 @@ Current documents in `knowledge/`:
 - [build-and-checks.md](./knowledge/build-and-checks.md): shared guidance for building repositories and validating that checks and tests pass
 - [migrations.md](./knowledge/migrations.md): shared workflow for running, checking, and creating migrations
 - [backports.md](./knowledge/backports.md): shared workflow for backporting changes to the active release branch
-- [dashboard-triage.md](./knowledge/dashboard-triage.md): single source of truth for the dashboard bug policy — Jira fields, HitCount rules, and evidence format
 
 Repository docs in `docs/`:
 

@@ -1,5 +1,7 @@
 # Makefile Architecture for Python Repositories
 
+> **Audience:** Consumed by extension and product repositories when working in those repositories. The skills in this repository do not reference this standard.
+
 ## Owner
 Sirius Team
 

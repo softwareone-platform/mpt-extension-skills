@@ -1,5 +1,7 @@
 # Migrations
 
+> **Audience:** Operational how-to consumed by extension and product repositories that run migrations. No skill in this repository routes to it.
+
 ## Purpose
 
 Describe how to run and create migrations in repositories that support them.

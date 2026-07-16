@@ -40,20 +40,20 @@ Apply one user-approved dashboard failure decision to Jira with the standard das
   - `skip <reason>`
 - Jira project key, defaulting to `MPT`.
 - Component selected by the workflow or user.
-- Dashboard policy fields: defined in `knowledge/dashboard-triage.md` (required Jira fields, HitCount rules, and evidence format).
+- Dashboard policy fields: defined in `standards/dashboard-triage.md` (required Jira fields, HitCount rules, and evidence format).
 
 ## Shared References
 
 The paths below are relative to the installed package root `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current`. If that root is unavailable while editing this source repository, use the same paths under the repository root.
 
 - `standards/skills.md`
-- `knowledge/dashboard-triage.md`
+- `standards/dashboard-triage.md`
 - `skills/mpt-ext-tool-jira-workitem-ops/SKILL.md`
 
 ## Bundled Resources
 
 - `scripts/plan_dashboard_decision.py`
-  - Validates the approved decision and deterministically computes the HitCount and policy fields, encoding the rules from `knowledge/dashboard-triage.md`.
+  - Validates the approved decision and deterministically computes the HitCount and policy fields, encoding the rules from `standards/dashboard-triage.md`.
   - Input: `--decision`, `--target-key`, `--component`, `--failures-count`, `--current-hitcount`, `--accumulate`, `--merge-target-action`, `--reason`, `--release-fix-version`.
   - Output: JSON with `action`, `target_key`, `component`, `hitcount`, `policy`, `skip_reason`, and a `blockers` list. Stop and report when `blockers` is non-empty.
 - `scripts/render_dashboard_adf.py`
@@ -81,7 +81,7 @@ The paths below are relative to the installed package root `${MPT_EXTENSION_SKIL
 - Capture status, components, fixVersions, Environment, Keywords, and current HitCount.
 - If the target is assigned to someone else, follow the assignee safety rule from `mpt-ext-tool-jira-workitem-ops`.
 
-4. Apply the decision. Apply the `hitcount` and `policy` computed by `scripts/plan_dashboard_decision.py` (which encodes the HitCount rules and policy fields from `knowledge/dashboard-triage.md`).
+4. Apply the decision. Apply the `hitcount` and `policy` computed by `scripts/plan_dashboard_decision.py` (which encodes the HitCount rules and policy fields from `standards/dashboard-triage.md`).
 - For `new`, create an `MPT` Bug with the generated summary, the resolved component, the computed policy fields, and the dashboard evidence as the description.
 - For `update`, add dashboard evidence as a comment and update HitCount per the update rule.
 - For `reopen`, add dashboard evidence as a comment, apply the HitCount reopen rule, ensure the dashboard policy fields are present, and transition through an explicit available reopen transition.
