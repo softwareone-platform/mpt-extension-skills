@@ -75,11 +75,14 @@ Treat `knowledge/` as reusable guidance. Repository-specific commands and except
 - [commit-messages.md](./standards/commit-messages.md): shared commit message format with tag, Jira ID, short summary, and descriptive commit body guidance
 - [documentation.md](./standards/documentation.md): repository documentation structure and authoring guidance
 - [extensions-best-practices.md](./standards/extensions-best-practices.md): extension architecture and local development guidance
+- [extensions-ui-best-practices.md](./standards/extensions-ui-best-practices.md): frontend (UI) authoring rules for extension modules — structure, naming, SDK and design-system usage, data fetching, plug declaration, styling, and iframe compatibility shims
+- [extensions-ui-testing-best-practices.md](./standards/extensions-ui-testing-best-practices.md): frontend (UI) testing rules — colocated Jest + Testing Library tests, behaviour-focused assertions, and mocking the SDK at the module boundary
 - [jira-fields.md](./standards/jira-fields.md): single source of truth for MPT Jira custom-field IDs used by Jira skills
 - [makefiles.md](./standards/makefiles.md): shared `Makefile` conventions
 - [packages-and-dependencies.md](./standards/packages-and-dependencies.md): Python dependency management rules
 - [pull-requests.md](./standards/pull-requests.md): pull request workflow and history rules
 - [python-coding.md](./standards/python-coding.md): Python coding conventions
+- [sdk-pipeline-steps.md](./standards/sdk-pipeline-steps.md): rules for writing Extension SDK pipeline steps, including immutable snapshots, hook-driven transitions, flow-control errors, and configuration
 - [skills.md](./standards/skills.md): shared rules and best practices for writing reusable skills
 - [unittests.md](./standards/unittests.md): Python unit testing guidelines
 - [user-stories.md](./standards/user-stories.md): work breakdown standard for turning an epic or TDR into demoable, estimated user stories and Back/Front subtasks
