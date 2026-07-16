@@ -14,31 +14,16 @@ This repository currently validates:
 - skill-script behavior with `pytest` and a 95% branch-coverage gate (see Skill Script Tests below)
 - internal Markdown links: every relative link across the repository's `*.md` files resolves to an existing file (checked with `lychee` in offline mode)
 
-## Install Shellcheck
+## Shellcheck
 
-Use `shellcheck` version `0.11.0`.
-
-Use one of the following local installation methods.
-
-macOS with Homebrew:
-
-```bash
-brew install shellcheck
-```
-
-Ubuntu or Debian:
-
-```bash
-sudo apt-get update
-sudo apt-get install -y shellcheck
-```
+`make check` runs `shellcheck` over every `scripts/*.sh` through the `shellcheck` `docker compose` service (pinned `koalaman/shellcheck-alpine:v0.11.0`), so the version is identical locally and in CI without a local install. It needs Docker.
 
 ## Local Validation Workflow
 
 Run shell linting from the repository root:
 
 ```bash
-shellcheck scripts/mpt-extensions-skills.sh scripts/mpt-extensions-skills-install.sh
+make check
 ```
 
 Run shell tests from the repository root:
@@ -68,7 +53,7 @@ make review
 
 Current commands:
 
-- `make check`: runs `shellcheck` for the CLI and release installer scripts
+- `make check`: runs `shellcheck` over every `scripts/*.sh` via the `shellcheck` `docker compose` service (pinned `koalaman/shellcheck-alpine:v0.11.0`); needs Docker
 - `make test`: runs the shell integration tests
 - `make test-scripts`: runs the skill-script `pytest` suite with branch coverage inside Docker via `docker compose run --rm tests` (needs Docker; no host Python packages required)
 - `make token-budget`: reports the token footprint of every skill across both runtimes (Claude `SKILL.md` `description`/body and Codex `agents/openai.yaml` `short_description`/`default_prompt`)
@@ -152,15 +137,9 @@ GitHub Actions runs the shell validation workflow on:
 - pull requests
 - pushes to `main`
 
-The workflow runs:
+The workflow runs `make check-all`, which runs `make check` (pinned `shellcheck` over `scripts/*.sh` via `docker compose`), `bash tests/test_mpt_skills.sh`, `make test-scripts` (pytest with a 95% branch-coverage gate, run in Docker via `docker compose`), `make token-budget-check`, and `make check-links` (internal Markdown link check).
 
-- `shellcheck 0.11.0` (pinned action) over `./scripts`
-- `make check-all`, which runs `shellcheck` for `scripts/mpt-extensions-skills.sh` and `scripts/mpt-extensions-skills-install.sh`, `bash tests/test_mpt_skills.sh`, `make test-scripts` (pytest with a 95% branch-coverage gate, run in Docker via `docker compose`), `make token-budget-check`, and `make check-links` (internal Markdown link check).
-
-So the skill token-budget gate runs in CI as part of `make check-all`.
-
-Local `make check` uses the `SHELLCHECK` command available on the developer machine.
-Install shellcheck `0.11.0` locally when you need parity with CI; otherwise CI remains the authoritative shellcheck version gate for these two scripts.
+Because `make check` pins the shellcheck version through the `docker compose` service, local and CI runs use the exact same version with no separate setup.
 
 ## Related Documents
 

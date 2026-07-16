@@ -1,11 +1,10 @@
 ## Add repo-specific targets here. Do not modify the shared *.mk files.
 
-SHELLCHECK ?= shellcheck
 runtime ?=
 version ?=
 
-check:  ## Run shellcheck validation
-	$(SHELLCHECK) scripts/mpt-extensions-skills.sh scripts/mpt-extensions-skills-install.sh
+check:  ## Run shellcheck (pinned, via docker compose) over every scripts/*.sh
+	docker compose run --rm shellcheck
 
 test:  ## Run shell tests
 	bash tests/test_mpt_skills.sh
