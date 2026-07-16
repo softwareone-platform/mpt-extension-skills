@@ -42,7 +42,7 @@ Typical examples:
 
 Use the migration commands documented by the target repository.
 
-Common commands:
+Common commands (see [make-targets.md](./make-targets.md) for each target's meaning):
 
 ```bash
 make migrate-check
@@ -50,13 +50,6 @@ make migrate-list
 make migrate-schema
 make migrate-data
 ```
-
-Typical meaning:
-
-- `make migrate-check`: check migration status
-- `make migrate-list`: list available migrations
-- `make migrate-schema`: run schema migrations
-- `make migrate-data`: run data migrations
 
 If both schema and data migrations must be applied, run them in this order:
 

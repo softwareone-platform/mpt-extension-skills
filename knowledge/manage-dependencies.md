@@ -17,16 +17,9 @@ Use this document when you need to:
 
 Follow the shared dependency standard in [packages-and-dependencies.md](../standards/packages-and-dependencies.md) for version policy and lockfile expectations.
 
-This repository family uses `uv` for dependency management. When a repository exposes the `make` targets below, prefer them over ad hoc dependency commands so dependency changes stay consistent with the repository workflow.
+This repository family uses `uv` for dependency management. When a repository exposes the dependency-related `make` targets (`make uv-add`, `make uv-add-dev`, `make uv-upgrade`; see [make-targets.md](./make-targets.md) for their exact names and meanings), prefer them over ad hoc dependency commands so dependency changes stay consistent with the repository workflow.
 
-```bash
-make uv-add pkg=<package>
-make uv-add-dev pkg=<package>
-make uv-upgrade
-make uv-upgrade pkg=<package>
-```
-
-Repositories may run `uv` through Docker-backed `make` targets. In those repositories, use the `make` targets above instead of calling `uv` directly unless the repository documentation explicitly requires a different command.
+Repositories may run `uv` through Docker-backed `make` targets. In those repositories, use those `make` targets instead of calling `uv` directly unless the repository documentation explicitly requires a different command.
 
 ## What To Verify
 
