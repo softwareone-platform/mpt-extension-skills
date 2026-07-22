@@ -39,20 +39,30 @@ rules live in a separate standard (see Related Documents).
    storage, pure predicates).
 3. A component's `.tsx`, its `.scss`, and its `.test.tsx` must be colocated in the same folder,
    following the file and folder naming conventions below.
-4. Entry points must stay thin: they must only mount React and import global styles; all logic must
-   live in `App.tsx` and below.
+4. Entry points must stay thin: they must initialize the shared i18n instance (side-effect import),
+   import global styles, and mount `<App />` inside the shared `DesignSystemOptionsProvider`; all
+   logic must live in `App.tsx` and below. See the Localization and formatting section for the i18n
+   import and the provider.
 
 GOOD (`src/modules/agreement/index.tsx`)
 ```tsx
+import '../../i18n/translations'; // side-effect: initializes the shared i18next instance
+
 import { setup } from '@mpt-extension/sdk';
 import { createRoot } from 'react-dom/client';
+import { DesignSystemOptionsProvider } from '@softwareone-platform/sdk-react-ui-v0/utils';
 
 import App from './App';
 import '../../style.scss';
 
 setup((element: Element) => {
-  const root = createRoot(element);
-  root.render(<App />);
+  createRoot(element).render(
+    <DesignSystemOptionsProvider
+      value={{ dateFormat: 'dd MMM yyyy', inputDateFormat: 'P', languageCode: 'en-US', timeFormat: 'HH:mm' }}
+    >
+      <App />
+    </DesignSystemOptionsProvider>,
+  );
 });
 ```
 
@@ -66,7 +76,7 @@ setup((element: Element) => {
 | Kind | Convention | Examples |
 | --- | --- | --- |
 | Module directory | `kebab-case`; an action-modal module ends with `-action`, a plug uses a plain name | `agreement/`, `request-commitment-action/` |
-| Module entry point | always `index.tsx` (mounts React only) | `agreement/index.tsx` |
+| Module entry point | always `index.tsx` (i18n init, then mounts React inside the shared providers) | `agreement/index.tsx` |
 | Module root component | `App.tsx` with styles in `App.scss` | `request-commitment-action/App.tsx` |
 | Reusable component | folder in `kebab-case`, files in `PascalCase` (`.tsx` + matching `.scss` + `.test.tsx`) | `components/details/details-section/DetailsSection.tsx` |
 | React hook | `camelCase` with a `use` prefix; file named exactly after the hook, under `shared/hooks/` | `shared/hooks/useAdobeCustomer.ts` |
@@ -388,6 +398,82 @@ setup((element: Element) => {
     line-height, modal layout (header/content/actions) for plugs rendered inside platform modals, and
     the in-memory `localStorage`/`sessionStorage` fallback (rule 28). These are expected to move into
     the UI SDK over time.
+
+### Localization and formatting
+
+39. All localization must live in `src/i18n/`, which holds exactly these files:
+    - `translations.tsx` — creates and configures the single shared i18next instance and exports it.
+    - `en.json` — the English resource bundle: every user-facing string, organised into nested key
+      groups (for example a `Common` group for reused strings, one group per feature).
+    - `sortTranslations.ts` — sorts `en.json` keys alphabetically; run it after adding keys so the
+      bundle stays ordered and diffs stay small.
+40. The instance in `translations.tsx` must be built with `i18next.createInstance()` +
+    `initReactI18next` and these options: `defaultNS: 'mpt'`, `nsSeparator: ';'`, `keySeparator: ':'`,
+    `lng`/`fallbackLng: 'en'`, `interpolation.escapeValue: false`, `react.useSuspense: false`. There
+    is a single i18next namespace (`mpt`); the top-level keys in `en.json` are nested key groups, not
+    namespaces. Because `keySeparator` is `':'`, a key path is written `Group:Subgroup:Key`, and
+    `nsSeparator` is `';'` precisely so `:` is free to separate nested keys. English must ship
+    synchronously through `resources` so the first render is already translated; the lazy
+    `resourcesToBackend` loader must stay for future locales. Every entry point must import this
+    module for its side effect as its **first import**, before React mounts (see rule 4).
+41. User-facing text must not be hardcoded in JSX. It must be read with `react-i18next`'s
+    `useTranslation()` as `t('Group:Key')` (a `:`-separated path into the nested key groups of the
+    `mpt` namespace), with the key added to `en.json` under the matching group. Translate all display
+    text — titles, descriptions, field labels, button text, placeholders and hints, notification and
+    validation messages, and table headers. Do not translate identifiers or values exchanged with the
+    backend (IDs, enum/status codes, API field names, parameter external IDs), `data-testid`s, or
+    other technical constants.
+42. A string that contains inline markup (for example a bold word inside a sentence) must use the
+    `<Trans>` component instead of `t()`, so the markup stays in the JSX and only the text is
+    translated. Write `<Trans i18nKey="Group:Key">` with the default English content — including the
+    inline elements — as its children; in `en.json`, represent each inline element with its indexed
+    placeholder (`<1>…</1>`), where the number matches the element's position among the children. Use
+    `t()` for plain strings and `<Trans>` only when inline elements are required; do not concatenate
+    translated fragments to rebuild a sentence.
+43. Each module's root must be wrapped, in the entry point, in `DesignSystemOptionsProvider`
+    (`@softwareone-platform/sdk-react-ui-v0/utils`), supplying the shared date/time/locale options
+    (`dateFormat`, `inputDateFormat`, `timeFormat`, `languageCode`) so design-system components format
+    dates and locale-aware values consistently. The same option values must be used across all
+    modules (see the entry-point example in rule 4).
+
+GOOD (`en.json` — nested key groups under the single `mpt` namespace; `Common` for reused strings)
+```json
+{
+  "Common": { "Close": "Close", "Status": "Status" },
+  "<Group>": {
+    "Title": "<title text>",
+    "Description": "<description text>",
+    "Submit": "<button text>"
+  }
+}
+```
+
+GOOD (component reads copy through `t` with a `:`-separated key path; the value sent to the backend stays untranslated)
+```tsx
+import { useTranslation } from 'react-i18next';
+
+function FeatureView() {
+  const { t } = useTranslation();
+  return (
+    <>
+      <MediumText as="h2" size={4}>{t('<Group>:Title')}</MediumText>
+      <Button onClick={() => submitRequest('ENABLED')}>{t('<Group>:Submit')}</Button>
+    </>
+  );
+}
+```
+
+GOOD (`<Trans>` for a sentence with inline markup; the `<1>` placeholder maps to the child element)
+```tsx
+import { Trans } from 'react-i18next';
+
+<Trans i18nKey="<Group>:Prompt">
+  To do the thing, click <BoldText as="span" size={2}>Do it</BoldText>.
+</Trans>
+```
+```json
+{ "<Group>": { "Prompt": "To do the thing, click <1>Do it</1>." } }
+```
 
 ## Related Documents
 
