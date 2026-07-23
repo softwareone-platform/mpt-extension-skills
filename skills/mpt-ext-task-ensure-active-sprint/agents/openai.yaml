@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ensure Active Sprint"
+  short_description: "Place a Jira issue in its board's active sprint"
+  default_prompt: "Ensure a Jira issue is in its board's active sprint: classify the Sprint field and, when no active sprint is present, resolve the board's active sprint and apply it (on the direct parent for subtasks, verifying inheritance)."

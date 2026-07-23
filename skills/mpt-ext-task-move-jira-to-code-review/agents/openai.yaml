@@ -1,4 +1,4 @@
 interface:
   display_name: "Move Jira To Code Review"
   short_description: "Transition a Jira issue into Code Review"
-  default_prompt: "Move a Jira issue into Code Review: read the current issue state, verify the work is already committed and ready for PR review, transition the issue to Code Review through the shared Jira operations skill, and report blockers clearly when the issue is not ready."
+  default_prompt: "Move a Jira issue into Code Review: read its state, verify the work is committed and PR-ready, ensure it belongs to the active sprint and stop with a blocker if placement is unresolved, transition it via the shared Jira operations skill only after placement succeeds, and report blockers."
