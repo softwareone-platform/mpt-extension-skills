@@ -2,7 +2,7 @@ import json
 
 from helpers import call_main, load
 
-SCRIPT_UNDER_TEST = "skills/mpt-ext-task-start-jira-work/scripts/analyze_sprint_field.py"
+SCRIPT_UNDER_TEST = "skills/mpt-ext-task-ensure-active-sprint/scripts/analyze_sprint_field.py"
 mod = load(SCRIPT_UNDER_TEST)
 
 LEGACY = (

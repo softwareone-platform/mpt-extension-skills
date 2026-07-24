@@ -12,6 +12,7 @@ Current skills:
 - [mpt-ext-tool-git-branch-ops](./skills/mpt-ext-tool-git-branch-ops/SKILL.md): Git branch creation and branch-base selection workflow for starting work safely
 - [mpt-ext-tool-jira-workitem-ops](./skills/mpt-ext-tool-jira-workitem-ops/SKILL.md): Jira work item operations for reading, editing, commenting, assignment, and links
 - [mpt-ext-task-start-jira-work](./skills/mpt-ext-task-start-jira-work/SKILL.md): Move Jira issues and parent chain into active development state
+- [mpt-ext-task-ensure-active-sprint](./skills/mpt-ext-task-ensure-active-sprint/SKILL.md): Place a Jira issue in its board's active sprint without changing workflow state
 - [mpt-ext-task-commit-changes](./skills/mpt-ext-task-commit-changes/SKILL.md): Stage intended files and create a repository-compliant commit
 - [mpt-ext-task-create-work-branch](./skills/mpt-ext-task-create-work-branch/SKILL.md): Create a work branch from Jira issue context and branch type
 - [mpt-ext-task-dependabot-pr-policy-fix](./skills/mpt-ext-task-dependabot-pr-policy-fix/SKILL.md): Apply dependency-policy fixes to a selected Dependabot PR or checked-out branch

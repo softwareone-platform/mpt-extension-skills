@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Classify a Jira issue's Sprint field for start-jira-work.
+"""Classify a Jira issue's Sprint field for ensure-active-sprint.
 
 Reads an issue's ``fields`` object (or a full issue with a ``fields`` key) and
 deterministically reports the Sprint-field state so the skill can decide sprint
@@ -121,7 +121,7 @@ def main() -> int:
     require_python_version()
 
     parser = argparse.ArgumentParser(
-        description="Classify a Jira issue's Sprint field for start-jira-work."
+        description="Classify a Jira issue's Sprint field for ensure-active-sprint."
     )
     parser.add_argument(
         "--issue-file",

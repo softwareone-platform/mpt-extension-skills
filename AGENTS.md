@@ -112,6 +112,7 @@ Treat `knowledge/` as reusable guidance. Repository-specific commands and except
 - [mpt-ext-tool-git-branch-ops](./skills/mpt-ext-tool-git-branch-ops/SKILL.md): Git branch operations for selecting a base branch and creating a safe work branch
 - [mpt-ext-tool-jira-workitem-ops](./skills/mpt-ext-tool-jira-workitem-ops/SKILL.md): Jira work item operations for reading, editing, commenting, assignment, and links
 - [mpt-ext-task-start-jira-work](./skills/mpt-ext-task-start-jira-work/SKILL.md): Task for moving a Jira issue and its parent chain into In Progress and resolving sprint or assignee mismatches
+- [mpt-ext-task-ensure-active-sprint](./skills/mpt-ext-task-ensure-active-sprint/SKILL.md): Task for placing a Jira issue in its board's active sprint (subtask inheritance included) without changing workflow state
 - [mpt-ext-task-commit-changes](./skills/mpt-ext-task-commit-changes/SKILL.md): Task for staging intended files and creating a repository-compliant commit
 - [mpt-ext-task-create-work-branch](./skills/mpt-ext-task-create-work-branch/SKILL.md): Task for reading Jira context and creating a correctly named work branch
 - [mpt-ext-task-dependabot-pr-policy-fix](./skills/mpt-ext-task-dependabot-pr-policy-fix/SKILL.md): Task for applying dependency-policy fixes to a selected Dependabot PR or checked-out branch
