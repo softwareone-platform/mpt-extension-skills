@@ -1,0 +1,4 @@
+interface:
+  display_name: "Write Python Unit Tests"
+  short_description: "Author or update Python (backend) pytest tests per the standard"
+  default_prompt: "Author or update Python (backend) pytest unit tests for the change set: read standards/unittests.md and treat it (not the linter) as the bar, then write tests with a visible AAA act, fixture-based setup (never helpers hiding arrange+act), parametrize, and no classes/annotations/docstrings/branching. Self-check; do not commit or open a PR."

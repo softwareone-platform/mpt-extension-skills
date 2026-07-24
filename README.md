@@ -25,6 +25,7 @@ Current skills:
 - [mpt-ext-task-handle-pr-comments](./skills/mpt-ext-task-handle-pr-comments/SKILL.md): Address existing PR review comments with scoped fixes or thread replies
 - [mpt-ext-task-move-jira-to-qa](./skills/mpt-ext-task-move-jira-to-qa/SKILL.md): Move a Jira issue into its correct post-merge status after reviewed work is merged
 - [mpt-ext-task-write-documentation](./skills/mpt-ext-task-write-documentation/SKILL.md): Author or refresh a repository's required documentation set following the documentation guideline
+- [mpt-ext-task-write-python-unittests](./skills/mpt-ext-task-write-python-unittests/SKILL.md): Author or update Python (backend) unit tests for a change set following the Python unit-testing standard
 - [mpt-ext-task-update-docs-from-changes](./skills/mpt-ext-task-update-docs-from-changes/SKILL.md): Update repository documentation from a code change set (unstaged, uncommitted, last commit, or branch diff)
 - [mpt-ext-task-create-initial-epic](./skills/mpt-ext-task-create-initial-epic/SKILL.md): Create the initial epic plus a 3d "Design, investigate and research" user story at kickoff
 - [mpt-ext-workflow-start-work](./skills/mpt-ext-workflow-start-work/SKILL.md): Coordinate branch creation and Jira start-of-work setup
