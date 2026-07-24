@@ -125,6 +125,7 @@ Treat `knowledge/` as reusable guidance. Repository-specific commands and except
 - [mpt-ext-task-handle-pr-comments](./skills/mpt-ext-task-handle-pr-comments/SKILL.md): Task for reading PR review feedback, applying scoped fixes, and replying in review threads
 - [mpt-ext-task-move-jira-to-qa](./skills/mpt-ext-task-move-jira-to-qa/SKILL.md): Task for transitioning a merged Jira issue into its correct post-merge status
 - [mpt-ext-task-write-documentation](./skills/mpt-ext-task-write-documentation/SKILL.md): Task for authoring or refreshing a repository's required documentation set per the documentation guideline
+- [mpt-ext-task-write-python-unittests](./skills/mpt-ext-task-write-python-unittests/SKILL.md): Task for authoring or updating Python (backend) unit tests for a change set per the Python unit-testing standard
 - [mpt-ext-task-update-docs-from-changes](./skills/mpt-ext-task-update-docs-from-changes/SKILL.md): Task for updating documentation from a code change set (unstaged, uncommitted, last commit, or branch diff)
 - [mpt-ext-task-create-initial-epic](./skills/mpt-ext-task-create-initial-epic/SKILL.md): Task for creating the initial epic plus a 3d "Design, investigate and research" user story
 - [mpt-ext-workflow-start-work](./skills/mpt-ext-workflow-start-work/SKILL.md): Workflow for coordinating branch creation and Jira start-state setup
