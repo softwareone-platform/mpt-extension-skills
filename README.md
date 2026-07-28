@@ -11,6 +11,7 @@ Current skills:
 - [mpt-ext-tool-gh-pr-ops](./skills/mpt-ext-tool-gh-pr-ops/SKILL.md): GitHub pull request operations for create, update, inspection, and comments
 - [mpt-ext-tool-git-branch-ops](./skills/mpt-ext-tool-git-branch-ops/SKILL.md): Git branch creation and branch-base selection workflow for starting work safely
 - [mpt-ext-tool-jira-workitem-ops](./skills/mpt-ext-tool-jira-workitem-ops/SKILL.md): Jira work item operations for reading, editing, commenting, assignment, and links
+- [mpt-ext-tool-teams-send-message](./skills/mpt-ext-tool-teams-send-message/SKILL.md): Post a message to a Microsoft Teams chat through a workflow webhook
 - [mpt-ext-task-start-jira-work](./skills/mpt-ext-task-start-jira-work/SKILL.md): Move Jira issues and parent chain into active development state
 - [mpt-ext-task-ensure-active-sprint](./skills/mpt-ext-task-ensure-active-sprint/SKILL.md): Place a Jira issue in its board's active sprint without changing workflow state
 - [mpt-ext-task-commit-changes](./skills/mpt-ext-task-commit-changes/SKILL.md): Stage intended files and create a repository-compliant commit
@@ -28,6 +29,7 @@ Current skills:
 - [mpt-ext-task-write-python-unittests](./skills/mpt-ext-task-write-python-unittests/SKILL.md): Author or update Python (backend) unit tests for a change set following the Python unit-testing standard
 - [mpt-ext-task-update-docs-from-changes](./skills/mpt-ext-task-update-docs-from-changes/SKILL.md): Update repository documentation from a code change set (unstaged, uncommitted, last commit, or branch diff)
 - [mpt-ext-task-create-initial-epic](./skills/mpt-ext-task-create-initial-epic/SKILL.md): Create the initial epic plus a 3d "Design, investigate and research" user story at kickoff
+- [mpt-ext-task-notify-pr-ready-in-teams](./skills/mpt-ext-task-notify-pr-ready-in-teams/SKILL.md): Notify a Teams chat when a PR is green — all checks pass and CodeRabbit approved
 - [mpt-ext-workflow-start-work](./skills/mpt-ext-workflow-start-work/SKILL.md): Coordinate branch creation and Jira start-of-work setup
 - [mpt-ext-workflow-dashboard-failure-triage](./skills/mpt-ext-workflow-dashboard-failure-triage/SKILL.md): Batch triage App Insights dashboard failures into MPT Jira bugs
 - [mpt-ext-workflow-fix-dependabot-prs](./skills/mpt-ext-workflow-fix-dependabot-prs/SKILL.md): Coordinate Dependabot PR discovery, policy fixes, validation, scoped check fixes, amend, and push
@@ -38,6 +40,7 @@ Current skills:
 - [mpt-ext-workflow-skill-authoring](./skills/mpt-ext-workflow-skill-authoring/SKILL.md): Shared workflow skill for creating and updating reusable skills
 - [mpt-ext-workflow-update-documentation](./skills/mpt-ext-workflow-update-documentation/SKILL.md): Coordinate updating documentation for a change set: update affected docs, self-check, and stage
 - [mpt-ext-workflow-decompose-tdr](./skills/mpt-ext-workflow-decompose-tdr/SKILL.md): Break a TDR or epic into agreed user stories and then estimated Back/Front subtasks
+- [mpt-ext-workflow-notify-pr-ready](./skills/mpt-ext-workflow-notify-pr-ready/SKILL.md): Notify a Teams chat on demand when a reviewed PR is green and CodeRabbit approved
 
 ## How to install
 
@@ -84,6 +87,7 @@ skills, for a guaranteed, named entry point into each SDLC step:
 - `/mpt-skill-authoring [purpose]` — create or update a reusable shared skill
 - `/mpt-update-docs` — update affected documentation for a change set and stage it
 - `/mpt-dashboard-triage` — triage extension dashboard failures into Jira
+- `/mpt-notify-pr-ready [<pr-or-branch>] [--to <destination>]` — notify a Teams chat when a reviewed PR is green
 
 The [hooks/](./hooks/) directory holds a `SessionStart` hook that injects a
 compact standards reminder and the command list at the start of each session.
