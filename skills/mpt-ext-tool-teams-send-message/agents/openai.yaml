@@ -1,0 +1,4 @@
+interface:
+  display_name: "Teams Send Message"
+  short_description: "Post one message to a Teams chat via a workflow webhook (primitive)"
+  default_prompt: "Post a message to a Microsoft Teams chat through its Workflows webhook. Take a resolved webhook environment-variable name and one source (plain text or an Adaptive Card file), build the envelope with the script, and POST it. Never hard-code or print the URL; report the result and stop on errors."

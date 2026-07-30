@@ -1,0 +1,4 @@
+interface:
+  display_name: "Notify PR Ready"
+  short_description: "On-demand Teams notification when a PR is green and approved"
+  default_prompt: "Run the flow to notify a Teams chat that a reviewed PR is ready. Delegate to the notify task: evaluate the green gate once (all checks pass and CodeRabbit approved), and only when green deliver the PR card. Do not wait or poll; report the blocker when nothing is sent."
