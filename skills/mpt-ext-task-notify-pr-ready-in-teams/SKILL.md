@@ -89,6 +89,7 @@ python3 "${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skill
   > "$workdir/pr_card.json"
 ```
 
+- The renderer displays successful Checks and approved CodeRabbit facts as green `✅` indicators; any unexpected non-empty state is displayed as a red `❌`.
 - Do not interpolate the PR title, author, or branch into shell commands; always route untrusted PR fields through `--pr-json`.
 
 6. Send the message through the Teams tool.
