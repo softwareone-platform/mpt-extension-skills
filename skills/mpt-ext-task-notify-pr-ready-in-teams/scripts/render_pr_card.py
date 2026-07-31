@@ -18,6 +18,8 @@ MIN_PYTHON = (3, 12)
 
 ADAPTIVE_SCHEMA = "http://adaptivecards.io/schemas/adaptive-card.json"
 ADAPTIVE_VERSION = "1.4"
+GREEN_TICK = "✅"
+RED_CROSS = "❌"
 
 
 def require_python_version() -> None:
@@ -43,6 +45,12 @@ def _fact(title: str, value: str | None) -> dict | None:
     return {"title": title, "value": md_escape(value)}
 
 
+def _ready_state_value(value: str | None, expected: str) -> str | None:
+    if value is None or not value.strip():
+        return None
+    return GREEN_TICK if value.casefold() == expected.casefold() else RED_CROSS
+
+
 def build_card(
     *,
     title: str,
@@ -66,8 +74,8 @@ def build_card(
         for f in (
             _fact("Author", author),
             _fact("Branch", f"{branch} → {base}" if branch and base else branch or base),
-            _fact("Checks", checks_state),
-            _fact("CodeRabbit", coderabbit_state),
+            _fact("Checks", _ready_state_value(checks_state, "success")),
+            _fact("CodeRabbit", _ready_state_value(coderabbit_state, "APPROVED")),
         )
         if f is not None
     ]
@@ -76,8 +84,8 @@ def build_card(
         {
             "type": "TextBlock",
             "text": heading,
-            "weight": "Bolder",
-            "size": "Medium",
+            "weight": "bolder",
+            "size": "medium",
             "wrap": True,
         },
         {"type": "TextBlock", "text": md_escape(title), "wrap": True},

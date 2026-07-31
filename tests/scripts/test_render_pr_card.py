@@ -12,6 +12,14 @@ def test_fact_skips_empty():
     assert mod._fact("A", None) is None
 
 
+def test_ready_state_value():
+    assert mod._ready_state_value("success", "success") == "✅"
+    assert mod._ready_state_value("approved", "APPROVED") == "✅"
+    assert mod._ready_state_value("failure", "success") == "❌"
+    assert mod._ready_state_value(None, "success") is None
+    assert mod._ready_state_value("  ", "success") is None
+
+
 def test_md_escape():
     assert mod.md_escape("plain text") == "plain text"
     assert mod.md_escape("[x](y)") == "\\[x\\]\\(y\\)"
@@ -41,11 +49,30 @@ def test_build_card_full():
     )
     assert card["type"] == "AdaptiveCard"
     assert card["body"][0]["text"] == "PR #42 ready for merge"
+    assert card["body"][0]["weight"] == "bolder"
+    assert card["body"][0]["size"] == "medium"
     factset = [b for b in card["body"] if b["type"] == "FactSet"][0]
     titles = [f["title"] for f in factset["facts"]]
     assert titles == ["Author", "Branch", "Checks", "CodeRabbit"]
     assert factset["facts"][1]["value"] == "feature/x → main"
+    assert factset["facts"][2]["value"] == "✅"
+    assert factset["facts"][3]["value"] == "✅"
     assert len(card["actions"]) == 2
+
+
+def test_build_card_uses_red_crosses_for_unexpected_states():
+    card = mod.build_card(
+        title="Add X",
+        number="42",
+        url="https://gh/pr/42",
+        checks_state="failure",
+        coderabbit_state="CHANGES_REQUESTED",
+    )
+    factset = [body for body in card["body"] if body["type"] == "FactSet"][0]
+    assert factset["facts"] == [
+        {"title": "Checks", "value": "❌"},
+        {"title": "CodeRabbit", "value": "❌"},
+    ]
 
 
 def test_build_card_minimal_no_number_no_facts():
