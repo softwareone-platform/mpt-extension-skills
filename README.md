@@ -139,6 +139,8 @@ Current documents in `standards/`:
 - [packages-and-dependencies.md](./standards/packages-and-dependencies.md): shared dependency management rules for Python repositories, including `uv`, lock files, and version pinning strategy
 - [pull-requests.md](./standards/pull-requests.md): shared pull request rules for titles, commit structure, reviewability, testing, and release branch workflows
 - [python-coding.md](./standards/python-coding.md): shared Python coding conventions, including typing, docstrings, linting, and naming expectations
+- [python-error-handling.md](./standards/python-error-handling.md): shared Python error and exception handling policy, including exception hierarchies, wrapping, and logging rules
+- [python-http-integrations.md](./standards/python-http-integrations.md): shared Python HTTP and external-service integration rules, including timeouts, error translation, retry policies, and idempotency
 - [sdk-pipeline-steps.md](./standards/sdk-pipeline-steps.md): rules for writing Extension SDK pipeline steps, including immutable snapshots, hook-driven transitions, flow-control errors, and configuration
 - [skills.md](./standards/skills.md): shared rules and best practices for writing reusable skills
 - [unittests.md](./standards/unittests.md): Python unit testing guidelines, including test structure, parametrization, determinism, and mocking rules
