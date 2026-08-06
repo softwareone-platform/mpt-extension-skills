@@ -39,6 +39,21 @@ reviews:
     - path: "**/*"
       instructions: |
         For each subsequent commit in this PR, explicitly verify if previous review comments have been resolved
+    - path: "**/*.py"
+      instructions: |
+        Review Python code against the shared Python standards and use them as the source of truth:
+        - `standards/python-coding.md` for coding conventions (typing, docstrings, linting, naming).
+        - `standards/python-error-handling.md` for exception hierarchies, wrapping, and logging rules.
+        - `standards/python-http-integrations.md` for HTTP timeout, retry, error-classification, and idempotency rules.
+        - `standards/cli.md` when the change implements CLI commands.
+    - path: "**/tests/**/*.py"
+      instructions: |
+        Review Python test code against `standards/unittests.md`.
+        Use that document as the source of truth for test structure, naming, fixtures, and assertion style.
+    - path: "{pyproject.toml,uv.lock}"
+      instructions: |
+        Review dependency changes against `standards/packages-and-dependencies.md`.
+        Use that document as the source of truth for dependency declaration, version pinning, and lock-file maintenance.
     - path: "docs/**"
       instructions: |
         Review documentation changes against `standards/documentation.md` and `docs/documentation.md`.
