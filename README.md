@@ -41,6 +41,7 @@ Current skills:
 - [mpt-ext-workflow-update-documentation](./skills/mpt-ext-workflow-update-documentation/SKILL.md): Coordinate updating documentation for a change set: update affected docs, self-check, and stage
 - [mpt-ext-workflow-decompose-tdr](./skills/mpt-ext-workflow-decompose-tdr/SKILL.md): Break a TDR or epic into agreed user stories and then estimated Back/Front subtasks
 - [mpt-ext-workflow-notify-pr-ready](./skills/mpt-ext-workflow-notify-pr-ready/SKILL.md): Notify a Teams chat on demand when a reviewed PR is green and CodeRabbit approved
+- [mpt-ext-workflow-coderabbit-review-loop](./skills/mpt-ext-workflow-coderabbit-review-loop/SKILL.md): Loop bounded CodeRabbit re-review iterations until the PR is approved, with misbehavior detection and per-iteration reports
 
 ## How to install
 

@@ -31,6 +31,7 @@ SDLC slash commands (thin wrappers over the workflow skills):
 - /mpt-skill-authoring [purpose] create or update a reusable shared skill
 - /mpt-update-docs              update affected docs for a change set and stage them
 - /mpt-dashboard-triage         triage extension dashboard failures into Jira
+- /mpt-coderabbit-review-loop   loop CodeRabbit re-reviews until approval (max 5)
 EOF
 
 exit 0

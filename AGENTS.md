@@ -141,6 +141,7 @@ Treat `knowledge/` as reusable guidance. Repository-specific commands and except
 - [mpt-ext-workflow-update-documentation](./skills/mpt-ext-workflow-update-documentation/SKILL.md): Workflow for updating documentation for a change set, self-checking against the guideline, and staging the docs
 - [mpt-ext-workflow-decompose-tdr](./skills/mpt-ext-workflow-decompose-tdr/SKILL.md): Workflow for breaking a TDR or epic into agreed user stories and estimated Back/Front subtasks
 - [mpt-ext-workflow-notify-pr-ready](./skills/mpt-ext-workflow-notify-pr-ready/SKILL.md): Workflow for notifying a Teams chat on demand when a reviewed PR is green and CodeRabbit approved
+- [mpt-ext-workflow-coderabbit-review-loop](./skills/mpt-ext-workflow-coderabbit-review-loop/SKILL.md): Workflow for looping bounded CodeRabbit re-review iterations until approval, with stall, outage, and iteration-cap safeguards
 
 ## Agent Expectations
 
