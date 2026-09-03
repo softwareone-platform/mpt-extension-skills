@@ -4,7 +4,9 @@
 Given a change source (unstaged, uncommitted, last commit, or a diff between
 branches), list the changed files and map each changed code path to the
 repository documents that the change most likely affects, following the
-documentation guideline in standards/documentation.md.
+documentation guideline in standards/documentation.md. For the working-tree
+sources (unstaged, uncommitted), untracked files are included as added files,
+because `git diff` does not list them.
 
 The path-to-document mapping is a deterministic heuristic. It tells the skill
 which documents to inspect; the skill makes the final decision about which docs
@@ -103,9 +105,29 @@ ALWAYS_REVIEW = ["README.md", "AGENTS.md"]
 DOC_PREFIXES = ("docs/",)
 DOC_FILES = {"README.md", "AGENTS.md"}
 
+# Sources that compare against the working tree and therefore must also pick up
+# untracked (never-staged) files, which `git diff` does not list.
+WORKING_TREE_SOURCES = {"unstaged", "uncommitted"}
+
 
 def is_doc_path(path: str) -> bool:
     return path.startswith(DOC_PREFIXES) or path in DOC_FILES
+
+
+def run_git(args: list[str]) -> list[str]:
+    """Run a git command and return its non-empty stdout lines."""
+    result = subprocess.run(
+        ["git", *args],
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        print(
+            f"error: git {' '.join(args)} failed: {result.stderr.strip()}",
+            file=sys.stderr,
+        )
+        raise SystemExit(1)
+    return [line for line in result.stdout.splitlines() if line.strip()]
 
 
 def git_diff_name_status(source: str, base: str) -> list[str]:
@@ -120,18 +142,18 @@ def git_diff_name_status(source: str, base: str) -> list[str]:
     else:  # pragma: no cover - argparse restricts choices
         raise ValueError(f"unknown source: {source}")
 
-    result = subprocess.run(
-        ["git", *args],
-        capture_output=True,
-        text=True,
-    )
-    if result.returncode != 0:
-        print(
-            f"error: git {' '.join(args)} failed: {result.stderr.strip()}",
-            file=sys.stderr,
-        )
-        raise SystemExit(1)
-    return [line for line in result.stdout.splitlines() if line.strip()]
+    return run_git(args)
+
+
+def git_untracked_files() -> list[str]:
+    """Working-tree paths that Git neither tracks nor ignores.
+
+    `--full-name` and the `:/` pathspec make the listing repo-wide and
+    repo-root-relative, matching `git diff --name-status`; plain `ls-files`
+    reports paths relative to the current directory and skips everything
+    outside it.
+    """
+    return run_git(["ls-files", "--others", "--exclude-standard", "--full-name", "--", ":/"])
 
 
 def parse_changes(lines: list[str]) -> list[dict]:
@@ -151,6 +173,20 @@ def parse_changes(lines: list[str]) -> list[dict]:
             old_path, path = None, parts[-1]
         changes.append({"status": status, "path": path, "old_path": old_path})
     return changes
+
+
+def untracked_changes(known_paths: set[str]) -> list[dict]:
+    """Untracked working-tree files as added-file records.
+
+    `git diff` never lists untracked paths, so without this a change set that
+    only adds files (a whole new skill directory, for example) maps to no
+    documents at all. Paths already reported by the diff are skipped.
+    """
+    return [
+        {"status": "A", "path": path, "old_path": None}
+        for path in git_untracked_files()
+        if path not in known_paths
+    ]
 
 
 def classify(change: dict) -> tuple[str, str] | None:
@@ -208,6 +244,8 @@ def find_stale_doc_references(removed_paths: list[str]) -> list[dict]:
 
 def build_report(source: str, base: str) -> dict:
     changes = parse_changes(git_diff_name_status(source, base))
+    if source in WORKING_TREE_SOURCES:
+        changes += untracked_changes({c["path"] for c in changes})
 
     doc_changes = [c for c in changes if is_doc_path(c["path"])]
     code_changes = [c for c in changes if not is_doc_path(c["path"])]

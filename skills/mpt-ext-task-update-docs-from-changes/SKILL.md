@@ -25,8 +25,8 @@ Bring repository documentation (`docs/*`, `README.md`, `AGENTS.md`) up to date w
 
 - A target repository that is a Git working tree with history.
 - The change source to document:
-  - `unstaged`: working tree vs index
-  - `uncommitted`: working tree vs `HEAD` (staged + unstaged)
+  - `unstaged`: working tree vs index (includes untracked files)
+  - `uncommitted`: working tree vs `HEAD` (staged + unstaged, includes untracked files)
   - `last-commit`: `HEAD~1..HEAD`
   - `branch-diff`: `<base>...HEAD` (base defaults to `origin/main`)
 - Optional base ref when the source is `branch-diff`.
