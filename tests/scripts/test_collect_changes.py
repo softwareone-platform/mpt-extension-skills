@@ -57,6 +57,29 @@ def test_git_diff_name_status_error(monkeypatch):
     assert excinfo.value.code == 1
 
 
+def test_git_untracked_files(monkeypatch):
+    seen = {}
+
+    def fake_run(args, capture_output, text):
+        seen["args"] = args
+        return subprocess.CompletedProcess(args, 0, stdout="skills/new/scripts/run.py\n\n", stderr="")
+
+    monkeypatch.setattr(mod.subprocess, "run", fake_run)
+
+    result = mod.git_untracked_files()
+
+    assert result == ["skills/new/scripts/run.py"]
+    assert seen["args"] == ["git", "ls-files", "--others", "--exclude-standard", "--full-name", "--", ":/"]
+
+
+def test_untracked_changes_skips_paths_already_in_the_diff(monkeypatch):
+    monkeypatch.setattr(mod, "git_untracked_files", lambda: ["src/new.py", "src/known.py"])
+
+    result = mod.untracked_changes({"src/known.py"})
+
+    assert result == [{"status": "A", "path": "src/new.py", "old_path": None}]
+
+
 def test_find_stale_doc_references(tmp_path, monkeypatch):
     assert mod.find_stale_doc_references([]) == []
     doc = tmp_path / "d.md"
@@ -73,6 +96,7 @@ def test_existing_docs_on_disk_runs():
 
 def test_build_report_and_main(monkeypatch):
     monkeypatch.setattr(mod, "git_diff_name_status", lambda s, b: ["M\tdocs/usage.md", "A\tsrc/app.py", "D\tlib/gone.py"])
+    monkeypatch.setattr(mod, "git_untracked_files", lambda: [])
     monkeypatch.setattr(mod, "existing_docs_on_disk", lambda: [])
     report = mod.build_report("branch-diff", "origin/main")
     assert report["source"] == "branch-diff"
@@ -81,3 +105,38 @@ def test_build_report_and_main(monkeypatch):
 
     code, out, _ = call_main(mod, ["--source", "unstaged"])
     assert code == 0 and json.loads(out)["source"] == "unstaged"
+
+
+@pytest.mark.parametrize("source", ["unstaged", "uncommitted"])
+def test_build_report_collects_untracked_files_as_added(monkeypatch, source):
+    monkeypatch.setattr(mod, "git_diff_name_status", lambda s, b: [])
+    monkeypatch.setattr(mod, "git_untracked_files", lambda: ["src/newmod.py"])
+    monkeypatch.setattr(mod, "existing_docs_on_disk", lambda: [])
+    added = [{"status": "A", "path": "src/newmod.py", "old_path": None}]
+
+    report = mod.build_report(source, "origin/main")
+
+    assert (report["changed_files"], report["code_changes"]) == (added, added)
+
+
+@pytest.mark.parametrize("source", ["unstaged", "uncommitted"])
+def test_build_report_maps_untracked_files_to_docs(monkeypatch, source):
+    monkeypatch.setattr(mod, "git_diff_name_status", lambda s, b: [])
+    monkeypatch.setattr(mod, "git_untracked_files", lambda: ["src/newmod.py"])
+    monkeypatch.setattr(mod, "existing_docs_on_disk", lambda: [])
+
+    report = mod.build_report(source, "origin/main")
+
+    assert report["affected_docs"] == {
+        mod.ARCH_DOC: [{"path": "src/newmod.py", "reason": "source module added"}],
+    }
+
+
+def test_build_report_ignores_untracked_files_for_history_sources(monkeypatch):
+    monkeypatch.setattr(mod, "git_diff_name_status", lambda s, b: [])
+    monkeypatch.setattr(mod, "git_untracked_files", lambda: ["src/newmod.py"])
+    monkeypatch.setattr(mod, "existing_docs_on_disk", lambda: [])
+
+    report = mod.build_report("last-commit", "origin/main")
+
+    assert report["changed_files"] == []
