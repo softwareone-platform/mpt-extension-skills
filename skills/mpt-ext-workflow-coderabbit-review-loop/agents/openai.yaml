@@ -1,0 +1,4 @@
+interface:
+  display_name: "CodeRabbit Review Loop"
+  short_description: "Loop CodeRabbit re-review iterations until the PR is approved"
+  default_prompt: "Run bounded CodeRabbit review iterations on the open pull request: address the bot's unresolved feedback, validate, commit, push, then wait for its new verdict. Finish only when CodeRabbit approves the current head and checks are green; stop early on non-convergence, unresponsiveness, or outage. Cap at 5 iterations, reporting each."
