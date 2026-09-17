@@ -84,6 +84,8 @@ Treat `knowledge/` as reusable guidance. Repository-specific commands and except
 - [packages-and-dependencies.md](./standards/packages-and-dependencies.md): Python dependency management rules
 - [pull-requests.md](./standards/pull-requests.md): pull request workflow and history rules
 - [python-coding.md](./standards/python-coding.md): Python coding conventions
+- [python-error-handling.md](./standards/python-error-handling.md): Python error and exception handling policy, including hierarchies, wrapping, and logging rules
+- [python-http-integrations.md](./standards/python-http-integrations.md): Python HTTP and external-service integration rules — timeouts, error translation, retry policies, and idempotency
 - [sdk-pipeline-steps.md](./standards/sdk-pipeline-steps.md): rules for writing Extension SDK pipeline steps, including immutable snapshots, hook-driven transitions, flow-control errors, and configuration
 - [skills.md](./standards/skills.md): shared rules and best practices for writing reusable skills
 - [unittests.md](./standards/unittests.md): Python unit testing guidelines
