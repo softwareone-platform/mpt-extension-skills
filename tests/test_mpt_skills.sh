@@ -307,6 +307,7 @@ test_install_from_local_path_uses_local_git_commit() {
   git -C "${source_dir}" init >/dev/null
   git -C "${source_dir}" config user.email test@example.com
   git -C "${source_dir}" config user.name Test
+  git -C "${source_dir}" config commit.gpgsign false
   git -C "${source_dir}" add . >/dev/null
   git -C "${source_dir}" commit -m init >/dev/null
 
