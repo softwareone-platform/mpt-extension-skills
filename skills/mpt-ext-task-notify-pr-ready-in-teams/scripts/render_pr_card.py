@@ -6,11 +6,12 @@ Deterministically templates the pull-request facts into an Adaptive Card
 Only the card content is built here; resolving the destination, evaluating the
 "green" gate, and posting are handled elsewhere in the skill.
 
-PR-supplied text (title, author, branch names) is placed into the card as data
+PR-supplied text (title, author, repository, branch names) is placed into the card as data
 only; it never controls the card structure.
 """
 import argparse
 import json
+import re
 import sys
 
 
@@ -57,6 +58,7 @@ def build_card(
     number,
     url: str,
     author: str | None = None,
+    repository: str | None = None,
     branch: str | None = None,
     base: str | None = None,
     jira_url: str | None = None,
@@ -73,6 +75,7 @@ def build_card(
         f
         for f in (
             _fact("Author", author),
+            _fact("Repository", repository),
             _fact("Branch", f"{branch} → {base}" if branch and base else branch or base),
             _fact("Checks", _ready_state_value(checks_state, "success")),
             _fact("CodeRabbit", _ready_state_value(coderabbit_state, "APPROVED")),
@@ -106,6 +109,15 @@ def build_card(
     }
 
 
+_PR_URL = re.compile(r"^https://github\.com/([^/\s]+/[^/\s]+)/pull/\d+")
+
+
+def _repository_from_url(url) -> str | None:
+    """Return ``owner/repo`` from a GitHub PR URL, or None when it does not match."""
+    match = _PR_URL.match(str(url or ""))
+    return match.group(1) if match else None
+
+
 def fields_from_snapshot(data: dict) -> dict:
     """Extract card fields from a ``gh pr view --json ...`` snapshot object.
 
@@ -121,6 +133,7 @@ def fields_from_snapshot(data: dict) -> dict:
         "number": data.get("number"),
         "url": data.get("url"),
         "author": author_name,
+        "repository": _repository_from_url(data.get("url")),
         "branch": data.get("headRefName"),
         "base": data.get("baseRefName"),
     }
@@ -150,6 +163,9 @@ def main() -> int:
     parser.add_argument("--url", help="PR URL (overrides --pr-json).")
     parser.add_argument("--number", help="PR number (overrides --pr-json).")
     parser.add_argument("--author", help="PR author (overrides --pr-json).")
+    parser.add_argument(
+        "--repository", help="Repository as owner/repo (overrides --pr-json, derived from its URL)."
+    )
     parser.add_argument("--branch", help="Head branch name (overrides --pr-json).")
     parser.add_argument("--base", help="Base branch name (overrides --pr-json).")
     parser.add_argument("--jira-url", help="Linked Jira issue URL, when known.")
@@ -174,6 +190,7 @@ def main() -> int:
             number=pick(args.number, "number"),
             url=pick(args.url, "url") or "",
             author=pick(args.author, "author"),
+            repository=pick(args.repository, "repository"),
             branch=pick(args.branch, "branch"),
             base=pick(args.base, "base"),
             jira_url=args.jira_url,
