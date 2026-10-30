@@ -1,5 +1,6 @@
 import json
 
+import pytest
 from helpers import call_main, load
 
 SCRIPT_UNDER_TEST = "skills/mpt-ext-task-notify-pr-ready-in-teams/scripts/evaluate_pr_green.py"
@@ -166,3 +167,51 @@ def test_main_non_object_json():
     code, _, err = call_main(mod, [], stdin="[]")
     assert code == 1
     assert "expected a JSON object" in err
+
+
+@pytest.mark.parametrize(
+    ("payload", "expected"),
+    [
+        ({}, {"state": "OPEN", "is_draft": False, "ok": True}),
+        ({"state": "OPEN", "isDraft": False}, {"state": "OPEN", "is_draft": False, "ok": True}),
+        ({"state": "OPEN", "isDraft": True}, {"state": "OPEN", "is_draft": True, "ok": False}),
+        ({"state": "merged"}, {"state": "MERGED", "is_draft": False, "ok": False}),
+        ({"state": "CLOSED", "isDraft": True}, {"state": "CLOSED", "is_draft": True, "ok": False}),
+    ],
+)
+def test_evaluate_pr_state(payload, expected):
+    result = mod.evaluate_pr_state(payload)
+
+    assert result == expected
+
+
+def _green_payload(**pr_fields):
+    return {
+        "statusCheckRollup": [{"state": "SUCCESS"}],
+        "latestReviews": [{"author": {"login": "coderabbitai"}, "state": "APPROVED"}],
+        **pr_fields,
+    }
+
+
+@pytest.mark.parametrize(
+    ("pr_fields", "reasons"),
+    [
+        ({"state": "MERGED"}, ["PR is MERGED, not OPEN"]),
+        ({"state": "CLOSED"}, ["PR is CLOSED, not OPEN"]),
+        ({"state": "OPEN", "isDraft": True}, ["PR is a draft"]),
+    ],
+)
+def test_evaluate_not_green_unless_open(pr_fields, reasons):
+    result = mod.evaluate(_green_payload(**pr_fields), mod.DEFAULT_CODERABBIT_LOGINS)
+
+    assert result["is_green"] is False
+    assert result["reasons"] == reasons
+
+
+def test_evaluate_green_for_open_pr():
+    result = mod.evaluate(
+        _green_payload(state="OPEN", isDraft=False), mod.DEFAULT_CODERABBIT_LOGINS
+    )
+
+    assert result["is_green"] is True
+    assert result["reasons"] == []
