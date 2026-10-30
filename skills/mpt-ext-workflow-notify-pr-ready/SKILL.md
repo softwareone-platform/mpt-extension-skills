@@ -7,7 +7,7 @@ description: Run the on-demand flow that notifies a Microsoft Teams chat when a 
 
 ## Purpose
 
-Coordinate the on-demand step that publishes a pull request's details to a Microsoft Teams chat once the PR is green: all required checks pass and CodeRabbit has approved.
+Coordinate the on-demand step that publishes a pull request's details to a Microsoft Teams chat once the PR is green: it is open (not a draft), all required checks pass, and CodeRabbit has approved.
 
 ## Use When
 
@@ -25,6 +25,7 @@ Coordinate the on-demand step that publishes a pull request's details to a Micro
 
 - The target PR: a PR number or the current branch's PR.
 - Optional `--to <destination>` override for the Teams destination.
+- Optional comment from the user, shown on the card under the header.
 - GitHub authentication to read PR checks and reviews.
 - The Teams webhook URL available through an environment variable (never committed).
 - Installed shared package root:
@@ -47,7 +48,7 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 - Read shared docs only when the repository explicitly points to them. Resolve those shared docs from `${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current` when available; otherwise read them from the `main` branch of the shared GitHub repository.
 
 2. Notify when the PR is green.
-- Use `mpt-ext-task-notify-pr-ready-in-teams` for the target PR, passing the optional `--to` destination through.
+- Use `mpt-ext-task-notify-pr-ready-in-teams` for the target PR, passing the optional `--to` destination and the comment through verbatim.
 - Let that task read the PR, evaluate the green gate once, resolve the destination, render the card, and deliver it through the Teams tool.
 - Act on its returned outcome: report delivery on success; on a failed gate or unresolved destination, stop and report the exact blocker it returns. Do not wait or poll.
 

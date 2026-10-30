@@ -2,9 +2,10 @@
 """Decide whether a pull request is "green" and ready to notify.
 
 Reads the JSON produced by
-``gh pr view <pr> --json statusCheckRollup,latestReviews,reviews`` on stdin and
-reports, deterministically, whether the PR meets the notification gate:
+``gh pr view <pr> --json statusCheckRollup,latestReviews,reviews,state,isDraft`` on
+stdin and reports, deterministically, whether the PR meets the notification gate:
 
+- the PR is open and not a draft (checked only when ``state``/``isDraft`` are present),
 - every status check has passed (none failing, none still pending), and
 - CodeRabbit has submitted a review whose latest state is ``APPROVED``.
 
@@ -131,10 +132,26 @@ def evaluate_coderabbit(payload: dict, logins: tuple[str, ...]) -> dict:
     }
 
 
+def evaluate_pr_state(payload: dict) -> dict:
+    """Only an open, non-draft PR is ready for merge.
+
+    A snapshot without ``state`` counts as open, so callers that do not request
+    the field keep the checks-and-CodeRabbit gate unchanged.
+    """
+    state = str(payload.get("state") or "OPEN").upper()
+    is_draft = bool(payload.get("isDraft"))
+    return {"state": state, "is_draft": is_draft, "ok": state == "OPEN" and not is_draft}
+
+
 def evaluate(payload: dict, logins: tuple[str, ...]) -> dict:
+    pr = evaluate_pr_state(payload)
     checks = evaluate_checks(payload.get("statusCheckRollup"))
     coderabbit = evaluate_coderabbit(payload, logins)
     reasons = []
+    if pr["state"] != "OPEN":
+        reasons.append(f"PR is {pr['state']}, not OPEN")
+    if pr["is_draft"]:
+        reasons.append("PR is a draft")
     if not checks["ok"]:
         if checks["failing"]:
             reasons.append("failing checks: " + ", ".join(checks["failing"]))
@@ -148,7 +165,8 @@ def evaluate(payload: dict, logins: tuple[str, ...]) -> dict:
         else:
             reasons.append(f"CodeRabbit review state is {coderabbit['state']}, not APPROVED")
     return {
-        "is_green": checks["ok"] and coderabbit["approved"],
+        "is_green": pr["ok"] and checks["ok"] and coderabbit["approved"],
+        "pr": pr,
         "checks": checks,
         "coderabbit": coderabbit,
         "reasons": reasons,
@@ -159,7 +177,7 @@ def main() -> int:
     require_python_version()
 
     parser = argparse.ArgumentParser(
-        description="Decide whether a PR is green (all checks pass and CodeRabbit approved)."
+        description="Decide whether a PR is green (open, all checks pass, and CodeRabbit approved)."
     )
     parser.add_argument(
         "--coderabbit-login",

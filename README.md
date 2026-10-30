@@ -87,7 +87,7 @@ skills, for a guaranteed, named entry point into each SDLC step:
 - `/mpt-skill-authoring [purpose]` — create or update a reusable shared skill
 - `/mpt-update-docs` — update affected documentation for a change set and stage it
 - `/mpt-dashboard-triage` — triage extension dashboard failures into Jira
-- `/mpt-notify-pr-ready [<pr-or-branch>] [--to <destination>]` — notify a Teams chat when a reviewed PR is green
+- `/mpt-notify-pr-ready [<pr-number>] [--to <destination>] [--] [<comment>]` — notify a Teams chat when a reviewed PR is green, with an optional comment
 
 The [hooks/](./hooks/) directory holds a `SessionStart` hook that injects a
 compact standards reminder and the command list at the start of each session.

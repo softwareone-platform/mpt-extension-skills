@@ -54,39 +54,47 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 
 3. Build the message envelope deterministically.
 - Use the bundled script to render the Teams Workflows message envelope; do not hand-write the envelope JSON.
-- Use a private per-invocation working directory (created with `mktemp -d` and removed on exit with a `trap`) so concurrent runs never collide on shared paths and no temp files are left behind:
+- Use a private per-invocation working directory, created once with `mktemp -d`, so concurrent runs never collide on shared paths. Each command runs in a fresh shell, so substitute the printed path for `<workdir>` in later steps. Do not register an `rm -rf` cleanup `trap`: it deletes the payload as soon as the first command exits, and auto-mode safety checks block recursive deletes. The post command in step 4 removes the known files.
 
 ```bash
-workdir="$(mktemp -d)"; trap 'rm -rf "$workdir"' EXIT
+mktemp -d   # prints the working directory, <workdir> below
 
 # From a plain-text body
 python3 "${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skills/mpt-ext-tool-teams-send-message/scripts/build_teams_message.py" \
-  --text "Build passed" > "$workdir/payload.json"
+  --text "Build passed" > "<workdir>/payload.json"
 
-# From an existing Adaptive Card (card_file is the caller's own card, kept
-# separate from this tool's temporary payload directory)
-card_file="<path-to-existing-adaptive-card.json>"
+# From an existing Adaptive Card (the caller's own card, kept separate from
+# this tool's temporary payload directory)
 python3 "${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current/skills/mpt-ext-tool-teams-send-message/scripts/build_teams_message.py" \
-  --card-file "$card_file" > "$workdir/payload.json"
+  --card-file "<path-to-existing-adaptive-card.json>" > "<workdir>/payload.json"
 ```
 
 4. Post the message to the webhook.
-- POST the rendered payload to the resolved URL using Bash indirect expansion on the *resolved* environment-variable name, so any destination works and the secret is never expanded into logs or command history. Bound the request with `--connect-timeout`/`--max-time` so a blocked network cannot hang the workflow, capture the HTTP status and body, and treat only 2xx as success:
+- POST the rendered payload to the resolved URL, reading it with `printenv` from the *resolved* environment-variable name, so any destination works and the secret is never expanded into logs or command history. The block runs in bash and zsh: run it directly in the agent's shell, not through `bash -c`, which auto-mode safety checks block because they cannot inspect the `rm` inside it. Bound the request with `--connect-timeout`/`--max-time` so a blocked network cannot hang the workflow, capture the HTTP status and body, and treat only 2xx as success:
 
 ```bash
 webhook_env="<resolved-webhook-environment-variable-name>"   # e.g. MPT_TEAMS_WEBHOOK_URL
-# Run under bash: this uses bash indirect expansion (${!var}). Avoid the name
-# `status`, which is a read-only special variable in zsh.
+# printenv reads the variable by name in any shell, without printing it. Avoid
+# the name `status`, which is a read-only special variable in zsh.
+webhook_url="$(printenv "$webhook_env")"
 http_status="$(curl -sS --connect-timeout 10 --max-time 30 \
-  -o "$workdir/response.txt" -w '%{http_code}' -X POST \
+  -o "<workdir>/response.txt" -w '%{http_code}' -X POST \
   -H "Content-Type: application/json" \
-  --data @"$workdir/payload.json" "${!webhook_env}")"
+  --data @"<workdir>/payload.json" "$webhook_url")"
+delivered=0
 if [ "${http_status#2}" = "${http_status}" ]; then
   echo "Teams delivery failed: HTTP ${http_status} via ${webhook_env}" >&2
-  cat "$workdir/response.txt" >&2
-  exit 1
+  cat "<workdir>/response.txt" >&2
+else
+  delivered=1
+  echo "Teams delivery OK: HTTP ${http_status} via ${webhook_env}"
 fi
-echo "Teams delivery OK: HTTP ${http_status} via ${webhook_env}"
+# Clean up on both paths, by name, before reporting the exit status. A cleanup
+# failure is a warning, not a delivery failure: the message was already posted,
+# and reporting it as failed would invite a duplicate resend.
+rm -f "<workdir>/payload.json" "<workdir>/response.txt" && rmdir "<workdir>" \
+  || echo "Warning: could not remove the working files in <workdir>" >&2
+[ "$delivered" = 1 ]
 ```
 
 - A successful Workflows webhook call returns HTTP `202 Accepted` with an empty body.
@@ -94,6 +102,12 @@ echo "Teams delivery OK: HTTP ${http_status} via ${webhook_env}"
 5. Report the result clearly.
 - State the destination environment variable used (its name, never its value) and whether the post succeeded.
 - Because `curl -sS` exits `0` even on HTTP 4xx/5xx, rely on the captured status, not the exit code. On a non-2xx response, report the HTTP status and body and stop; do not retry blindly.
+- The post command removes the working files on success and failure; report a cleanup warning separately from the delivery result. When building the payload fails in step 3 and nothing is posted, remove them the same way, by name and never recursively, and report a cleanup failure as a warning:
+
+```bash
+rm -f "<workdir>/payload.json" "<workdir>/response.txt" && rmdir "<workdir>" \
+  || echo "Warning: could not remove the working files in <workdir>" >&2
+```
 
 ## Guardrails
 
