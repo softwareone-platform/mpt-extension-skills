@@ -138,11 +138,11 @@ def test_evaluate_green_and_reasons():
     assert "not APPROVED" in joined
 
 
-def test_evaluate_reasons_no_checks_and_no_review():
+def test_evaluate_reasons_no_checks_and_no_coderabbit_activity():
     result = mod.evaluate({}, mod.DEFAULT_CODERABBIT_LOGINS)
-    joined = " | ".join(result["reasons"])
-    assert "no status checks found" in joined
-    assert "no CodeRabbit review found" in joined
+
+    assert result["reasons"] == ["no status checks found on the PR"]
+    assert result["coderabbit"]["required"] is False
 
 
 def test_main_reads_stdin():
@@ -215,3 +215,101 @@ def test_evaluate_green_for_open_pr():
 
     assert result["is_green"] is True
     assert result["reasons"] == []
+
+
+@pytest.fixture
+def checks_only_payload():
+    def factory(**fields):
+        return {"statusCheckRollup": [{"state": "SUCCESS"}], **fields}
+
+    return factory
+
+
+def test_evaluate_green_without_coderabbit_activity(checks_only_payload):
+    result = mod.evaluate(checks_only_payload(), mod.DEFAULT_CODERABBIT_LOGINS)
+
+    assert result["is_green"] is True
+    assert result["coderabbit"]["required"] is False
+    assert result["reasons"] == []
+
+
+def test_evaluate_requires_coderabbit_when_it_reviewed(checks_only_payload):
+    payload = checks_only_payload(
+        reviews=[{"author": {"login": "coderabbitai"}, "state": "CHANGES_REQUESTED"}]
+    )
+
+    result = mod.evaluate(payload, mod.DEFAULT_CODERABBIT_LOGINS)
+
+    assert result["is_green"] is False
+    assert result["coderabbit"]["required"] is True
+    assert result["reasons"] == ["CodeRabbit review state is CHANGES_REQUESTED, not APPROVED"]
+
+
+@pytest.mark.parametrize(
+    ("rollup", "expected"),
+    [
+        ([{"name": "CodeRabbit", "status": "COMPLETED", "conclusion": "SUCCESS"}], True),
+        ([{"context": "CodeRabbit", "state": "PENDING"}], True),
+        ([{"name": "coderabbit", "status": "IN_PROGRESS"}], True),
+        ([{"name": "CodeRabbit", "status": "COMPLETED", "conclusion": "SKIPPED"}], False),
+        ([{"name": "tests", "status": "COMPLETED", "conclusion": "SUCCESS"}, "junk"], False),
+        (None, False),
+    ],
+)
+def test_coderabbit_check_active(rollup, expected):
+    result = mod.coderabbit_check_active(rollup)
+
+    assert result is expected
+
+
+def test_evaluate_requires_coderabbit_when_its_check_ran():
+    payload = {
+        "statusCheckRollup": [
+            {"name": "tests", "status": "COMPLETED", "conclusion": "SUCCESS"},
+            {"name": "CodeRabbit", "status": "COMPLETED", "conclusion": "SUCCESS"},
+        ]
+    }
+
+    result = mod.evaluate(payload, mod.DEFAULT_CODERABBIT_LOGINS)
+
+    assert result["is_green"] is False
+    assert result["coderabbit"]["required"] is True
+    assert result["coderabbit"]["check_active"] is True
+    assert result["reasons"] == ["no CodeRabbit review found"]
+
+
+def test_evaluate_green_when_coderabbit_check_skipped():
+    payload = {
+        "statusCheckRollup": [
+            {"name": "tests", "status": "COMPLETED", "conclusion": "SUCCESS"},
+            {"name": "CodeRabbit", "status": "COMPLETED", "conclusion": "SKIPPED"},
+        ]
+    }
+
+    result = mod.evaluate(payload, mod.DEFAULT_CODERABBIT_LOGINS)
+
+    assert result["is_green"] is True
+    assert result["coderabbit"]["required"] is False
+
+
+def test_main_green_without_coderabbit_activity(checks_only_payload):
+    code, out, _ = call_main(mod, [], stdin=json.dumps(checks_only_payload()))
+
+    result = json.loads(out)
+    assert code == 0
+    assert result["is_green"] is True
+    assert result["coderabbit"]["required"] is False
+
+
+def test_main_blocks_non_approved_coderabbit_review(checks_only_payload):
+    payload = checks_only_payload(
+        reviews=[{"author": {"login": "coderabbitai"}, "state": "CHANGES_REQUESTED"}]
+    )
+
+    code, out, _ = call_main(mod, [], stdin=json.dumps(payload))
+
+    result = json.loads(out)
+    assert code == 0
+    assert result["is_green"] is False
+    assert result["coderabbit"]["required"] is True
+    assert result["reasons"] == ["CodeRabbit review state is CHANGES_REQUESTED, not APPROVED"]

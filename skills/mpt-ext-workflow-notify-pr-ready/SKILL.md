@@ -1,18 +1,18 @@
 ---
 name: mpt-ext-workflow-notify-pr-ready
-description: Run the on-demand flow that notifies a Microsoft Teams chat when a reviewed PR is green — all checks pass and CodeRabbit approved. Evaluates once and stops; it does not wait for review.
+description: Run the on-demand flow that notifies a Microsoft Teams chat when a reviewed PR is green — all checks pass and CodeRabbit approved if active. Evaluates once and stops; it does not wait for review.
 ---
 
 # Notify PR Ready
 
 ## Purpose
 
-Coordinate the on-demand step that publishes a pull request's details to a Microsoft Teams chat once the PR is green: it is open (not a draft), all required checks pass, and CodeRabbit has approved.
+Coordinate the on-demand step that publishes a pull request's details to a Microsoft Teams chat once the PR is green: it is open (not a draft), all required checks pass, and CodeRabbit has approved when it is active on the PR.
 
 ## Use When
 
 - A developer wants to announce, on demand, that a reviewed PR is ready.
-- CodeRabbit has already run and the PR is expected to be green.
+- The PR is expected to be green; if CodeRabbit is expected to review this PR, it has started or finished.
 - The team is notified in a Teams chat that may vary per project.
 
 ## Do Not Use When
@@ -36,8 +36,8 @@ ${MPT_EXTENSION_SKILLS_HOME:-$HOME/.mpt-extension-skills}/current
 
 ## Assumptions
 
-- The notification is triggered on demand, after CodeRabbit has finished; this flow evaluates the gate once and stops rather than waiting.
-- The repository's CodeRabbit configuration submits a formal `APPROVED` review when clean, so the gate can pass.
+- The notification is triggered on demand; if CodeRabbit is expected to review this PR, trigger it after CodeRabbit has started or finished. This flow evaluates the gate once and stops rather than waiting.
+- CodeRabbit approval is required only when CodeRabbit is active on the PR; when required, its configuration submits a formal `APPROVED` review when clean, so the gate can pass.
 - Destination resolution and delivery are handled by the underlying task and tool skills.
 
 ## Workflow
