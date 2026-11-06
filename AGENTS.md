@@ -131,7 +131,7 @@ Treat `knowledge/` as reusable guidance. Repository-specific commands and except
 - [mpt-ext-task-write-python-unittests](./skills/mpt-ext-task-write-python-unittests/SKILL.md): Task for authoring or updating Python (backend) unit tests for a change set per the Python unit-testing standard
 - [mpt-ext-task-update-docs-from-changes](./skills/mpt-ext-task-update-docs-from-changes/SKILL.md): Task for updating documentation from a code change set (unstaged, uncommitted, last commit, or branch diff)
 - [mpt-ext-task-create-initial-epic](./skills/mpt-ext-task-create-initial-epic/SKILL.md): Task for creating the initial epic plus a 3d "Design, investigate and research" user story
-- [mpt-ext-task-notify-pr-ready-in-teams](./skills/mpt-ext-task-notify-pr-ready-in-teams/SKILL.md): Task for notifying a Teams chat when a PR is green (all checks pass and CodeRabbit approved)
+- [mpt-ext-task-notify-pr-ready-in-teams](./skills/mpt-ext-task-notify-pr-ready-in-teams/SKILL.md): Task for notifying a Teams chat when a PR is green (all checks pass and CodeRabbit approved, when active on the PR)
 - [mpt-ext-workflow-start-work](./skills/mpt-ext-workflow-start-work/SKILL.md): Workflow for coordinating branch creation and Jira start-state setup
 - [mpt-ext-workflow-dashboard-failure-triage](./skills/mpt-ext-workflow-dashboard-failure-triage/SKILL.md): Workflow for batch triaging App Insights dashboard failures into MPT Jira decisions
 - [mpt-ext-workflow-fix-dependabot-prs](./skills/mpt-ext-workflow-fix-dependabot-prs/SKILL.md): Workflow for coordinating Dependabot PR discovery, policy fixes, validation, scoped check fixes, amend, and push
@@ -142,7 +142,7 @@ Treat `knowledge/` as reusable guidance. Repository-specific commands and except
 - [mpt-ext-workflow-skill-authoring](./skills/mpt-ext-workflow-skill-authoring/SKILL.md): Skill authoring workflow for creating or updating reusable shared skills
 - [mpt-ext-workflow-update-documentation](./skills/mpt-ext-workflow-update-documentation/SKILL.md): Workflow for updating documentation for a change set, self-checking against the guideline, and staging the docs
 - [mpt-ext-workflow-decompose-tdr](./skills/mpt-ext-workflow-decompose-tdr/SKILL.md): Workflow for breaking a TDR or epic into agreed user stories and estimated Back/Front subtasks
-- [mpt-ext-workflow-notify-pr-ready](./skills/mpt-ext-workflow-notify-pr-ready/SKILL.md): Workflow for notifying a Teams chat on demand when a reviewed PR is green and CodeRabbit approved
+- [mpt-ext-workflow-notify-pr-ready](./skills/mpt-ext-workflow-notify-pr-ready/SKILL.md): Workflow for notifying a Teams chat on demand when a reviewed PR is green and CodeRabbit approved, when active on the PR
 
 ## Agent Expectations
 

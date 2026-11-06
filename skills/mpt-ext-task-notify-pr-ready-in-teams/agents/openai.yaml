@@ -1,4 +1,4 @@
 interface:
   display_name: "Notify PR Ready In Teams"
-  short_description: "Notify a Teams chat when a PR is green and CodeRabbit approved"
-  default_prompt: "Notify a Teams chat that a PR is ready. Evaluate checks and CodeRabbit once. Only when green, resolve the destination, render the PR card (author with avatar, repository, branch, changes, check icons), and send it. Never wait or poll; otherwise send nothing and report the blocker."
+  short_description: "Notify a Teams chat when a PR is green (CodeRabbit if active)"
+  default_prompt: "Notify a Teams chat that a PR is ready. Evaluate checks, and CodeRabbit if active, once. Only when green, resolve the destination, render the PR card (author with avatar, repository, branch, changes, check icons), and send it. Never wait or poll; otherwise send nothing and report the blocker."

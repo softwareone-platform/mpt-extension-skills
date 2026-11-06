@@ -1,5 +1,5 @@
 ---
-description: Notify a Teams chat that a reviewed PR is ready — post its details when all checks pass and CodeRabbit has approved.
+description: Notify a Teams chat that a reviewed PR is ready — post its details when all checks pass and CodeRabbit has approved (when active on the PR).
 argument-hint: [<pr-number>] [--to <destination>] [--] [<comment>]
 ---
 

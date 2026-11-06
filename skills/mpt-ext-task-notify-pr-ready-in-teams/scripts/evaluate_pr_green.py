@@ -7,7 +7,13 @@ stdin and reports, deterministically, whether the PR meets the notification gate
 
 - the PR is open and not a draft (checked only when ``state``/``isDraft`` are present),
 - every status check has passed (none failing, none still pending), and
-- CodeRabbit has submitted a review whose latest state is ``APPROVED``.
+- CodeRabbit has submitted a review whose latest state is ``APPROVED``, when
+  CodeRabbit is active on the PR.
+
+CodeRabbit counts as active, and its approval as required, only when it has
+reviewed the PR or the PR carries a non-skipped ``CodeRabbit`` status check. A
+repository config file alone does not count: without activity on the PR the
+CodeRabbit app is assumed not to be enabled for the repository.
 
 The script only classifies facts and returns the combined ``is_green`` verdict
 with human-readable reasons; the skill decides what to do with the result.
@@ -22,6 +28,9 @@ MIN_PYTHON = (3, 12)
 # Default GitHub login for the CodeRabbit bot (the "[bot]" suffix is dropped in
 # the review author login, but accept both forms).
 DEFAULT_CODERABBIT_LOGINS = ("coderabbitai", "coderabbitai[bot]")
+
+# Name of the status check CodeRabbit reports on the PR head commit.
+CODERABBIT_CHECK_NAME = "coderabbit"
 
 # CheckRun.conclusion values that count as passing.
 _PASSING_CONCLUSIONS = {"SUCCESS", "NEUTRAL", "SKIPPED"}
@@ -106,6 +115,23 @@ def _latest_reviews(payload: dict) -> list:
 _DECISION_STATES = {"APPROVED", "CHANGES_REQUESTED", "DISMISSED"}
 
 
+def coderabbit_check_active(rollup: list) -> bool:
+    """Return True when the rollup has a CodeRabbit status check that was not skipped.
+
+    The check proves CodeRabbit is active on the PR even before it submits a
+    review. A SKIPPED check
+    means CodeRabbit chose not to review, so no approval will follow.
+    """
+    for entry in rollup or []:
+        if not isinstance(entry, dict):
+            continue
+        if _check_name(entry).casefold() != CODERABBIT_CHECK_NAME:
+            continue
+        if (entry.get("conclusion") or "").upper() != "SKIPPED":
+            return True
+    return False
+
+
 def evaluate_coderabbit(payload: dict, logins: tuple[str, ...]) -> dict:
     wanted = {name.lower() for name in logins}
     # Prefer the full chronological reviews list so a trailing COMMENTED summary
@@ -125,8 +151,14 @@ def evaluate_coderabbit(payload: dict, logins: tuple[str, ...]) -> dict:
         if state in _DECISION_STATES:
             last_decision = state
     effective = last_decision if last_decision is not None else last_any
+    found = effective is not None
+    check_active = coderabbit_check_active(payload.get("statusCheckRollup"))
+    # Only activity on the PR makes the approval required: a config file without
+    # the CodeRabbit app enabled would otherwise block the gate forever.
     return {
-        "found": effective is not None,
+        "required": found or check_active,
+        "found": found,
+        "check_active": check_active,
         "state": effective,
         "approved": effective == "APPROVED",
     }
@@ -147,6 +179,7 @@ def evaluate(payload: dict, logins: tuple[str, ...]) -> dict:
     pr = evaluate_pr_state(payload)
     checks = evaluate_checks(payload.get("statusCheckRollup"))
     coderabbit = evaluate_coderabbit(payload, logins)
+    coderabbit_ok = coderabbit["approved"] or not coderabbit["required"]
     reasons = []
     if pr["state"] != "OPEN":
         reasons.append(f"PR is {pr['state']}, not OPEN")
@@ -159,13 +192,13 @@ def evaluate(payload: dict, logins: tuple[str, ...]) -> dict:
             reasons.append("pending checks: " + ", ".join(checks["pending"]))
         if checks["state"] == "none":
             reasons.append("no status checks found on the PR")
-    if not coderabbit["approved"]:
+    if not coderabbit_ok:
         if not coderabbit["found"]:
             reasons.append("no CodeRabbit review found")
         else:
             reasons.append(f"CodeRabbit review state is {coderabbit['state']}, not APPROVED")
     return {
-        "is_green": pr["ok"] and checks["ok"] and coderabbit["approved"],
+        "is_green": pr["ok"] and checks["ok"] and coderabbit_ok,
         "pr": pr,
         "checks": checks,
         "coderabbit": coderabbit,
@@ -177,7 +210,8 @@ def main() -> int:
     require_python_version()
 
     parser = argparse.ArgumentParser(
-        description="Decide whether a PR is green (open, all checks pass, and CodeRabbit approved)."
+        description="Decide whether a PR is green (open, all checks pass, and CodeRabbit "
+        "approved when it is active on the PR)."
     )
     parser.add_argument(
         "--coderabbit-login",
